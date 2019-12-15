@@ -16,4 +16,9 @@
         android:icon="@drawable/ic_add_location_black_24dp"
         android:title="@string/title_notifications" />
 
+    <item
+        android:id="@+id/navigation_force_crash"
+        android:icon="@drawable/ic_error_black_24dp"
+        android:title="@string/title_crash" />
+
 </menu>

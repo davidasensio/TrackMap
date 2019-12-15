@@ -2,6 +2,7 @@ package com.handysparksoft.trackmap
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.crashlytics.android.Crashlytics
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -25,6 +26,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_join_map -> {
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_force_crash -> {
+                    Crashlytics.getInstance().crash()
                     return@OnNavigationItemSelectedListener true
                 }
             }
