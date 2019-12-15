@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">TrackMap</string>
+    <string name="title_home">Create</string>
+    <string name="title_dashboard">Share</string>
+    <string name="title_notifications">Notifications</string>
     <string name="title_activity_maps">Map</string>
 </resources>
