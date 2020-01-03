@@ -10,19 +10,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.handysparksoft.trackmap.data.server.TrackMapRepository
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.*
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
+import kotlinx.android.synthetic.main.activity_main.*
 import splitties.activities.start
-import kotlin.coroutines.CoroutineContext
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, CoroutineScope {
-    override val coroutineContext: CoroutineContext
-        get() = Dispatchers.Main + job
-
-    lateinit var job: Job
+class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View {
+    private var presenter = MainPresenter()
 
     private lateinit var mMap: GoogleMap
 
@@ -51,21 +45,17 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, CoroutineScope {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        job = Job()
+        presenter.onCreate(this)
 
         supportActionBar?.hide()
 
         setupMapUI()
 
         setupUI()
-
-        launch(Dispatchers.Main) {
-            println(TrackMapRepository().getTrackMapList())
-        }
     }
 
     override fun onDestroy() {
-        job.cancel()
+        presenter.onDestroy()
         super.onDestroy()
     }
 
