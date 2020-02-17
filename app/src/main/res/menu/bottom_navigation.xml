@@ -17,6 +17,11 @@
         android:title="@string/title_current" />
 
     <item
+        android:id="@+id/navigation_search_trackmap"
+        android:icon="@drawable/ic_search_black_24dp"
+        android:title="@string/search_trackmap" />
+
+    <item
         android:id="@+id/navigation_force_crash"
         android:icon="@drawable/ic_error_black_24dp"
         android:title="@string/title_crash" />

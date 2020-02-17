@@ -6,4 +6,6 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_crash">Force crash</string>
+
+    <string name="search_trackmap">Search TrackMap</string>
 </resources>
