@@ -31,6 +31,34 @@ allprojects {
     }
 
     ext {
+        referenceVersionCode = 1
+        referenceVersionName = "1.0.0"
+
+        getCustomVersionCode = { referenceVersionCode ->
+            def referenceVersionMultiplier = 10000
+            def finalVersionCode = referenceVersionCode * referenceVersionMultiplier
+            def bitriseBuild = System.getenv()["BITRISE_BUILD"]
+
+            if (bitriseBuild) {
+                def bitriseBuildNumber = System.getenv()["BITRISE_BUILD_NUMBER"]
+                finalVersionCode = finalVersionCode + Integer.valueOf(bitriseBuildNumber)
+            }
+            return finalVersionCode
+        }
+
+        getCustomVersionName = { referenceVersionName ->
+            def finalVersionName = referenceVersionName
+            def bitriseBuild = System.getenv()["BITRISE_BUILD"]
+
+            if (bitriseBuild) {
+                def bitriseBuildNumber = System.getenv()["BITRISE_BUILD_NUMBER"]
+                finalVersionName = finalVersionName + "." +  bitriseBuildNumber
+            } else {
+                finalVersionName = finalVersionName + ".LOCAL"
+            }
+            return finalVersionName
+        }
+
         final def maps_version = "17.0.0"
         final def retrofit_version = "2.6.3"
         final def loginInterceptor_version = "4.2.1"

@@ -13,14 +13,27 @@ android {
         applicationId "com.handysparksoft.trackmap"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 1
-        versionName "1.0"
+        versionCode getCustomVersionCode(referenceVersionCode)
+        versionName getCustomVersionName(referenceVersionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    // Custom APK output name
+    applicationVariants.all { variant ->
+        def buildType = variant.buildType.name
+        def versionCode = defaultConfig.versionCode
+        def versionName = defaultConfig.versionName
+        def apkOutputName = "app-${buildType}_trackmap_VC${versionCode}_${versionName}_.apk"
+
+        variant.outputs.all { output ->
+            outputFileName = apkOutputName
         }
     }
 }
