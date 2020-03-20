@@ -11,12 +11,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
+import com.handysparksoft.trackmap.ui.common.PermissionChecker
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import splitties.activities.start
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View {
     private var presenter = MainPresenter()
+    private lateinit var permissionChecker: PermissionChecker
 
     private lateinit var mMap: GoogleMap
 
@@ -46,11 +48,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
         setContentView(R.layout.activity_main)
 
         presenter.onCreate(this)
-
         supportActionBar?.hide()
-
+        permissionChecker = PermissionChecker(this, container)
         setupMapUI()
-
         setupUI()
     }
 
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
     private fun setupMapUI() {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = supportFragmentManager
-            .findFragmentById(R.id.trackMap) as SupportMapFragment
+            .findFragmentById(R.id.trackMapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
     }
 
@@ -70,6 +70,10 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
         title = getString(R.string.app_name)
+
+        myPositionImageView?.setOnClickListener {
+
+        }
     }
 
     /**
@@ -83,6 +87,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+
+        permissionChecker.requestLocationPermission(onGrantedPermission = {
+            startMap()
+        })
+    }
+
+    private fun startMap() {
+        mMap.isMyLocationEnabled = true
 
         // Add a marker in Sydney and move the camera
         val sydney = LatLng(-34.0, 151.0)
