@@ -1,26 +1,37 @@
 package com.handysparksoft.trackmap.ui.main
 
+import android.gesture.Gesture
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.crashlytics.android.Crashlytics
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
+import com.handysparksoft.trackmap.ui.common.MapActionHelper
 import com.handysparksoft.trackmap.ui.common.PermissionChecker
+import com.handysparksoft.trackmap.ui.common.toLatLng
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
+import com.handysparksoft.trackmap.ui.main.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
 import splitties.activities.start
+
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View {
     private var presenter = MainPresenter()
     private lateinit var permissionChecker: PermissionChecker
 
-    private lateinit var mMap: GoogleMap
+    private lateinit var googleMap: GoogleMap
+    private lateinit var mapActionHelper: MapActionHelper
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private var lastLocation: LatLng? = null
+    private var myPositionState: MyPositionState = Unlocated
 
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -50,6 +61,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
         presenter.onCreate(this)
         supportActionBar?.hide()
         permissionChecker = PermissionChecker(this, container)
+        fusedLocationProviderClient = FusedLocationProviderClient(this)
         setupMapUI()
         setupUI()
     }
@@ -71,8 +83,21 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
 
         title = getString(R.string.app_name)
 
-        myPositionImageView?.setOnClickListener {
 
+
+//        myPositionImageView?.setOnClickListener {
+//            toggleView()
+//        }
+    }
+
+    private fun moveToLastLocation() {
+        fusedLocationProviderClient.lastLocation.addOnCompleteListener {
+            if (it.isSuccessful && it.result!= null) {
+                lastLocation = it.result?.toLatLng()
+                mapActionHelper.moveToPosition(latLng = lastLocation!!)
+            } else {
+
+            }
         }
     }
 
@@ -86,19 +111,60 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        this.googleMap = googleMap
+        this.mapActionHelper = MapActionHelper(googleMap)
+        mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
 
         permissionChecker.requestLocationPermission(onGrantedPermission = {
             startMap()
+            moveToLastLocation()
         })
     }
 
     private fun startMap() {
-        mMap.isMyLocationEnabled = true
+        googleMap.isMyLocationEnabled = true
+        googleMap.setOnMyLocationButtonClickListener {
+            myPositionState = if (myPositionState == Located) {
+                LocatedAndTilted
+            } else {
+                Located
+            }
+            tiltView()
+            true
+        }
+
+        googleMap.setOnCameraMoveStartedListener(object: GoogleMap.OnCameraMoveStartedListener {
+            override fun onCameraMoveStarted(reason: Int) {
+                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                    myPositionState = Unlocated
+                }
+            }
+        })
 
         // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+//        val sydney = LatLng(39.46, -0.35)
+//        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
+//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
+
+    private fun toggleView() {
+        lastLocation?.let {
+            val tilt = if (myPositionState == LocatedAndTilted) 30f else 0f
+            mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
+        }
+    }
+
+    private fun tiltView() {
+        lastLocation?.let {
+            val tilt = if (myPositionState == LocatedAndTilted) 30f else 0f
+            mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
+        }
+    }
+
+}
+
+sealed class MyPositionState() {
+    object Unlocated : MyPositionState()
+    object Located : MyPositionState()
+    object LocatedAndTilted : MyPositionState()
 }
