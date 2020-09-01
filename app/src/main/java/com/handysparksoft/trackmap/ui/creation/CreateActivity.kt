@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.handysparksoft.trackmap.data.server.TrackMapRepository
 import com.handysparksoft.trackmap.databinding.ActivityCreateBinding
 import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
@@ -28,7 +29,10 @@ class CreateActivity : AppCompatActivity() {
         binding = ActivityCreateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this).get(CreateActivityViewModel::class.java)
+        viewModel = ViewModelProvider(
+            this,
+            CreateActivityViewModelFactory(TrackMapRepository())
+        ).get(CreateActivityViewModel::class.java)
 
         this.toast("Param1 is ${intent.getIntExtra("param1", 0)}")
 
