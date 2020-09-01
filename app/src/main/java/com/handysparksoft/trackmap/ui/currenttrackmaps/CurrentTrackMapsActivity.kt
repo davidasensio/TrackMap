@@ -1,5 +1,6 @@
 package com.handysparksoft.trackmap.ui.currenttrackmaps
 
+import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -7,18 +8,19 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.data.server.TrackMapRepository
 import com.handysparksoft.trackmap.domain.TrackMap
 import com.handysparksoft.trackmap.ui.common.gone
+import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
 import com.handysparksoft.trackmap.ui.common.visible
 import kotlinx.android.synthetic.main.activity_current_track_maps.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
 
 class CurrentTrackMapsActivity : AppCompatActivity(), CurrentTrackMapsPresenter.View {
+    companion object {
+        fun start(context: Context) {
+            context.startActivity<CurrentTrackMapsActivity>()
+        }
+    }
 
-    private val presenter : CurrentTrackMapsPresenter by lazy { CurrentTrackMapsPresenter(TrackMapRepository()) }
+    private val presenter: CurrentTrackMapsPresenter by lazy { CurrentTrackMapsPresenter(TrackMapRepository()) }
 
     private val adapter: CurrentTrackMapsAdapter = CurrentTrackMapsAdapter {
         presenter.onCurrentTrackMapClicked(it)

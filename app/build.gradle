@@ -36,6 +36,10 @@ android {
             outputFileName = apkOutputName
         }
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
