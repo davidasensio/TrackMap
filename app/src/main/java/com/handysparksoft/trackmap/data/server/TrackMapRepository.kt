@@ -5,7 +5,7 @@ import com.handysparksoft.trackmap.domain.TrackMap
 class TrackMapRepository {
     private val service = TrackMapDb.service
 
-    suspend fun getTrackMapList(): List<TrackMap> {
+    suspend fun getTrackMapList(): Map<String, TrackMap> {
         return service.listTrackMapAsync()
     }
 

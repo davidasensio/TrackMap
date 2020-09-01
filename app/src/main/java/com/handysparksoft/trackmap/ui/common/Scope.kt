@@ -16,7 +16,7 @@ interface Scope : CoroutineScope {
         job = SupervisorJob()
     }
 
-    fun cancelScope() {
+    fun destroyScope() {
         job.cancel()
     }
 

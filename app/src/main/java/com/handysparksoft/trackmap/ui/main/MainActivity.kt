@@ -3,6 +3,7 @@ package com.handysparksoft.trackmap.ui.main
 import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.GoogleMap
@@ -19,8 +20,8 @@ import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
 import com.handysparksoft.trackmap.ui.main.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View {
-    private var presenter = MainPresenter()
+class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+    private lateinit var viewModel: MainActivityViewModel
     private lateinit var permissionChecker: PermissionChecker
 
     private lateinit var googleMap: GoogleMap
@@ -55,17 +56,12 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        presenter.onCreate(this)
+        viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         supportActionBar?.hide()
         permissionChecker = PermissionChecker(this, container)
         fusedLocationProviderClient = FusedLocationProviderClient(this)
         setupMapUI()
         setupUI()
-    }
-
-    override fun onDestroy() {
-        presenter.onDestroy()
-        super.onDestroy()
     }
 
     private fun setupMapUI() {
