@@ -1,27 +1,23 @@
 package com.handysparksoft.trackmap.ui.main
 
-import android.gesture.Gesture
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.crashlytics.android.Crashlytics
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.ui.common.MapActionHelper
 import com.handysparksoft.trackmap.ui.common.PermissionChecker
 import com.handysparksoft.trackmap.ui.common.toLatLng
+import com.handysparksoft.trackmap.ui.creation.CreateActivity
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
 import com.handysparksoft.trackmap.ui.main.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
-import splitties.activities.start
-
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View {
     private var presenter = MainPresenter()
@@ -37,13 +33,14 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.navigation_create_map -> {
+                    CreateActivity.start(this)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_dashboard -> {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_join_map -> {
-                    start<CurrentTrackMapsActivity>()
+                    CurrentTrackMapsActivity.start(this)
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_force_crash -> {
@@ -83,16 +80,15 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
 
         title = getString(R.string.app_name)
 
-
-
 //        myPositionImageView?.setOnClickListener {
 //            toggleView()
 //        }
     }
 
+    @SuppressLint("MissingPermission")
     private fun moveToLastLocation() {
         fusedLocationProviderClient.lastLocation.addOnCompleteListener {
-            if (it.isSuccessful && it.result!= null) {
+            if (it.isSuccessful && it.result != null) {
                 lastLocation = it.result?.toLatLng()
                 mapActionHelper.moveToPosition(latLng = lastLocation!!)
             } else {
@@ -121,6 +117,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
         })
     }
 
+    @SuppressLint("MissingPermission")
     private fun startMap() {
         googleMap.isMyLocationEnabled = true
         googleMap.setOnMyLocationButtonClickListener {
@@ -133,7 +130,7 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
             true
         }
 
-        googleMap.setOnCameraMoveStartedListener(object: GoogleMap.OnCameraMoveStartedListener {
+        googleMap.setOnCameraMoveStartedListener(object : GoogleMap.OnCameraMoveStartedListener {
             override fun onCameraMoveStarted(reason: Int) {
                 if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                     myPositionState = Unlocated
@@ -160,7 +157,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback, MainPresenter.View
             mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
         }
     }
-
 }
 
 sealed class MyPositionState() {

@@ -8,4 +8,11 @@
     <string name="title_crash">Force crash</string>
 
     <string name="search_trackmap">Search TrackMap</string>
+    <string name="create_code">Code</string>
+    <string name="create_name">Name</string>
+    <string name="create_description">Description</string>
+    <string name="create_trackmap">Create Trackmap</string>
+    <string name="code_helper_text">Unique trackmap code</string>
+    <string name="name_helper_text">Name for the trackmap</string>
+    <string name="description_helper_text">Short trackmap description</string>
 </resources>

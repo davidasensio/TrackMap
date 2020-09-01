@@ -1,8 +1,6 @@
 package com.handysparksoft.trackmap.data.server
 
-import android.os.Build
 import android.util.Log
-import com.google.gson.GsonBuilder
 import com.handysparksoft.trackmap.BuildConfig
 import com.moczul.ok2curl.CurlInterceptor
 import com.moczul.ok2curl.logger.Loggable
@@ -28,7 +26,7 @@ object TrackMapDb {
                 okHttpClientBuilder.addInterceptor(this)
             }
         }
-        return OkHttpClient.Builder().build()
+        return okHttpClientBuilder.build()
     }
 
     val service = Retrofit.Builder()
