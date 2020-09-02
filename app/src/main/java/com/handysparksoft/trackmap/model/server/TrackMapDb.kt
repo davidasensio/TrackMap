@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.data.server
+package com.handysparksoft.trackmap.model.server
 
 import android.util.Log
 import com.handysparksoft.trackmap.BuildConfig
@@ -29,7 +29,7 @@ object TrackMapDb {
         return okHttpClientBuilder.build()
     }
 
-    val service = Retrofit.Builder()
+    val service: TrackMapService = Retrofit.Builder()
         .baseUrl(baseUrl)
         .client(getOkhttpClient())
         .addConverterFactory(GsonConverterFactory.create())

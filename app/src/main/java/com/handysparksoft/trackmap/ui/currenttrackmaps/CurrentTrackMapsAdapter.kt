@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.domain.TrackMap
+import com.handysparksoft.domain.model.TrackMap
 import kotlinx.android.synthetic.main.item_current_trackmap.view.*
 
 class CurrentTrackMapsAdapter(

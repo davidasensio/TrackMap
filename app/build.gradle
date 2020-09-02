@@ -45,6 +45,10 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
+    implementation project(":usecases")
+    implementation project(":data")
+    implementation project(":domain")
+
     implementation androidLibs.values()
     implementation kotlinLibs.values()
     implementation networkLibs.values()
