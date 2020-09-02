@@ -7,8 +7,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.data.server.TrackMapRepository
+import com.handysparksoft.trackmap.model.server.ServerDataSource
+import com.handysparksoft.trackmap.model.server.TrackMapDb
 import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel.UiModel.Content
@@ -31,7 +33,13 @@ class CurrentTrackMapsActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            CurrentTrackMapsViewModelFactory(TrackMapRepository())
+            CurrentTrackMapsViewModelFactory(
+                com.handysparksoft.usecases.GetTrackMapsUseCase(
+                    TrackMapRepository(
+                        ServerDataSource(TrackMapDb.service)
+                    )
+                )
+            )
         ).get(CurrentTrackMapsViewModel::class.java)
 
         adapter = CurrentTrackMapsAdapter {

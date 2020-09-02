@@ -5,14 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.handysparksoft.trackmap.data.server.TrackMapRepository
-import com.handysparksoft.trackmap.domain.TrackMap
+import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.trackmap.ui.common.Event
 import com.handysparksoft.trackmap.ui.common.Scope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CurrentTrackMapsViewModel(private val trackMapRepository: TrackMapRepository) : ViewModel(),
+class CurrentTrackMapsViewModel(private val getTrackMapsUseCase: com.handysparksoft.usecases.GetTrackMapsUseCase) : ViewModel(),
     Scope by Scope.Impl() {
 
     sealed class UiModel {
@@ -43,10 +43,10 @@ class CurrentTrackMapsViewModel(private val trackMapRepository: TrackMapReposito
         super.onCleared()
     }
 
-    fun refresh() {
+    private fun refresh() {
         launch(Dispatchers.Main) {
             _model.value = UiModel.Loading
-            _model.value = UiModel.Content(ArrayList(trackMapRepository.getTrackMapList().values))
+            _model.value = UiModel.Content(ArrayList(getTrackMapsUseCase.execute().values))
         }
     }
 
@@ -55,10 +55,10 @@ class CurrentTrackMapsViewModel(private val trackMapRepository: TrackMapReposito
     }
 }
 
-class CurrentTrackMapsViewModelFactory(private val trackMapRepository: TrackMapRepository) :
+class CurrentTrackMapsViewModelFactory(private val getTrackMapsUseCase: GetTrackMapsUseCase) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(trackMapRepository::class.java)
-            .newInstance(trackMapRepository)
+        return modelClass.getConstructor(getTrackMapsUseCase::class.java)
+            .newInstance(getTrackMapsUseCase)
     }
 }

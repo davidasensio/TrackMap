@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.domain
+package com.handysparksoft.domain.model
 
 data class TrackMap(
     val code: String,

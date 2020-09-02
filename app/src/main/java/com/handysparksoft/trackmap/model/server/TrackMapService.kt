@@ -1,6 +1,6 @@
-package com.handysparksoft.trackmap.data.server
+package com.handysparksoft.trackmap.model.server
 
-import com.handysparksoft.trackmap.domain.TrackMap
+import com.handysparksoft.domain.model.TrackMap
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.PUT
@@ -12,8 +12,8 @@ interface TrackMapService {
     suspend fun all(): Any
 
     @GET("trackmaps/maps/list.json")
-    suspend fun listTrackMapAsync(): Map<String, TrackMap>
+    suspend fun listTrackMaps(): Map<String, TrackMap>
 
     @PUT("trackmaps/maps/list/{id}.json")
-    suspend fun putTrackMap(@Path("id") id: String, @Body trackMap: TrackMap)
+    suspend fun saveTrackMap(@Path("id") id: String, @Body trackMap: TrackMap)
 }
