@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.di
+package com.handysparksoft.trackmap.core.di
 
 import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.data.source.RemoteDataSource

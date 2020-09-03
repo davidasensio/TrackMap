@@ -1,11 +1,8 @@
-package com.handysparksoft.trackmap.di
+package com.handysparksoft.trackmap.core.di
 
 import android.app.Application
-import com.handysparksoft.trackmap.ui.creation.CreateViewModel
-import com.handysparksoft.trackmap.ui.creation.CreateViewModelFactory
-import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel
-import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModelFactory
-import com.handysparksoft.trackmap.ui.main.MainViewModel
+import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
+import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsViewModelFactory
 import dagger.BindsInstance
 import dagger.Component
 import javax.inject.Singleton

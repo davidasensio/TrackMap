@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.currenttrackmaps
+package com.handysparksoft.trackmap.features.entries
 
 import android.view.LayoutInflater
 import android.view.View
