@@ -23,7 +23,7 @@ class CreateActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var viewModel: CreateActivityViewModel
+    private lateinit var viewModel: CreateViewModel
     private lateinit var binding: ActivityCreateBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +43,7 @@ class CreateActivity : AppCompatActivity() {
                     )
                 )
             )
-        ).get(CreateActivityViewModel::class.java)
+        ).get(CreateViewModel::class.java)
 
         this.toast("Param1 is ${intent.getIntExtra("param1", 0)}")
 

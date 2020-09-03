@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class CreateActivityViewModel(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
+class CreateViewModel(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
     ViewModel(),
     Scope by Scope.Impl() {
 

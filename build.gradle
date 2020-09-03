@@ -94,15 +94,20 @@ allprojects {
                 crashlytics: "com.crashlytics.sdk.android:crashlytics:2.10.1",
                 analytics  : "com.google.firebase:firebase-analytics:17.2.1",
                 //splitties  : "com.louiscad.splitties:splitties-activities:$splitties_version",
-                dexter     : "com.karumi:dexter:6.0.2"
+                dexter     : "com.karumi:dexter:6.0.2",
+                dagger     : "com.google.dagger:dagger:2.26",
+        ]
+
+        kaptLibs = [
+                dagger: "com.google.dagger:dagger-compiler:2.26"
         ]
 
         testLibs = [
-                junit        : "junit:junit:4.12"
+                junit: "junit:junit:4.12"
         ]
 
         androidTestLibs = [
-                extJunit       : "androidx.test.ext:junit:1.1.1"
+                extJunit: "androidx.test.ext:junit:1.1.1"
         ]
     }
 }

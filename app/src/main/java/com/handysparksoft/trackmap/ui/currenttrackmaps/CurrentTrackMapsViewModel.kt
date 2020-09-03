@@ -12,7 +12,7 @@ import com.handysparksoft.trackmap.ui.common.Scope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CurrentTrackMapsViewModel(private val getTrackMapsUseCase: com.handysparksoft.usecases.GetTrackMapsUseCase) : ViewModel(),
+class CurrentTrackMapsViewModel(private val getTrackMapsUseCase: GetTrackMapsUseCase) : ViewModel(),
     Scope by Scope.Impl() {
 
     sealed class UiModel {
