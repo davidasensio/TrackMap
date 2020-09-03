@@ -5,13 +5,10 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.trackmap.databinding.ActivityCreateBinding
-import com.handysparksoft.trackmap.data.server.ServerDataSource
-import com.handysparksoft.trackmap.data.server.TrackMapDb
+import com.handysparksoft.trackmap.ui.common.app
 import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
-import com.handysparksoft.usecases.SaveTrackMapUseCase
 import kotlinx.android.synthetic.main.activity_create.*
 
 class CreateActivity : AppCompatActivity() {
@@ -23,8 +20,14 @@ class CreateActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var viewModel: CreateViewModel
     private lateinit var binding: ActivityCreateBinding
+    private val viewModel: CreateViewModel by lazy {
+        ViewModelProvider(
+            this,
+            app.component.createViewModelFactory
+        ).get(CreateViewModel::class.java)
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,18 +35,6 @@ class CreateActivity : AppCompatActivity() {
         binding = ActivityCreateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(
-            this,
-            CreateViewModelFactory(
-                SaveTrackMapUseCase(
-                    TrackMapRepository(
-                        ServerDataSource(
-                            TrackMapDb.service
-                        )
-                    )
-                )
-            )
-        ).get(CreateViewModel::class.java)
 
         this.toast("Param1 is ${intent.getIntExtra("param1", 0)}")
 

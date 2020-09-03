@@ -1,8 +1,7 @@
 package com.handysparksoft.trackmap.di
 
-import com.handysparksoft.trackmap.ui.creation.CreateViewModel
-import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel
-import com.handysparksoft.trackmap.ui.main.MainViewModel
+import com.handysparksoft.trackmap.ui.creation.CreateViewModelFactory
+import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModelFactory
 import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.usecases.SaveTrackMapUseCase
 import dagger.Module
@@ -12,13 +11,10 @@ import dagger.Provides
 class ViewModelModule {
 
     @Provides
-    fun mainViewModelProvider() = MainViewModel()
+    fun createViewModelFactoryProvider(saveTrackMapUseCase: SaveTrackMapUseCase) =
+        CreateViewModelFactory(saveTrackMapUseCase)
 
     @Provides
-    fun createViewModelProvider(saveTrackMapUseCase: SaveTrackMapUseCase) =
-        CreateViewModel(saveTrackMapUseCase)
-
-    @Provides
-    fun currentViewModelProvider(getTrackMapsUseCase: GetTrackMapsUseCase) =
-        CurrentTrackMapsViewModel(getTrackMapsUseCase)
+    fun currentViewModelFactoryProvider(getTrackMapsUseCase: GetTrackMapsUseCase) =
+        CurrentTrackMapsViewModelFactory(getTrackMapsUseCase)
 }

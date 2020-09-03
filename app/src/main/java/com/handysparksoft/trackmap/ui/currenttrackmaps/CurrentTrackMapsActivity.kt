@@ -11,6 +11,7 @@ import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.data.server.ServerDataSource
 import com.handysparksoft.trackmap.data.server.TrackMapDb
+import com.handysparksoft.trackmap.ui.common.app
 import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel.UiModel.Content
@@ -24,23 +25,17 @@ class CurrentTrackMapsActivity : AppCompatActivity() {
         }
     }
 
-    private lateinit var viewModel: CurrentTrackMapsViewModel
     private lateinit var adapter: CurrentTrackMapsAdapter
+    private val viewModel: CurrentTrackMapsViewModel by lazy {
+        ViewModelProvider(
+            this,
+            app.component.currentViewModelFactory
+        ).get(CurrentTrackMapsViewModel::class.java)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_current_track_maps)
-
-        viewModel = ViewModelProvider(
-            this,
-            CurrentTrackMapsViewModelFactory(
-                com.handysparksoft.usecases.GetTrackMapsUseCase(
-                    TrackMapRepository(
-                        ServerDataSource(TrackMapDb.service)
-                    )
-                )
-            )
-        ).get(CurrentTrackMapsViewModel::class.java)
 
         adapter = CurrentTrackMapsAdapter {
             viewModel.onCurrentTrackMapClicked(it)
