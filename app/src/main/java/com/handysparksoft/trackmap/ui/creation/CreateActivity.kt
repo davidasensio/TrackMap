@@ -7,8 +7,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.trackmap.databinding.ActivityCreateBinding
-import com.handysparksoft.trackmap.model.server.ServerDataSource
-import com.handysparksoft.trackmap.model.server.TrackMapDb
+import com.handysparksoft.trackmap.data.server.ServerDataSource
+import com.handysparksoft.trackmap.data.server.TrackMapDb
 import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
 import com.handysparksoft.usecases.SaveTrackMapUseCase

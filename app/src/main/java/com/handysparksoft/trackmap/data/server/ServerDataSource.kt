@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.model.server
+package com.handysparksoft.trackmap.data.server
 
 import com.handysparksoft.data.source.RemoteDataSource
 import com.handysparksoft.domain.model.TrackMap

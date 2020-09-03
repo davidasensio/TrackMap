@@ -9,8 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.model.server.ServerDataSource
-import com.handysparksoft.trackmap.model.server.TrackMapDb
+import com.handysparksoft.trackmap.data.server.ServerDataSource
+import com.handysparksoft.trackmap.data.server.TrackMapDb
 import com.handysparksoft.trackmap.ui.common.startActivity
 import com.handysparksoft.trackmap.ui.common.toast
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel.UiModel.Content
