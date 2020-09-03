@@ -9,10 +9,14 @@ import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
+import com.handysparksoft.trackmap.core.platform.UserHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CurrentTrackMapsViewModel(private val getTrackMapsUseCase: GetTrackMapsUseCase) : ViewModel(),
+class CurrentTrackMapsViewModel(
+    private val getTrackMapsUseCase: GetTrackMapsUseCase,
+    private val userHandler: UserHandler
+) : ViewModel(),
     Scope by Scope.Impl() {
 
     sealed class UiModel {
@@ -45,8 +49,9 @@ class CurrentTrackMapsViewModel(private val getTrackMapsUseCase: GetTrackMapsUse
 
     private fun refresh() {
         launch(Dispatchers.Main) {
+            val userId = userHandler.getUserId()
             _model.value = UiModel.Loading
-            _model.value = UiModel.Content(ArrayList(getTrackMapsUseCase.execute().values))
+            _model.value = UiModel.Content(ArrayList(getTrackMapsUseCase.execute(userId).values))
         }
     }
 
@@ -55,10 +60,13 @@ class CurrentTrackMapsViewModel(private val getTrackMapsUseCase: GetTrackMapsUse
     }
 }
 
-class CurrentTrackMapsViewModelFactory(private val getTrackMapsUseCase: GetTrackMapsUseCase) :
+class CurrentTrackMapsViewModelFactory(
+    private val getTrackMapsUseCase: GetTrackMapsUseCase,
+    private val userHandler: UserHandler
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(getTrackMapsUseCase::class.java)
-            .newInstance(getTrackMapsUseCase)
+        return modelClass.getConstructor(getTrackMapsUseCase::class.java, userHandler::class.java)
+            .newInstance(getTrackMapsUseCase, userHandler)
     }
 }

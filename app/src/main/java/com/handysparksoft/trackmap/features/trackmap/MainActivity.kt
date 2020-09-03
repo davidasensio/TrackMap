@@ -12,18 +12,26 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
+import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.toLatLng
+import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.MapActionHelper
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
-import com.handysparksoft.trackmap.core.extension.toLatLng
+import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsActivity
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+    @Inject
+    lateinit var userHandler: UserHandler
+
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+        ViewModelProvider(this, app.component.mainViewModelFactory).get(MainViewModel::class.java)
     }
+
     private lateinit var permissionChecker: PermissionChecker
 
     private lateinit var googleMap: GoogleMap
@@ -58,11 +66,20 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        injectComponents()
+
         supportActionBar?.hide()
         permissionChecker = PermissionChecker(this, container)
         fusedLocationProviderClient = FusedLocationProviderClient(this)
+
         setupMapUI()
         setupUI()
+
+        viewModel.saveUser()
+    }
+
+    private fun injectComponents() {
+        app.component.inject(this) // Equals to DaggerAppComponent.factory().create(applicationContext as Application).inject(this)
     }
 
     private fun setupMapUI() {

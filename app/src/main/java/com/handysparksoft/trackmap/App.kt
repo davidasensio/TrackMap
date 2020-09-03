@@ -4,6 +4,7 @@ import android.app.Application
 import com.crashlytics.android.Crashlytics
 import com.handysparksoft.trackmap.core.di.AppComponent
 import com.handysparksoft.trackmap.core.di.DaggerAppComponent
+import com.handysparksoft.trackmap.core.platform.UserHandler
 import io.fabric.sdk.android.Fabric
 
 class App : Application() {

@@ -44,7 +44,7 @@ class CurrentTrackMapsActivity : AppCompatActivity() {
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.navigation.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let {
-                toast("TrackMap ${it.code} clicked")
+                toast("TrackMap ${it.trackMapId} clicked")
             }
         })
     }

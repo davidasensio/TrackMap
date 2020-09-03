@@ -1,10 +1,11 @@
 package com.handysparksoft.domain.model
 
 data class TrackMap(
-    val code: String,
+    val trackMapId: String,
+    val ownerId: String,
     val name: String,
     val description: String,
-    val owner: String,
     val active: Boolean,
-    val creationDate: Long = System.currentTimeMillis()
+    val creationDate: Long = System.currentTimeMillis(),
+    val participantIds: List<String>
 )

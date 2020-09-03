@@ -7,12 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.core.platform.Scope
+import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.usecases.SaveTrackMapUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
-class CreateViewModel(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
+class CreateViewModel(
+    private val saveTrackMapUseCase: SaveTrackMapUseCase,
+    private val userHandler: UserHandler
+) :
     ViewModel(),
     Scope by Scope.Impl() {
 
@@ -41,16 +45,29 @@ class CreateViewModel(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
         return String.format("%03d-%03d", part1, part2)
     }
 
-    fun createTrackMap(code: String, name: String, description: String) {
-        val trackMap = TrackMap(code, name, description, "me", true, System.currentTimeMillis())
+    fun createTrackMap(trackMapId: String, name: String, description: String) {
+        val userId = userHandler.getUserId()
+
+        val trackMap = TrackMap(
+            trackMapId,
+            userId,
+            name,
+            description,
+            true,
+            System.currentTimeMillis(),
+            listOf(userId)
+        )
         launch(Dispatchers.Main) {
-            saveTrackMapUseCase.execute(code, trackMap)
+            saveTrackMapUseCase.execute(userId, trackMapId, trackMap)
         }
     }
 }
 
-class CreateViewModelFactory(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
+class CreateViewModelFactory(
+    private val saveTrackMapUseCase: SaveTrackMapUseCase,
+    private val userHandler: UserHandler
+) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        modelClass.getConstructor(saveTrackMapUseCase::class.java).newInstance(saveTrackMapUseCase)
+        modelClass.getConstructor(saveTrackMapUseCase::class.java, userHandler::class.java).newInstance(saveTrackMapUseCase, userHandler)
 }
