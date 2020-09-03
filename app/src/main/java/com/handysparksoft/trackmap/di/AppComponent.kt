@@ -8,7 +8,9 @@ import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel
 import com.handysparksoft.trackmap.ui.main.MainViewModel
 import dagger.BindsInstance
 import dagger.Component
+import javax.inject.Singleton
 
+@Singleton
 @Component(modules = [AppModule::class, DataModule::class, UseCaseModule::class, ViewModelModule::class])
 interface AppComponent {
 
