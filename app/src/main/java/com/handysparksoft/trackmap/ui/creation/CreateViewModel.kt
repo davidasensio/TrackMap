@@ -49,7 +49,7 @@ class CreateActivityViewModel(private val saveTrackMapUseCase: SaveTrackMapUseCa
     }
 }
 
-class CreateActivityViewModelFactory(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
+class CreateViewModelFactory(private val saveTrackMapUseCase: SaveTrackMapUseCase) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         modelClass.getConstructor(saveTrackMapUseCase::class.java).newInstance(saveTrackMapUseCase)

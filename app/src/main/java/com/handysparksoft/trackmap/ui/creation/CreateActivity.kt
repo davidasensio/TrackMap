@@ -34,7 +34,7 @@ class CreateActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(
             this,
-            CreateActivityViewModelFactory(
+            CreateViewModelFactory(
                 SaveTrackMapUseCase(
                     TrackMapRepository(
                         ServerDataSource(
