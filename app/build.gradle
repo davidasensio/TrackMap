@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
-
 apply plugin: 'kotlin-android'
-
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 apply plugin: 'io.fabric'
 
@@ -53,6 +52,8 @@ dependencies {
     implementation kotlinLibs.values()
     implementation networkLibs.values()
     implementation libs.values()
+
+    kapt kaptLibs.values()
 
     testImplementation testLibs.values()
     androidTestImplementation androidTestLibs.values()

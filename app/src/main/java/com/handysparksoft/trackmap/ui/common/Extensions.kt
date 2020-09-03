@@ -6,11 +6,15 @@ import android.location.Location
 import android.view.View
 import android.widget.Toast
 import com.google.android.gms.maps.model.LatLng
+import com.handysparksoft.trackmap.App
 
 /**
  * Extension functions of:
  * Context / Activity / Fragment
  */
+val Context.app: App
+    get() = applicationContext as App
+
 inline fun <reified T> Context.startActivity(configIntent: Intent.() -> Unit = {}) {
     val intent = Intent(this, T::class.java)
     intent.apply(configIntent)

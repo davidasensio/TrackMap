@@ -14,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.ui.common.MapActionHelper
 import com.handysparksoft.trackmap.ui.common.PermissionChecker
+import com.handysparksoft.trackmap.ui.common.app
 import com.handysparksoft.trackmap.ui.common.toLatLng
 import com.handysparksoft.trackmap.ui.creation.CreateActivity
 import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
@@ -21,7 +22,9 @@ import com.handysparksoft.trackmap.ui.main.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
-    private lateinit var viewModel: MainViewModel
+    private val viewModel: MainViewModel by lazy {
+        ViewModelProvider(this).get(MainViewModel::class.java)
+    }
     private lateinit var permissionChecker: PermissionChecker
 
     private lateinit var googleMap: GoogleMap
@@ -56,7 +59,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         supportActionBar?.hide()
         permissionChecker = PermissionChecker(this, container)
         fusedLocationProviderClient = FusedLocationProviderClient(this)
