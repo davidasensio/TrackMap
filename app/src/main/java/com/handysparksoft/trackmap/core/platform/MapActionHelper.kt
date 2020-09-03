@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.common
+package com.handysparksoft.trackmap.core.platform
 
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap

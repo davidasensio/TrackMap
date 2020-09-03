@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.data.server
+package com.handysparksoft.trackmap.core.data.server
 
 import android.util.Log
 import com.handysparksoft.trackmap.BuildConfig

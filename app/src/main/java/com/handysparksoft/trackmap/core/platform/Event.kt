@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.common
+package com.handysparksoft.trackmap.core.platform
 
 /**
  * Used as a wrapper for data that is exposed via a LiveData that represents an event.

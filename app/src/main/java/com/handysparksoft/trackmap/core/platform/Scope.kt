@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.common
+package com.handysparksoft.trackmap.core.platform
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

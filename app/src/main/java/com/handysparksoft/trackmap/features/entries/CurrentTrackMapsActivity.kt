@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.currenttrackmaps
+package com.handysparksoft.trackmap.features.entries
 
 import android.content.Context
 import android.os.Bundle
@@ -7,15 +7,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.data.server.ServerDataSource
-import com.handysparksoft.trackmap.data.server.TrackMapDb
-import com.handysparksoft.trackmap.ui.common.app
-import com.handysparksoft.trackmap.ui.common.startActivity
-import com.handysparksoft.trackmap.ui.common.toast
-import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel.UiModel.Content
-import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsViewModel.UiModel.Loading
+import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.extension.toast
+import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsViewModel.UiModel.Content
+import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsViewModel.UiModel.Loading
 import kotlinx.android.synthetic.main.activity_current_track_maps.*
 
 class CurrentTrackMapsActivity : AppCompatActivity() {

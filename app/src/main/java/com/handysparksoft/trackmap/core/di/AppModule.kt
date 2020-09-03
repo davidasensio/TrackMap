@@ -1,8 +1,8 @@
-package com.handysparksoft.trackmap.di
+package com.handysparksoft.trackmap.core.di
 
 import com.handysparksoft.data.source.RemoteDataSource
-import com.handysparksoft.trackmap.data.server.ServerDataSource
-import com.handysparksoft.trackmap.data.server.TrackMapDb
+import com.handysparksoft.trackmap.core.data.server.ServerDataSource
+import com.handysparksoft.trackmap.core.data.server.TrackMapDb
 import dagger.Module
 import dagger.Provides
 

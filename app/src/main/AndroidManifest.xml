@@ -24,7 +24,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".ui.creation.CreateActivity"
+        <activity android:name=".features.create.CreateActivity"
             android:label="Create a Trackmap">
             <!--<intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,10 +38,10 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".ui.currenttrackmaps.CurrentTrackMapsActivity"
+            android:name=".features.entries.CurrentTrackMapsActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".ui.main.MainActivity"
+            android:name=".features.trackmap.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.main
+package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -12,13 +12,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.ui.common.MapActionHelper
-import com.handysparksoft.trackmap.ui.common.PermissionChecker
-import com.handysparksoft.trackmap.ui.common.app
-import com.handysparksoft.trackmap.ui.common.toLatLng
-import com.handysparksoft.trackmap.ui.creation.CreateActivity
-import com.handysparksoft.trackmap.ui.currenttrackmaps.CurrentTrackMapsActivity
-import com.handysparksoft.trackmap.ui.main.MyPositionState.*
+import com.handysparksoft.trackmap.core.platform.MapActionHelper
+import com.handysparksoft.trackmap.core.platform.PermissionChecker
+import com.handysparksoft.trackmap.core.extension.toLatLng
+import com.handysparksoft.trackmap.features.create.CreateActivity
+import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsActivity
+import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {

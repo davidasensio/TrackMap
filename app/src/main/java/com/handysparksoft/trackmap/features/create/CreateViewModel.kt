@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.creation
+package com.handysparksoft.trackmap.features.create
 
 import androidx.annotation.CallSuper
 import androidx.lifecycle.LiveData
@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.domain.model.TrackMap
-import com.handysparksoft.trackmap.ui.common.Scope
+import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.usecases.SaveTrackMapUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.ui.creation
+package com.handysparksoft.trackmap.features.create
 
 import android.content.Context
 import android.os.Bundle
@@ -6,9 +6,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.trackmap.databinding.ActivityCreateBinding
-import com.handysparksoft.trackmap.ui.common.app
-import com.handysparksoft.trackmap.ui.common.startActivity
-import com.handysparksoft.trackmap.ui.common.toast
+import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.extension.toast
 import kotlinx.android.synthetic.main.activity_create.*
 
 class CreateActivity : AppCompatActivity() {
