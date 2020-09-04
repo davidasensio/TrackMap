@@ -2,6 +2,7 @@ package com.handysparksoft.trackmap.core.platform
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.location.Location
 import android.provider.Settings
 import javax.inject.Inject
 
