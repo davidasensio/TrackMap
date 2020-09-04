@@ -2,6 +2,7 @@ package com.handysparksoft.trackmap.features.entries
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -39,7 +40,7 @@ class MainActivity : AppCompatActivity() {
                 BottomNavigationView.OnNavigationItemSelectedListener { item ->
                     when (item.itemId) {
                         R.id.navigation_create_map -> {
-                            CreateActivity.start(this)
+                            CreateActivity.startActivityForResult(this)
                             return@OnNavigationItemSelectedListener true
                         }
                         R.id.navigation_dashboard -> {
@@ -48,10 +49,10 @@ class MainActivity : AppCompatActivity() {
                         R.id.navigation_join_map -> {
                             joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
                         }
-                        R.id.navigation_search_trackmap -> {
+                        /*R.id.navigation_search_trackmap -> {
                             MainActivity.start(this)
                             return@OnNavigationItemSelectedListener true
-                        }
+                        }*/
                         R.id.navigation_force_crash -> {
                             Crashlytics.getInstance().crash()
                             return@OnNavigationItemSelectedListener true
@@ -79,6 +80,13 @@ class MainActivity : AppCompatActivity() {
         setupUI()
     }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            viewModel.refresh()
+        }
+    }
+
     private fun setAdapter() {
         adapter = TrackMapEntriesAdapter {
             viewModel.onCurrentTrackMapClicked(it)
@@ -94,12 +102,16 @@ class MainActivity : AppCompatActivity() {
             is Content -> {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
+                swipeRefreshLayout.isRefreshing = false
             }
         }
     }
 
     private fun setupUI() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        swipeRefreshLayout.setOnRefreshListener {
+            viewModel.refresh()
+        }
     }
 
     private fun joinTrackMapTemporal() {

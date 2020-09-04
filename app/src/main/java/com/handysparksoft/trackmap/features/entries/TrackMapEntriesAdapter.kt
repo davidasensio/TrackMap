@@ -39,7 +39,7 @@ class TrackMapEntriesAdapter(
             itemView.nameTextView.text = trackMap.name
             itemView.descriptionTextView.text = trackMap.description
             itemView.codeTextView.text = trackMap.trackMapId
-            itemView.participantsTextView.text = trackMap.participantIds.size.toString()
+            itemView.participantsTextView.text = (trackMap.participantIds.size).toString()
             itemView.goButton.setOnClickListener {
                 listener.invoke(trackMap)
             }

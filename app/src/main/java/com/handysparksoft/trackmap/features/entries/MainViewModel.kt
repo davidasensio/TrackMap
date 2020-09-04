@@ -51,7 +51,7 @@ class MainViewModel(
         super.onCleared()
     }
 
-    private fun refresh() {
+    fun refresh() {
         launch(Dispatchers.Main) {
             val userId = userHandler.getUserId()
             _model.value = UiModel.Loading
@@ -72,6 +72,7 @@ class MainViewModel(
     fun joinTrackMap(trackMapCode: String) {
         launch(Dispatchers.Main) {
             joinTrackMapUseCase.execute(userHandler.getUserId(), trackMapCode)
+            refresh()
         }
     }
 }

@@ -26,7 +26,7 @@ interface TrackMapService {
         @Body user: UserProfileData
     )
 
-    @PUT("users/{userId}/trackMaps/{trackMapId}.json")
+    @PATCH("users/{userId}/trackMaps/{trackMapId}.json")
     suspend fun saveUserTrackMap(
         @Path("userId") userId: String,
         @Path("trackMapId") trackMapId: String,

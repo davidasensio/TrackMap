@@ -6,6 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.usecases.SaveTrackMapUseCase
@@ -16,11 +17,12 @@ import java.util.*
 class CreateViewModel(
     private val saveTrackMapUseCase: SaveTrackMapUseCase,
     private val userHandler: UserHandler
-) :
-    ViewModel(),
-    Scope by Scope.Impl() {
+) : ViewModel(), Scope by Scope.Impl() {
 
     private val trackMapCode = MutableLiveData<String>()
+    private val _trackMapCreation = MutableLiveData<Event<Boolean>>()
+    val trackMapCreation: LiveData<Event<Boolean>>
+        get() = _trackMapCreation
 
     init {
         initScope()
@@ -46,19 +48,20 @@ class CreateViewModel(
     }
 
     fun createTrackMap(trackMapId: String, name: String, description: String) {
-        val userId = userHandler.getUserId()
+        val ownerId = userHandler.getUserId()
 
         val trackMap = TrackMap(
             trackMapId,
-            userId,
+            ownerId,
             name,
             description,
             true,
             System.currentTimeMillis(),
-            listOf(userId)
+            listOf(ownerId)
         )
         launch(Dispatchers.Main) {
-            saveTrackMapUseCase.execute(userId, trackMapId, trackMap)
+            saveTrackMapUseCase.execute(ownerId, trackMapId, trackMap)
+            _trackMapCreation.value = Event(true)
         }
     }
 }
@@ -69,5 +72,6 @@ class CreateViewModelFactory(
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        modelClass.getConstructor(saveTrackMapUseCase::class.java, userHandler::class.java).newInstance(saveTrackMapUseCase, userHandler)
+        modelClass.getConstructor(saveTrackMapUseCase::class.java, userHandler::class.java)
+            .newInstance(saveTrackMapUseCase, userHandler)
 }

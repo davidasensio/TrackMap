@@ -23,8 +23,8 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
         remoteDataSource.saveTrackMap(userId, trackMapId, trackMap)
     }
 
-    suspend fun joinTrackMap(trackMapId: String, trackMapParticipant: TrackMapParticipant) {
-        remoteDataSource.joinTrackMap(trackMapId, trackMapParticipant)
+    suspend fun joinTrackMap(userId: String, trackMapId: String, trackMap: TrackMap, trackMapParticipant: TrackMapParticipant) {
+        remoteDataSource.joinTrackMap(userId, trackMapId, trackMap, trackMapParticipant)
     }
 
     suspend fun getTrackMapById(trackMapId: String): TrackMap? {
