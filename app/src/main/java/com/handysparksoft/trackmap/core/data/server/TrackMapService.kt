@@ -1,9 +1,6 @@
 package com.handysparksoft.trackmap.core.data.server
 
-import com.handysparksoft.domain.model.TrackMap
-import com.handysparksoft.domain.model.User
-import com.handysparksoft.domain.model.UserProfileData
-import com.handysparksoft.domain.model.UserTrackMaps
+import com.handysparksoft.domain.model.*
 import retrofit2.http.*
 
 interface TrackMapService {
@@ -42,10 +39,9 @@ interface TrackMapService {
         @Body trackMap: TrackMap
     )
 
-    @PUT("trackMaps/{trackMapId}/participantIds/{userId}.json")
+    @PATCH("trackMaps/{trackMapId}.json")
     suspend fun joinTrackMap(
         @Path("trackMapId") trackMapId: String,
-        @Path("userId") userId: String,
-        @Body id: TrackMap
+        @Body trackMapParticipant: TrackMapParticipant
     )
 }

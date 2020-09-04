@@ -8,6 +8,6 @@ interface RemoteDataSource {
     suspend fun updateUser(userId: String, userProfileData: UserProfileData)
     suspend fun getUserTrackMaps(userId: String): Map<String, TrackMap>
     suspend fun saveTrackMap(userId: String, trackMapId: String, trackMap: TrackMap)
-    suspend fun joinTrackMap(trackMapId: String)
+    suspend fun joinTrackMap(userId: String, trackMapId: String)
     suspend fun getTrackMapById(trackMapId: String): TrackMap?
 }

@@ -1,7 +1,10 @@
 package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.os.Bundle
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.crashlytics.android.Crashlytics
@@ -14,7 +17,6 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.toLatLng
-import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.MapActionHelper
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
 import com.handysparksoft.trackmap.core.platform.UserHandler
@@ -51,6 +53,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_join_map -> {
+                    joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
+                }
+                R.id.navigation_search_trackmap -> {
                     CurrentTrackMapsActivity.start(this)
                     return@OnNavigationItemSelectedListener true
                 }
@@ -61,6 +66,25 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             false
         }
+
+    private fun joinTrackMapTemporal() {
+        val promptJoinDialog = AlertDialog.Builder(this)
+        val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
+        promptJoinDialog.setView(promptDialogView)
+
+        promptJoinDialog
+            .setCancelable(true)
+            .setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                val trackMapCodeEditText =
+                    promptDialogView.findViewById<EditText>(R.id.trackMapCodeEditText)
+                viewModel.joinTrackMap(trackMapCodeEditText.text.toString())
+            })
+            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, _ ->
+                dialog.cancel()
+            })
+            .create()
+            .show()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

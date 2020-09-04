@@ -33,6 +33,12 @@ class MainViewModel(
             saveUserUseCase.execute(userHandler.getUserId(), "default")
         }
     }
+
+    fun joinTrackMap(trackMapCode: String) {
+        launch(Dispatchers.Main) {
+            joinTrackMapUseCase.execute(userHandler.getUserId(), trackMapCode)
+        }
+    }
 }
 
 class MainViewModelFactory(
