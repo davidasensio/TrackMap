@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ThemeBackgroundColor" type="color">#1D2124</item>
+    <item name="ThemeItemBackgroundColor" type="color">#FF0B0D0E</item>
+</resources>
