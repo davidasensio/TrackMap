@@ -1,7 +1,10 @@
 package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
+import android.content.DialogInterface
 import android.os.Bundle
+import android.widget.EditText
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.crashlytics.android.Crashlytics
@@ -12,18 +15,25 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
+import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.toLatLng
 import com.handysparksoft.trackmap.core.platform.MapActionHelper
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
-import com.handysparksoft.trackmap.core.extension.toLatLng
+import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsActivity
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+    @Inject
+    lateinit var userHandler: UserHandler
+
     private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this).get(MainViewModel::class.java)
+        ViewModelProvider(this, app.component.mainViewModelFactory).get(MainViewModel::class.java)
     }
+
     private lateinit var permissionChecker: PermissionChecker
 
     private lateinit var googleMap: GoogleMap
@@ -43,6 +53,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_join_map -> {
+                    joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
+                }
+                R.id.navigation_search_trackmap -> {
                     CurrentTrackMapsActivity.start(this)
                     return@OnNavigationItemSelectedListener true
                 }
@@ -54,15 +67,43 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
             false
         }
 
+    private fun joinTrackMapTemporal() {
+        val promptJoinDialog = AlertDialog.Builder(this)
+        val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
+        promptJoinDialog.setView(promptDialogView)
+
+        promptJoinDialog
+            .setCancelable(true)
+            .setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
+                val trackMapCodeEditText =
+                    promptDialogView.findViewById<EditText>(R.id.trackMapCodeEditText)
+                viewModel.joinTrackMap(trackMapCodeEditText.text.toString())
+            })
+            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, _ ->
+                dialog.cancel()
+            })
+            .create()
+            .show()
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        injectComponents()
+
         supportActionBar?.hide()
         permissionChecker = PermissionChecker(this, container)
         fusedLocationProviderClient = FusedLocationProviderClient(this)
+
         setupMapUI()
         setupUI()
+
+        viewModel.saveUser()
+    }
+
+    private fun injectComponents() {
+        app.component.inject(this) // Equals to DaggerAppComponent.factory().create(applicationContext as Application).inject(this)
     }
 
     private fun setupMapUI() {

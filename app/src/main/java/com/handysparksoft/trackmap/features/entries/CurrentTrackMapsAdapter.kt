@@ -29,7 +29,7 @@ class CurrentTrackMapsAdapter(
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         fun bind(trackMap: TrackMap) {
-            itemView.code.text = trackMap.code
+            itemView.code.text = trackMap.trackMapId
             itemView.name.text = trackMap.name
         }
     }

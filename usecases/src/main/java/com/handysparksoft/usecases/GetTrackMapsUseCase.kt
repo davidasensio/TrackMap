@@ -4,5 +4,5 @@ import com.handysparksoft.data.repository.TrackMapRepository
 import com.handysparksoft.domain.model.TrackMap
 
 class GetTrackMapsUseCase(private val trackMapRepository: TrackMapRepository) {
-    suspend fun execute(): Map<String, TrackMap> = trackMapRepository.getTrackMapList()
+    suspend fun execute(userId: String): Map<String, TrackMap> = trackMapRepository.getUserTrackMaps(userId)
 }
