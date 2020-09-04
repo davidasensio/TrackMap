@@ -7,19 +7,19 @@
         android:title="@string/title_home" />
 
     <item
-        android:id="@+id/navigation_dashboard"
-        android:icon="@drawable/ic_dashboard_black_24dp"
-        android:title="@string/title_dashboard" />
-
-    <item
         android:id="@+id/navigation_join_map"
         android:icon="@drawable/ic_add_location_black_24dp"
         android:title="@string/title_join" />
 
     <item
+        android:id="@+id/navigation_dashboard"
+        android:icon="@drawable/ic_share_black"
+        android:title="@string/title_dashboard" />
+
+    <!--<item
         android:id="@+id/navigation_search_trackmap"
         android:icon="@drawable/ic_search_black_24dp"
-        android:title="@string/title_current" />
+        android:title="@string/title_current" />-->
 
     <item
         android:id="@+id/navigation_force_crash"

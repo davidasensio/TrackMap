@@ -1,6 +1,8 @@
 package com.handysparksoft.trackmap.features.create
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -15,8 +17,11 @@ class CreateActivity : AppCompatActivity() {
     companion object {
         fun start(context: Context) {
             context.startActivity<CreateActivity>() {
-                putExtra("param1", 5)
+                //putExtra("param1", 5)
             }
+        }
+        fun startActivityForResult(activity: Activity) {
+            activity.startActivityForResult(Intent(activity, CreateActivity::class.java), 1)
         }
     }
 
@@ -35,8 +40,14 @@ class CreateActivity : AppCompatActivity() {
         binding = ActivityCreateBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
-        this.toast("Param1 is ${intent.getIntExtra("param1", 0)}")
+        viewModel.trackMapCreation.observe(this, Observer {
+            it.getContentIfNotHandled()?.let { created ->
+                if (created) {
+                    setResult(RESULT_OK)
+                    finish()
+                }
+            }
+        })
 
         initToolbar(toolbar)
         setupUI()
@@ -54,14 +65,14 @@ class CreateActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        viewModel.getTrackMapCode().observe(this, Observer(::trackmapCodeObserver))
+        viewModel.getTrackMapCode().observe(this, Observer(::trackMapCodeObserver))
 
         createTrackmapButton?.setOnClickListener {
             onCreateAction()
         }
     }
 
-    private fun trackmapCodeObserver(generatedCode: String) {
+    private fun trackMapCodeObserver(generatedCode: String) {
         createCodeEditText?.setText(generatedCode)
     }
 
@@ -70,6 +81,5 @@ class CreateActivity : AppCompatActivity() {
         val name = createNameEditText?.text.toString()
         val description = createDescriptionEditText?.text.toString()
         viewModel.createTrackMap(code, name, description)
-        toast("Creating map...")
     }
 }

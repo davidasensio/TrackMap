@@ -1,6 +1,7 @@
 package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.DialogInterface
 import android.os.Bundle
 import android.widget.EditText
@@ -16,22 +17,29 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.extension.toLatLng
 import com.handysparksoft.trackmap.core.platform.MapActionHelper
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
-import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsActivity
+import com.handysparksoft.trackmap.features.entries.MainActivity
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_trackmap.*
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity(), OnMapReadyCallback {
+class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
+    companion object {
+        fun start(context: Context) {
+            context.startActivity<TrackMapActivity>()
+        }
+    }
+
     @Inject
     lateinit var userHandler: UserHandler
 
-    private val viewModel: MainViewModel by lazy {
-        ViewModelProvider(this, app.component.mainViewModelFactory).get(MainViewModel::class.java)
+    private val viewModel: TrackMapViewModel by lazy {
+        ViewModelProvider(this, app.component.trackMapViewModelFactory).get(TrackMapViewModel::class.java)
     }
 
     private lateinit var permissionChecker: PermissionChecker
@@ -42,53 +50,9 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     private var lastLocation: LatLng? = null
     private var myPositionState: MyPositionState = Unlocated
 
-    private val mOnNavigationItemSelectedListener =
-        BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_create_map -> {
-                    CreateActivity.start(this)
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigation_dashboard -> {
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigation_join_map -> {
-                    joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
-                }
-                R.id.navigation_search_trackmap -> {
-                    CurrentTrackMapsActivity.start(this)
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigation_force_crash -> {
-                    Crashlytics.getInstance().crash()
-                    return@OnNavigationItemSelectedListener true
-                }
-            }
-            false
-        }
-
-    private fun joinTrackMapTemporal() {
-        val promptJoinDialog = AlertDialog.Builder(this)
-        val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
-        promptJoinDialog.setView(promptDialogView)
-
-        promptJoinDialog
-            .setCancelable(true)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                val trackMapCodeEditText =
-                    promptDialogView.findViewById<EditText>(R.id.trackMapCodeEditText)
-                viewModel.joinTrackMap(trackMapCodeEditText.text.toString())
-            })
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, _ ->
-                dialog.cancel()
-            })
-            .create()
-            .show()
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_trackmap)
 
         injectComponents()
 
@@ -98,8 +62,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setupMapUI()
         setupUI()
-
-        viewModel.saveUser()
     }
 
     private fun injectComponents() {
@@ -114,8 +76,6 @@ class MainActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setupUI() {
-        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-
         title = getString(R.string.app_name)
 
 //        myPositionImageView?.setOnClickListener {

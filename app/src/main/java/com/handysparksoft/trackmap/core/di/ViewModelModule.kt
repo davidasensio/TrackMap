@@ -2,8 +2,8 @@ package com.handysparksoft.trackmap.core.di
 
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
-import com.handysparksoft.trackmap.features.entries.CurrentTrackMapsViewModelFactory
-import com.handysparksoft.trackmap.features.trackmap.MainViewModelFactory
+import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
+import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
 import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.usecases.JoinTrackMapUseCase
 import com.handysparksoft.usecases.SaveTrackMapUseCase
@@ -16,11 +16,12 @@ class ViewModelModule {
 
     @Provides
     fun mainViewModelFactoryProvider(
+        getTrackMapsUseCase: GetTrackMapsUseCase,
         saveUserUseCase: SaveUserUseCase,
         joinTrackMapUseCase: JoinTrackMapUseCase,
         userHandler: UserHandler
     ) =
-        MainViewModelFactory(saveUserUseCase, joinTrackMapUseCase, userHandler)
+        MainViewModelFactory(getTrackMapsUseCase, saveUserUseCase, joinTrackMapUseCase, userHandler)
 
     @Provides
     fun createViewModelFactoryProvider(
@@ -30,6 +31,6 @@ class ViewModelModule {
         CreateViewModelFactory(saveTrackMapUseCase, userHandler)
 
     @Provides
-    fun currentViewModelFactoryProvider(getTrackMapsUseCase: GetTrackMapsUseCase, userHandler: UserHandler) =
-        CurrentTrackMapsViewModelFactory(getTrackMapsUseCase, userHandler)
+    fun trackMapViewModelFactoryProvider(userHandler: UserHandler) =
+        TrackMapViewModelFactory(userHandler)
 }

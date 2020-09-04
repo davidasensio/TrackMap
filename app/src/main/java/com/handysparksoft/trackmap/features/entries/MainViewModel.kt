@@ -10,11 +10,15 @@ import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
+import com.handysparksoft.usecases.JoinTrackMapUseCase
+import com.handysparksoft.usecases.SaveUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class CurrentTrackMapsViewModel(
+class MainViewModel(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
+    private val saveUserUseCase: SaveUserUseCase,
+    private val joinTrackMapUseCase: JoinTrackMapUseCase,
     private val userHandler: UserHandler
 ) : ViewModel(),
     Scope by Scope.Impl() {
@@ -47,7 +51,7 @@ class CurrentTrackMapsViewModel(
         super.onCleared()
     }
 
-    private fun refresh() {
+    fun refresh() {
         launch(Dispatchers.Main) {
             val userId = userHandler.getUserId()
             _model.value = UiModel.Loading
@@ -58,15 +62,39 @@ class CurrentTrackMapsViewModel(
     fun onCurrentTrackMapClicked(trackMap: TrackMap) {
         _navigation.value = Event(trackMap)
     }
+
+    fun saveUser() {
+        launch(Dispatchers.Main) {
+            saveUserUseCase.execute(userHandler.getUserId(), "default")
+        }
+    }
+
+    fun joinTrackMap(trackMapCode: String) {
+        launch(Dispatchers.Main) {
+            joinTrackMapUseCase.execute(userHandler.getUserId(), trackMapCode)
+            refresh()
+        }
+    }
 }
 
-class CurrentTrackMapsViewModelFactory(
+class MainViewModelFactory(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
+    private val saveUserUseCase: SaveUserUseCase,
+    private val joinTrackMapUseCase: JoinTrackMapUseCase,
     private val userHandler: UserHandler
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(getTrackMapsUseCase::class.java, userHandler::class.java)
-            .newInstance(getTrackMapsUseCase, userHandler)
+        return modelClass.getConstructor(
+            getTrackMapsUseCase::class.java,
+            saveUserUseCase::class.java,
+            joinTrackMapUseCase::class.java,
+            userHandler::class.java
+        ).newInstance(
+            getTrackMapsUseCase,
+            saveUserUseCase,
+            joinTrackMapUseCase,
+            userHandler
+        )
     }
 }
