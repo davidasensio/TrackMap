@@ -18,7 +18,11 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
     }
 
     override suspend fun getUserTrackMaps(userId: String): Map<String, TrackMap> {
-        return service.getUserTrackMaps(userId)
+        return try {
+            service.getUserTrackMaps(userId)
+        } catch (e: Exception) {
+            HashMap() // Return an empty HashMap when a request returns null
+        }
     }
 
     override suspend fun saveTrackMap(userId: String, trackMapId: String, trackMap: TrackMap) {
