@@ -2,6 +2,7 @@ package com.handysparksoft.data.repository
 
 import com.handysparksoft.data.source.RemoteDataSource
 import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.domain.model.TrackMapParticipant
 import com.handysparksoft.domain.model.UserProfileData
 
 class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
@@ -22,8 +23,8 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
         remoteDataSource.saveTrackMap(userId, trackMapId, trackMap)
     }
 
-    suspend fun joinTrackMap(userId:String, trackMapId: String) {
-        remoteDataSource.joinTrackMap(userId, trackMapId)
+    suspend fun joinTrackMap(trackMapId: String, trackMapParticipant: TrackMapParticipant) {
+        remoteDataSource.joinTrackMap(trackMapId, trackMapParticipant)
     }
 
     suspend fun getTrackMapById(trackMapId: String): TrackMap? {

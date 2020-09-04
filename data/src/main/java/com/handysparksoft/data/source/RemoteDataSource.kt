@@ -1,6 +1,7 @@
 package com.handysparksoft.data.source
 
 import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.domain.model.TrackMapParticipant
 import com.handysparksoft.domain.model.UserProfileData
 
 interface RemoteDataSource {
@@ -8,6 +9,6 @@ interface RemoteDataSource {
     suspend fun updateUser(userId: String, userProfileData: UserProfileData)
     suspend fun getUserTrackMaps(userId: String): Map<String, TrackMap>
     suspend fun saveTrackMap(userId: String, trackMapId: String, trackMap: TrackMap)
-    suspend fun joinTrackMap(userId: String, trackMapId: String)
+    suspend fun joinTrackMap(trackMapId: String, trackMapParticipant: TrackMapParticipant)
     suspend fun getTrackMapById(trackMapId: String): TrackMap?
 }
