@@ -37,6 +37,7 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
 
         service.joinTrackMap(trackMapId, trackMapParticipant)
         service.saveUserTrackMap(userId, trackMapId, trackMapUpdated)
+        service.saveUserTrackMap(trackMap.ownerId, trackMapId, trackMapUpdated)
     }
 
     override suspend fun getTrackMapById(trackMapId: String): TrackMap? {
