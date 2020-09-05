@@ -6,11 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.domain.model.TrackMap
-import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
+import com.handysparksoft.usecases.GetTrackMapsUseCase
 import com.handysparksoft.usecases.JoinTrackMapUseCase
+import com.handysparksoft.usecases.SaveUserTrackMapUseCase
 import com.handysparksoft.usecases.SaveUserUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -19,6 +20,7 @@ class MainViewModel(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
+    private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val userHandler: UserHandler
 ) : ViewModel(),
     Scope by Scope.Impl() {
@@ -71,7 +73,14 @@ class MainViewModel(
 
     fun joinTrackMap(trackMapCode: String) {
         launch(Dispatchers.Main) {
-            joinTrackMapUseCase.execute(userHandler.getUserId(), trackMapCode)
+            val userId = userHandler.getUserId()
+            val joinedTrackMap = joinTrackMapUseCase.execute(userId, trackMapCode)
+            joinedTrackMap?.let { trackMap ->
+                val ownerId = trackMap.ownerId
+                saveUserTrackMapUseCase.execute(userId, trackMap.trackMapId, trackMap)
+                saveUserTrackMapUseCase.execute(ownerId, trackMap.trackMapId, trackMap)
+            }
+
             refresh()
         }
     }
@@ -81,6 +90,7 @@ class MainViewModelFactory(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
+    private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val userHandler: UserHandler
 ) :
     ViewModelProvider.Factory {
@@ -89,11 +99,13 @@ class MainViewModelFactory(
             getTrackMapsUseCase::class.java,
             saveUserUseCase::class.java,
             joinTrackMapUseCase::class.java,
+            saveUserTrackMapUseCase::class.java,
             userHandler::class.java
         ).newInstance(
             getTrackMapsUseCase,
             saveUserUseCase,
             joinTrackMapUseCase,
+            saveUserTrackMapUseCase,
             userHandler
         )
     }

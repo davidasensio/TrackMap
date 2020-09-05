@@ -10,12 +10,14 @@ import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.usecases.SaveTrackMapUseCase
+import com.handysparksoft.usecases.SaveUserTrackMapUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.*
 
 class CreateViewModel(
     private val saveTrackMapUseCase: SaveTrackMapUseCase,
+    private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val userHandler: UserHandler
 ) : ViewModel(), Scope by Scope.Impl() {
 
@@ -60,7 +62,8 @@ class CreateViewModel(
             listOf(ownerId)
         )
         launch(Dispatchers.Main) {
-            saveTrackMapUseCase.execute(ownerId, trackMapId, trackMap)
+            saveTrackMapUseCase.execute(trackMapId, trackMap)
+            saveUserTrackMapUseCase.execute(ownerId, trackMapId, trackMap)
             _trackMapCreation.value = Event(true)
         }
     }
@@ -68,10 +71,15 @@ class CreateViewModel(
 
 class CreateViewModelFactory(
     private val saveTrackMapUseCase: SaveTrackMapUseCase,
+    private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val userHandler: UserHandler
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        modelClass.getConstructor(saveTrackMapUseCase::class.java, userHandler::class.java)
-            .newInstance(saveTrackMapUseCase, userHandler)
+        modelClass.getConstructor(
+            saveTrackMapUseCase::class.java,
+            saveUserTrackMapUseCase::class.java,
+            userHandler::class.java
+        )
+            .newInstance(saveTrackMapUseCase, saveUserTrackMapUseCase, userHandler)
 }

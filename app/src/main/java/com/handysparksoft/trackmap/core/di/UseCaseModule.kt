@@ -1,10 +1,7 @@
 package com.handysparksoft.trackmap.core.di
 
 import com.handysparksoft.data.repository.TrackMapRepository
-import com.handysparksoft.usecases.GetTrackMapsUseCase
-import com.handysparksoft.usecases.JoinTrackMapUseCase
-import com.handysparksoft.usecases.SaveTrackMapUseCase
-import com.handysparksoft.usecases.SaveUserUseCase
+import com.handysparksoft.usecases.*
 import dagger.Module
 import dagger.Provides
 
@@ -26,4 +23,8 @@ class UseCaseModule {
     @Provides
     fun saveTrackMapUseCaseProvider(trackMapRepository: TrackMapRepository) =
         SaveTrackMapUseCase(trackMapRepository)
+
+    @Provides
+    fun saveUserTrackMapUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        SaveUserTrackMapUseCase(trackMapRepository)
 }
