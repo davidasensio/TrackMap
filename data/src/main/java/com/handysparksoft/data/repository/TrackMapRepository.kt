@@ -34,4 +34,8 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
     suspend fun getTrackMapById(trackMapId: String): TrackMap? {
         return remoteDataSource.getTrackMapById(trackMapId)
     }
+
+    suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
+        return remoteDataSource.updateUserLocation(userId, latitude, longitude)
+    }
 }

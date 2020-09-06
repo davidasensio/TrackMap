@@ -1,5 +1,6 @@
 package com.handysparksoft.trackmap.features.entries
 
+import android.location.Location
 import androidx.annotation.CallSuper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -9,10 +10,7 @@ import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
-import com.handysparksoft.usecases.GetTrackMapsUseCase
-import com.handysparksoft.usecases.JoinTrackMapUseCase
-import com.handysparksoft.usecases.SaveUserTrackMapUseCase
-import com.handysparksoft.usecases.SaveUserUseCase
+import com.handysparksoft.usecases.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -21,6 +19,7 @@ class MainViewModel(
     private val saveUserUseCase: SaveUserUseCase,
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
+    private val updateUserLocationUseCase: UpdateUserLocationUseCase,
     private val userHandler: UserHandler
 ) : ViewModel(),
     Scope by Scope.Impl() {
@@ -84,6 +83,14 @@ class MainViewModel(
             refresh()
         }
     }
+
+    fun updateUserLocation(userUpdatedLocation: Location) {
+        launch(Dispatchers.Main) {
+            with(userUpdatedLocation) {
+                updateUserLocationUseCase.execute(userHandler.getUserId(), latitude, longitude)
+            }
+        }
+    }
 }
 
 class MainViewModelFactory(
@@ -91,6 +98,7 @@ class MainViewModelFactory(
     private val saveUserUseCase: SaveUserUseCase,
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
+    private val updateUserLocationUseCase: UpdateUserLocationUseCase,
     private val userHandler: UserHandler
 ) :
     ViewModelProvider.Factory {
@@ -100,12 +108,14 @@ class MainViewModelFactory(
             saveUserUseCase::class.java,
             joinTrackMapUseCase::class.java,
             saveUserTrackMapUseCase::class.java,
+            updateUserLocationUseCase::class.java,
             userHandler::class.java
         ).newInstance(
             getTrackMapsUseCase,
             saveUserUseCase,
             joinTrackMapUseCase,
             saveUserTrackMapUseCase,
+            updateUserLocationUseCase,
             userHandler
         )
     }

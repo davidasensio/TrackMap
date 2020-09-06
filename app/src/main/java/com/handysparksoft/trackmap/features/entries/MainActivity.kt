@@ -16,8 +16,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.LocationHandler
+import com.handysparksoft.trackmap.core.platform.PermissionChecker
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
@@ -42,6 +42,9 @@ class MainActivity : AppCompatActivity() {
 
     @Inject
     lateinit var locationHandler: LocationHandler
+
+    // FIXME make injectable
+    private lateinit var permissionChecker: PermissionChecker
 
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -73,6 +76,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         app.component.inject(this)
+        permissionChecker = PermissionChecker(this, mainContentLayout)
 
         setAdapter()
 
@@ -86,7 +90,9 @@ class MainActivity : AppCompatActivity() {
 
         setupUI()
 
-        //setupLocalization()
+        permissionChecker.requestLocationPermission(onGrantedPermission = {
+            startUserTrackLocation()
+        })
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -142,8 +148,9 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
-    /*fun setupLocalization() {
-        val lastLocation = locationHandler.lastLocation
-        toast("Last location is ${lastLocation.toString()}")
-    }*/
+    private fun startUserTrackLocation() {
+        locationHandler.subscribeLocationUpdates {
+            viewModel.updateUserLocation(it)
+        }
+    }
 }

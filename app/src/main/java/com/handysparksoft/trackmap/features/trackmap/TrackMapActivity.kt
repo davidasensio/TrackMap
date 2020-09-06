@@ -12,9 +12,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.core.platform.*
+import com.handysparksoft.trackmap.core.platform.LocationHandler
+import com.handysparksoft.trackmap.core.platform.MapActionHelper
+import com.handysparksoft.trackmap.core.platform.Prefs
+import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
-import kotlinx.android.synthetic.main.activity_trackmap.*
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -40,8 +42,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         ).get(TrackMapViewModel::class.java)
     }
 
-    private lateinit var permissionChecker: PermissionChecker
-
     private lateinit var googleMap: GoogleMap
     private lateinit var mapActionHelper: MapActionHelper
     private var lastLocation: LatLng? = null
@@ -54,7 +54,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         injectComponents()
 
         supportActionBar?.hide()
-        permissionChecker = PermissionChecker(this, container)
 
         setupMapUI()
         setupUI()
@@ -102,10 +101,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         this.mapActionHelper = MapActionHelper(googleMap)
         mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
 
-        permissionChecker.requestLocationPermission(onGrantedPermission = {
-            startMap()
-            moveToLastLocation()
-        })
+        startMap()
+        moveToLastLocation()
     }
 
     @SuppressLint("MissingPermission")
