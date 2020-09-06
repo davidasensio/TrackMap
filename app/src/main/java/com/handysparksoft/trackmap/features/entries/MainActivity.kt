@@ -16,11 +16,14 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.extension.toast
+import com.handysparksoft.trackmap.core.platform.LocationHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -36,36 +39,40 @@ class MainActivity : AppCompatActivity() {
             app.component.mainViewModelFactory
         ).get(MainViewModel::class.java)
     }
+
+    @Inject
+    lateinit var locationHandler: LocationHandler
+
     private val mOnNavigationItemSelectedListener =
-                BottomNavigationView.OnNavigationItemSelectedListener { item ->
-                    when (item.itemId) {
-                        R.id.navigation_create_map -> {
-                            CreateActivity.startActivityForResult(this)
-                            return@OnNavigationItemSelectedListener true
-                        }
-                        R.id.navigation_dashboard -> {
-                            return@OnNavigationItemSelectedListener true
-                        }
-                        R.id.navigation_join_map -> {
-                            joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
-                        }
-                        /*R.id.navigation_search_trackmap -> {
-                            MainActivity.start(this)
-                            return@OnNavigationItemSelectedListener true
-                        }*/
-                        R.id.navigation_force_crash -> {
-                            Crashlytics.getInstance().crash()
-                            return@OnNavigationItemSelectedListener true
-                        }
-                    }
-                    false
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_create_map -> {
+                    CreateActivity.startActivityForResult(this)
+                    return@OnNavigationItemSelectedListener true
                 }
-
-
+                R.id.navigation_dashboard -> {
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_join_map -> {
+                    joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
+                }
+                /*R.id.navigation_search_trackmap -> {
+                    MainActivity.start(this)
+                    return@OnNavigationItemSelectedListener true
+                }*/
+                R.id.navigation_force_crash -> {
+                    Crashlytics.getInstance().crash()
+                    return@OnNavigationItemSelectedListener true
+                }
+            }
+            false
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        app.component.inject(this)
 
         setAdapter()
 
@@ -78,6 +85,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.saveUser()
 
         setupUI()
+
+        //setupLocalization()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -132,4 +141,9 @@ class MainActivity : AppCompatActivity() {
             .create()
             .show()
     }
+
+    /*fun setupLocalization() {
+        val lastLocation = locationHandler.lastLocation
+        toast("Last location is ${lastLocation.toString()}")
+    }*/
 }

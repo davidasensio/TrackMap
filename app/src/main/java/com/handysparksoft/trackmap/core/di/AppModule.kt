@@ -5,7 +5,6 @@ import android.content.Context
 import com.handysparksoft.data.source.RemoteDataSource
 import com.handysparksoft.trackmap.core.data.server.ServerDataSource
 import com.handysparksoft.trackmap.core.data.server.TrackMapDb
-import com.handysparksoft.trackmap.core.platform.UserHandler
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
