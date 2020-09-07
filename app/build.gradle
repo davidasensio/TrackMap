@@ -51,6 +51,7 @@ dependencies {
     implementation androidLibs.values()
     implementation kotlinLibs.values()
     implementation networkLibs.values()
+    implementation firebaseLibs.values()
     implementation libs.values()
 
     kapt kaptLibs.values()

@@ -18,6 +18,7 @@ import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.LocationHandler
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
+import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
@@ -39,6 +40,9 @@ class MainActivity : AppCompatActivity() {
             app.component.mainViewModelFactory
         ).get(MainViewModel::class.java)
     }
+
+    @Inject
+    lateinit var prefs: Prefs
 
     @Inject
     lateinit var locationHandler: LocationHandler
@@ -83,7 +87,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.navigation.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let {
-                TrackMapActivity.start(this)
+                TrackMapActivity.start(this, it)
             }
         })
         viewModel.saveUser()
@@ -91,8 +95,15 @@ class MainActivity : AppCompatActivity() {
         setupUI()
 
         permissionChecker.requestLocationPermission(onGrantedPermission = {
+            updateLastLocation()
             startUserTrackLocation()
         })
+    }
+
+    private fun updateLastLocation() {
+        locationHandler.getLastLocation {
+            prefs.lastLocation = it
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
