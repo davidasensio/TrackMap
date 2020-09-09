@@ -1,6 +1,7 @@
 package com.handysparksoft.trackmap.core.di
 
 import android.app.Application
+import com.handysparksoft.trackmap.core.platform.LocationForegroundService
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
 import com.handysparksoft.trackmap.features.entries.MainActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
@@ -22,6 +23,7 @@ interface AppComponent {
     // Field injections
     fun inject(mainActivity: MainActivity)
     fun inject(trackMapActivity: TrackMapActivity)
+    fun inject(locationForegroundService: LocationForegroundService)
 
     @Component.Factory
     interface Factory {

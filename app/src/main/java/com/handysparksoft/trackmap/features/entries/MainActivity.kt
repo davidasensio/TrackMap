@@ -1,8 +1,11 @@
 package com.handysparksoft.trackmap.features.entries
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -15,8 +18,11 @@ import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.LocationHandler
+import com.handysparksoft.trackmap.core.platform.LocationForegroundService
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.features.create.CreateActivity
@@ -49,6 +55,8 @@ class MainActivity : AppCompatActivity() {
 
     // FIXME make injectable
     private lateinit var permissionChecker: PermissionChecker
+
+    private lateinit var locationForegroundService: LocationForegroundService
 
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -96,7 +104,8 @@ class MainActivity : AppCompatActivity() {
 
         permissionChecker.requestLocationPermission(onGrantedPermission = {
             updateLastLocation()
-            startUserTrackLocation()
+//            startUserTrackLocation()
+            startUserTrackLocationService()
         })
     }
 
@@ -163,5 +172,43 @@ class MainActivity : AppCompatActivity() {
         locationHandler.subscribeLocationUpdates {
             viewModel.updateUserLocation(it)
         }
+    }
+
+    private fun startUserTrackLocationService() {
+        locationForegroundService = LocationForegroundService()
+        val serviceIntent = Intent(this, locationForegroundService::class.java)
+        if (!isMyServiceRunning(locationForegroundService::class.java, this)) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
+            toast("Service initialized")
+        } else {
+            toast("Service already initialized!")
+        }
+
+    }
+
+    private fun isMyServiceRunning(serviceClass: Class<*>, mActivity: Activity): Boolean {
+        val manager: ActivityManager =
+            mActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.getClassName()) {
+                logDebug("Service status - Running")
+                return true
+            }
+        }
+        logDebug("Service status - Not Running")
+        return false
+    }
+
+    fun isLocationEnabledOrNot(context: Context): Boolean {
+        var locationManager: LocationManager? = null
+        locationManager =
+            context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
     }
 }

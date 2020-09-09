@@ -14,6 +14,7 @@
          location permissions for the 'MyLocation' functionality.
     -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
         android:name=".App"
@@ -29,7 +30,9 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
-        <activity android:name=".features.entries.MainActivity">
+        <activity
+            android:name=".features.entries.MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,5 +47,10 @@
         <activity
             android:name=".features.create.CreateActivity"
             android:label="Create a Trackmap" />
+
+        <service
+            android:name=".core.platform.LocationForegroundService"
+            android:enabled="true"
+            android:exported="false" />
     </application>
 </manifest>

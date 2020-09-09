@@ -17,10 +17,7 @@ import com.handysparksoft.domain.model.ParticipantLocation
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
-import com.handysparksoft.trackmap.core.extension.app
-import com.handysparksoft.trackmap.core.extension.isDarkModeActive
-import com.handysparksoft.trackmap.core.extension.logError
-import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
 import javax.inject.Inject
@@ -186,7 +183,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun tiltView() {
-        prefs.lastLocation?.let {
+        prefs.lastLocation.let {
             val tilt = if (myPositionState == LocatedAndTilted) 30f else 0f
             mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
         }
@@ -241,17 +238,22 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun refreshTrackMap() {
         googleMap.clear()
-        participants.forEach {
-            googleMapHandler.addMarker(
-                LatLng(it.latitude, it.longitude),
-                it.userId
-                // ,MARKER_ICON_DEFAULT_GREE
-            )
+        participants.forEach { participantLocation ->
+            LatLng(
+                participantLocation.latitude,
+                participantLocation.longitude
+            ).whenAvailable { latLng ->
+                googleMapHandler.addMarker(
+                    latLng,
+                    participantLocation.userId
+                    // ,MARKER_ICON_DEFAULT_GREEN
+                )
+            }
         }
     }
 }
 
-sealed class MyPositionState() {
+sealed class MyPositionState {
     object Unallocated : MyPositionState()
     object Located : MyPositionState()
     object LocatedAndTilted : MyPositionState()
