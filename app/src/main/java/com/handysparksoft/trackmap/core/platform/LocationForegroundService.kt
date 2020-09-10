@@ -17,6 +17,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class LocationForegroundService : Service(), Scope by Scope.Impl() {
+    companion object {
+        const val ACTION_STOP = "ACTION_STOP"
+    }
 
     @Inject
     lateinit var userHandler: UserHandler
@@ -47,7 +50,18 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        checkIntent(intent)
         return START_STICKY
+    }
+
+    private fun checkIntent(intent: Intent?) {
+        intent?.action?.let {
+            when (it) {
+                ACTION_STOP -> {
+                    stopSelf()
+                }
+            }
+        }
     }
 
     override fun onBind(intent: Intent?): IBinder? {
@@ -81,14 +95,31 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         val notification = notificationBuilder
             .setOngoing(true)
             .setContentTitle(getString(R.string.app_name))
-            .setContentText("TrackMap is running")
+            .setContentText("Tracking location is active")
             .setSmallIcon(R.drawable.ic_map_black_24dp)
             .setPriority(NotificationManager.IMPORTANCE_MIN)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(pendingIntent)
+            .setStyle(
+                NotificationCompat.BigTextStyle()
+                    .bigText("While tracking is active user location is being monitored. Stop tracking action is available below")
+                    .setSummaryText("Tracking is active")
+            )
+            .addAction(getStopAction())
             .build()
 
         startForeground(1, notification)
+    }
+
+    private fun getStopAction(): NotificationCompat.Action? {
+        val intent = Intent(this, LocationForegroundService::class.java)
+        intent.action = ACTION_STOP
+        val pendingIntent = PendingIntent.getService(this, 0, intent, 0)
+        return NotificationCompat.Action(
+            R.drawable.ic_stop,
+            "Stop tracking",
+            pendingIntent
+        )
     }
 
     private fun requestLocationUpdates() {
