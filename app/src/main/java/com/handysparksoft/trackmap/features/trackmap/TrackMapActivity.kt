@@ -63,6 +63,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
+    private val userMarkerMap = hashMapOf<String, Int>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trackmap)
@@ -236,20 +238,36 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+
     fun refreshTrackMap() {
         googleMap.clear()
         participants.forEach { participantLocation ->
+            val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
+            val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
             LatLng(
                 participantLocation.latitude,
                 participantLocation.longitude
             ).whenAvailable { latLng ->
                 googleMapHandler.addMarker(
                     latLng,
-                    participantLocation.userId
-                    // ,MARKER_ICON_DEFAULT_GREEN
+                    participantLocation.userAlias(isUserSession),
+                    participantIcon
                 )
             }
         }
+    }
+
+    private fun getParticipantMarker(userId: String, isUserSession: Boolean): Int {
+        var participantIcon = userMarkerMap[userId]
+        if (participantIcon == null) {
+            participantIcon = if (isUserSession) {
+                GoogleMapHandler.MARKER_ICON_DEFAULT_GREEN
+            } else {
+                googleMapHandler.getRandomMarker()
+            }
+            userMarkerMap[userId] = participantIcon
+        }
+        return participantIcon
     }
 }
 

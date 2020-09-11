@@ -18,7 +18,7 @@ import javax.inject.Singleton
 class LocationHandler @Inject constructor(private val context: Context) {
     companion object {
         private val LOCATION_MIN_TIME_MILLIS = if (BuildConfig.DEBUG) 500L else 1000L
-        private val LOCATION_MIN_DISTANCE_METERS = if (BuildConfig.DEBUG) 0.20f else 5f
+        private val LOCATION_MIN_DISTANCE_METERS = if (BuildConfig.DEBUG) 0.10f else 5f
     }
 
     // Acquire a reference to the system Location Manager
