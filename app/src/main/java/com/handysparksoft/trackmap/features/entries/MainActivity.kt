@@ -187,7 +187,6 @@ class MainActivity : AppCompatActivity() {
         } else {
             toast("Service already initialized!")
         }
-
     }
 
     private fun isMyServiceRunning(serviceClass: Class<*>, mActivity: Activity): Boolean {

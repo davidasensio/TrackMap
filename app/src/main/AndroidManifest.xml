@@ -15,7 +15,7 @@
     -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />-->
 
     <application
         android:name=".App"
@@ -54,5 +54,15 @@
             android:foregroundServiceType="location"
             android:enabled="true"
             android:exported="false" />
+
+        <receiver
+            android:name=".core.platform.LocationRestartForegroundService"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="restartservice" />
+                <action android:name="android.intent.action.ACTION_BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 </manifest>

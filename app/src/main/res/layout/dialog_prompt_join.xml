@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:hint="000-000"
+        android:text="000-000"
         android:lines="1"
         android:maxLines="1"
         android:textAlignment="center"

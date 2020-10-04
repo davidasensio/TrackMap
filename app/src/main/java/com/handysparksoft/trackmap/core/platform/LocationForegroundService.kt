@@ -21,6 +21,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         const val ACTION_STOP = "ACTION_STOP"
     }
 
+
     @Inject
     lateinit var userHandler: UserHandler
 
@@ -29,6 +30,8 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
 
     @Inject
     lateinit var updateUserLocationUseCase: UpdateUserLocationUseCase
+
+    private var manuallyStopped: Boolean = false
 
     init {
         initScope()
@@ -58,6 +61,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         intent?.action?.let {
             when (it) {
                 ACTION_STOP -> {
+                    manuallyStopped = true
                     stopSelf()
                 }
             }
@@ -72,6 +76,17 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         stopRequestLocationUpdates()
         destroyScope()
         super.onDestroy()
+
+        if (!manuallyStopped) {
+            forceRestartService()
+        }
+    }
+
+    private fun forceRestartService() {
+        val broadcastIntent = Intent()
+        broadcastIntent.action = LocationRestartForegroundService.RESTART_SERVICE_ACTION
+        broadcastIntent.setClass(this, LocationRestartForegroundService::class.java)
+        this.sendBroadcast(broadcastIntent)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
