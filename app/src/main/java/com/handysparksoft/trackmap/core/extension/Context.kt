@@ -2,8 +2,11 @@ package com.handysparksoft.trackmap.core.extension
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
+import android.util.Log
 import android.widget.Toast
 import com.handysparksoft.trackmap.App
+import com.handysparksoft.trackmap.BuildConfig
 
 /**
  * Extension functions of: Context / Activity / Fragment
@@ -19,4 +22,21 @@ inline fun <reified T> Context.startActivity(configIntent: Intent.() -> Unit = {
 
 fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
     Toast.makeText(this, message, length).show()
+}
+
+fun Context.isDarkModeActive(): Boolean {
+    val darkModeFlags = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return darkModeFlags == Configuration.UI_MODE_NIGHT_YES
+}
+
+fun Any.logDebug(message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.d(this::class.java.simpleName, message)
+    }
+}
+
+fun Any.logError(message: String) {
+    if (BuildConfig.DEBUG) {
+        Log.e(this::class.java.simpleName, message)
+    }
 }

@@ -1,8 +1,11 @@
 package com.handysparksoft.trackmap.features.entries
 
+import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
+import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
 import android.widget.EditText
@@ -15,12 +18,19 @@ import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.extension.toast
+import com.handysparksoft.trackmap.core.platform.LocationHandler
+import com.handysparksoft.trackmap.core.platform.LocationForegroundService
+import com.handysparksoft.trackmap.core.platform.PermissionChecker
+import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import kotlinx.android.synthetic.main.activity_main.*
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
     companion object {
@@ -36,48 +46,73 @@ class MainActivity : AppCompatActivity() {
             app.component.mainViewModelFactory
         ).get(MainViewModel::class.java)
     }
+
+    @Inject
+    lateinit var prefs: Prefs
+
+    @Inject
+    lateinit var locationHandler: LocationHandler
+
+    // FIXME make injectable
+    private lateinit var permissionChecker: PermissionChecker
+
+    private lateinit var locationForegroundService: LocationForegroundService
+
     private val mOnNavigationItemSelectedListener =
-                BottomNavigationView.OnNavigationItemSelectedListener { item ->
-                    when (item.itemId) {
-                        R.id.navigation_create_map -> {
-                            CreateActivity.startActivityForResult(this)
-                            return@OnNavigationItemSelectedListener true
-                        }
-                        R.id.navigation_dashboard -> {
-                            return@OnNavigationItemSelectedListener true
-                        }
-                        R.id.navigation_join_map -> {
-                            joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
-                        }
-                        /*R.id.navigation_search_trackmap -> {
-                            MainActivity.start(this)
-                            return@OnNavigationItemSelectedListener true
-                        }*/
-                        R.id.navigation_force_crash -> {
-                            Crashlytics.getInstance().crash()
-                            return@OnNavigationItemSelectedListener true
-                        }
-                    }
-                    false
+        BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_create_map -> {
+                    CreateActivity.startActivityForResult(this)
+                    return@OnNavigationItemSelectedListener true
                 }
-
-
+                R.id.navigation_dashboard -> {
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_join_map -> {
+                    joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
+                }
+                /*R.id.navigation_search_trackmap -> {
+                    MainActivity.start(this)
+                    return@OnNavigationItemSelectedListener true
+                }*/
+                R.id.navigation_force_crash -> {
+                    Crashlytics.getInstance().crash()
+                    return@OnNavigationItemSelectedListener true
+                }
+            }
+            false
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        app.component.inject(this)
+        permissionChecker = PermissionChecker(this, mainContentLayout)
 
         setAdapter()
 
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.navigation.observe(this, Observer { event ->
             event.getContentIfNotHandled()?.let {
-                TrackMapActivity.start(this)
+                TrackMapActivity.start(this, it)
             }
         })
         viewModel.saveUser()
 
         setupUI()
+
+        permissionChecker.requestLocationPermission(onGrantedPermission = {
+            updateLastLocation()
+//            startUserTrackLocation()
+            startUserTrackLocationService()
+        })
+    }
+
+    private fun updateLastLocation() {
+        locationHandler.getLastLocation {
+            prefs.lastLocation = it
+        }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -131,5 +166,48 @@ class MainActivity : AppCompatActivity() {
             })
             .create()
             .show()
+    }
+
+    private fun startUserTrackLocation() {
+        locationHandler.subscribeLocationUpdates {
+            viewModel.updateUserLocation(it)
+        }
+    }
+
+    private fun startUserTrackLocationService() {
+        locationForegroundService = LocationForegroundService()
+        val serviceIntent = Intent(this, locationForegroundService::class.java)
+        if (!isMyServiceRunning(locationForegroundService::class.java, this)) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent)
+            } else {
+                startService(serviceIntent)
+            }
+            toast("Service initialized")
+        } else {
+            toast("Service already initialized!")
+        }
+    }
+
+    private fun isMyServiceRunning(serviceClass: Class<*>, mActivity: Activity): Boolean {
+        val manager: ActivityManager =
+            mActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
+            if (serviceClass.name == service.service.getClassName()) {
+                logDebug("Service status - Running")
+                return true
+            }
+        }
+        logDebug("Service status - Not Running")
+        return false
+    }
+
+    fun isLocationEnabledOrNot(context: Context): Boolean {
+        var locationManager: LocationManager? = null
+        locationManager =
+            context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+        return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(
+            LocationManager.NETWORK_PROVIDER
+        )
     }
 }

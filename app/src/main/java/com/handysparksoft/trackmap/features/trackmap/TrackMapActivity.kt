@@ -2,53 +2,68 @@ package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.DialogInterface
 import android.os.Bundle
-import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import com.crashlytics.android.Crashlytics
-import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.handysparksoft.domain.model.ParticipantLocation
+import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.core.extension.app
-import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.core.extension.toLatLng
-import com.handysparksoft.trackmap.core.platform.MapActionHelper
-import com.handysparksoft.trackmap.core.platform.PermissionChecker
-import com.handysparksoft.trackmap.core.platform.UserHandler
-import com.handysparksoft.trackmap.features.create.CreateActivity
-import com.handysparksoft.trackmap.features.entries.MainActivity
+import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
+import com.handysparksoft.trackmap.core.extension.*
+import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
-import kotlinx.android.synthetic.main.activity_trackmap.*
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
-        fun start(context: Context) {
-            context.startActivity<TrackMapActivity>()
+        private const val TRACKMAP_PARAM = "trackMapId"
+
+        fun start(context: Context, trackMap: TrackMap) {
+            context.startActivity<TrackMapActivity> {
+                putExtra(TRACKMAP_PARAM, trackMap)
+            }
         }
     }
 
     @Inject
     lateinit var userHandler: UserHandler
 
-    private val viewModel: TrackMapViewModel by lazy {
-        ViewModelProvider(this, app.component.trackMapViewModelFactory).get(TrackMapViewModel::class.java)
-    }
+    @Inject
+    lateinit var prefs: Prefs
 
-    private lateinit var permissionChecker: PermissionChecker
+    @Inject
+    lateinit var locationHandler: LocationHandler
+
+    @Inject
+    lateinit var firebaseHandler: FirebaseHandler
+
+    @Inject
+    lateinit var googleMapHandler: GoogleMapHandler
 
     private lateinit var googleMap: GoogleMap
+
     private lateinit var mapActionHelper: MapActionHelper
-    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private var lastLocation: LatLng? = null
-    private var myPositionState: MyPositionState = Unlocated
+    private var myPositionState: MyPositionState = Unallocated
+    private val viewModel: TrackMapViewModel by lazy {
+        ViewModelProvider(
+            this,
+            app.component.trackMapViewModelFactory
+        ).get(TrackMapViewModel::class.java)
+    }
+
+    private val participants = mutableListOf<ParticipantLocation>()
+
+    private lateinit var participantsLocationChildEventListener: ChildEventListener
+
+    private val userMarkerMap = hashMapOf<String, Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,11 +72,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         injectComponents()
 
         supportActionBar?.hide()
-        permissionChecker = PermissionChecker(this, container)
-        fusedLocationProviderClient = FusedLocationProviderClient(this)
 
         setupMapUI()
         setupUI()
+    }
+
+    override fun onDestroy() {
+        unsubscribeForParticipantLocationUpdates()
+        super.onDestroy()
     }
 
     private fun injectComponents() {
@@ -85,14 +103,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     @SuppressLint("MissingPermission")
     private fun moveToLastLocation() {
-        fusedLocationProviderClient.lastLocation.addOnCompleteListener {
-            if (it.isSuccessful && it.result != null) {
-                lastLocation = it.result?.toLatLng()
-                mapActionHelper.moveToPosition(latLng = lastLocation!!)
-            } else {
-
-            }
-        }
+        mapActionHelper.moveToPosition(prefs.lastLocation)
     }
 
     /**
@@ -106,13 +117,31 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
-        this.mapActionHelper = MapActionHelper(googleMap)
-        mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
+        googleMapHandler.initialize(googleMap)
+        mapActionHelper = MapActionHelper(googleMap)
 
-        permissionChecker.requestLocationPermission(onGrantedPermission = {
-            startMap()
-            moveToLastLocation()
-        })
+        setMapStyle()
+        startMap()
+        moveToLastLocation()
+        setTrackMapData()
+    }
+
+    private fun setMapStyle() {
+        if (isDarkModeActive()) {
+            try {
+                googleMap.setMapStyle(
+                    MapStyleOptions.loadRawResourceStyle(
+                        this,
+                        R.raw.map_night_style
+                    )
+                )
+            } catch (e: Exception) {
+                logError("Can't map find style. Error: ${e.message}")
+                mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
+            }
+        } else {
+            mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -131,7 +160,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.setOnCameraMoveStartedListener(object : GoogleMap.OnCameraMoveStartedListener {
             override fun onCameraMoveStarted(reason: Int) {
                 if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                    myPositionState = Unlocated
+                    myPositionState = Unallocated
                 }
             }
         })
@@ -142,23 +171,108 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
     }
 
+    private fun setTrackMapData() {
+        (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
+            setupTrackMap(it)
+        }
+    }
+
     private fun toggleView() {
-        lastLocation?.let {
+        prefs.lastLocation?.let {
             val tilt = if (myPositionState == LocatedAndTilted) 30f else 0f
             mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
         }
     }
 
     private fun tiltView() {
-        lastLocation?.let {
+        prefs.lastLocation.let {
             val tilt = if (myPositionState == LocatedAndTilted) 30f else 0f
             mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
         }
     }
+
+    private fun setupTrackMap(trackMap: TrackMap) {
+        trackMap.participantIds.forEach { userId ->
+            subscribeForParticipantLocationUpdates(userId)
+        }
+    }
+
+    private fun subscribeForParticipantLocationUpdates(userId: String) {
+        participantsLocationChildEventListener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                participants.firstOrNull { it.userId == userId }?.let {
+                    when (snapshot.key) {
+                        "latitude" -> it.latitude = snapshot.value as Double
+                        "longitude" -> it.longitude = snapshot.value as Double
+                    }
+                }
+                refreshTrackMap()
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+            }
+        }
+
+        val defaultLatitude =
+            if (userId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
+        val defaultLongitude =
+            if (userId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
+        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude))
+        firebaseHandler.getChildUserId(userId)
+            .addChildEventListener(participantsLocationChildEventListener)
+        refreshTrackMap()
+    }
+
+    private fun unsubscribeForParticipantLocationUpdates() {
+        if (::participantsLocationChildEventListener.isInitialized) {
+            firebaseHandler.rootRef.removeEventListener(participantsLocationChildEventListener)
+        }
+    }
+
+
+    fun refreshTrackMap() {
+        googleMap.clear()
+        participants.forEach { participantLocation ->
+            val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
+            val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
+            LatLng(
+                participantLocation.latitude,
+                participantLocation.longitude
+            ).whenAvailable { latLng ->
+                googleMapHandler.addMarker(
+                    latLng,
+                    participantLocation.userAlias(isUserSession),
+                    participantIcon
+                )
+            }
+        }
+    }
+
+    private fun getParticipantMarker(userId: String, isUserSession: Boolean): Int {
+        var participantIcon = userMarkerMap[userId]
+        if (participantIcon == null) {
+            participantIcon = if (isUserSession) {
+                GoogleMapHandler.MARKER_ICON_DEFAULT_GREEN
+            } else {
+                googleMapHandler.getRandomMarker()
+            }
+            userMarkerMap[userId] = participantIcon
+        }
+        return participantIcon
+    }
 }
 
-sealed class MyPositionState() {
-    object Unlocated : MyPositionState()
+sealed class MyPositionState {
+    object Unallocated : MyPositionState()
     object Located : MyPositionState()
     object LocatedAndTilted : MyPositionState()
 }

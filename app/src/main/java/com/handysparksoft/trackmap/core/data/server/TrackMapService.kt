@@ -44,4 +44,10 @@ interface TrackMapService {
         @Path("trackMapId") trackMapId: String,
         @Body trackMapParticipant: TrackMapParticipant
     )
+
+    @PATCH("users/{userId}.json")
+    suspend fun updateUserLocation(
+        @Path("userId") userId: String,
+        @Body user: UserLocationData
+    )
 }

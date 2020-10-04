@@ -27,4 +27,8 @@ class UseCaseModule {
     @Provides
     fun saveUserTrackMapUseCaseProvider(trackMapRepository: TrackMapRepository) =
         SaveUserTrackMapUseCase(trackMapRepository)
+
+    @Provides
+    fun updateUserLocationUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        UpdateUserLocationUseCase(trackMapRepository)
 }

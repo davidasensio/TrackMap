@@ -17,6 +17,7 @@ class ViewModelModule {
         saveUserUseCase: SaveUserUseCase,
         joinTrackMapUseCase: JoinTrackMapUseCase,
         saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
+        updateUserLocationUseCase: UpdateUserLocationUseCase,
         userHandler: UserHandler
     ) =
         MainViewModelFactory(
@@ -24,6 +25,7 @@ class ViewModelModule {
             saveUserUseCase,
             joinTrackMapUseCase,
             saveUserTrackMapUseCase,
+            updateUserLocationUseCase,
             userHandler
         )
 

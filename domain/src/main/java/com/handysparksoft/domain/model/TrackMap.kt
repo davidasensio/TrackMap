@@ -1,5 +1,7 @@
 package com.handysparksoft.domain.model
 
+import java.io.Serializable
+
 data class TrackMap(
     val trackMapId: String,
     val ownerId: String,
@@ -8,4 +10,4 @@ data class TrackMap(
     val active: Boolean,
     val creationDate: Long = System.currentTimeMillis(),
     val participantIds: List<String>
-)
+) : Serializable

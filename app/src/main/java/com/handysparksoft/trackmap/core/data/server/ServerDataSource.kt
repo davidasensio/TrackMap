@@ -1,10 +1,7 @@
 package com.handysparksoft.trackmap.core.data.server
 
 import com.handysparksoft.data.source.RemoteDataSource
-import com.handysparksoft.domain.model.TrackMap
-import com.handysparksoft.domain.model.TrackMapParticipant
-import com.handysparksoft.domain.model.User
-import com.handysparksoft.domain.model.UserProfileData
+import com.handysparksoft.domain.model.*
 
 class ServerDataSource(private val service: TrackMapService) : RemoteDataSource {
 
@@ -36,12 +33,15 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
     override suspend fun joinTrackMap(userId: String, trackMapId: String, trackMap: TrackMap, trackMapParticipant: TrackMapParticipant) {
         val participantIdsUpdated = trackMap.participantIds.toMutableList()
         participantIdsUpdated.add(userId)
-        val trackMapUpdated = trackMap.copy(participantIds = participantIdsUpdated)
 
         service.joinTrackMap(trackMapId, trackMapParticipant)
     }
 
     override suspend fun getTrackMapById(trackMapId: String): TrackMap? {
         return service.getTrackMaps().values.firstOrNull { it.trackMapId == trackMapId}
+    }
+
+    override suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
+        service.updateUserLocation(userId, UserLocationData(latitude, longitude))
     }
 }
