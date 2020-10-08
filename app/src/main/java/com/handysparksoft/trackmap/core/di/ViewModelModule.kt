@@ -16,6 +16,7 @@ class ViewModelModule {
         getTrackMapsUseCase: GetTrackMapsUseCase,
         saveUserUseCase: SaveUserUseCase,
         joinTrackMapUseCase: JoinTrackMapUseCase,
+        leaveTrackMapUseCase: LeaveTrackMapUseCase,
         saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
         updateUserLocationUseCase: UpdateUserLocationUseCase,
         userHandler: UserHandler
@@ -24,6 +25,7 @@ class ViewModelModule {
             getTrackMapsUseCase,
             saveUserUseCase,
             joinTrackMapUseCase,
+            leaveTrackMapUseCase,
             saveUserTrackMapUseCase,
             updateUserLocationUseCase,
             userHandler

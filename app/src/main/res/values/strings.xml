@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">TrackMap</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="leave">Leave</string>
+
     <string name="title_home">Create</string>
     <string name="title_dashboard">Share</string>
     <string name="title_current">Current TrackMaps</string>
@@ -21,4 +25,6 @@
 
     <string name="splash_slogan">Share your location with everybody you want</string>
     <string name="splash_author">By Handysparksoft</string>
+
+    <string name="leave_trackmap_question">Leave TrackMap \"%1$s\"?</string>
 </resources>
