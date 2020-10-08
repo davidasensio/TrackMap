@@ -9,7 +9,7 @@ import com.handysparksoft.trackmap.App
 import com.handysparksoft.trackmap.BuildConfig
 
 /**
- * Extension functions of: Context / Activity / Fragment
+ * Extension functions of: Context / Activity / Fragment / Intent
  */
 val Context.app: App
     get() = applicationContext as App
@@ -27,6 +27,14 @@ fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
 fun Context.isDarkModeActive(): Boolean {
     val darkModeFlags = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     return darkModeFlags == Configuration.UI_MODE_NIGHT_YES
+}
+
+fun Intent.addClearAllFlags() {
+    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+}
+
+fun Intent.addClearTopFlag() {
+    addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 }
 
 fun Any.logDebug(message: String) {

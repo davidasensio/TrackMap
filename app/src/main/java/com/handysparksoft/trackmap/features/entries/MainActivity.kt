@@ -14,15 +14,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.crashlytics.android.Crashlytics
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.extension.toast
-import com.handysparksoft.trackmap.core.platform.LocationHandler
 import com.handysparksoft.trackmap.core.platform.LocationForegroundService
+import com.handysparksoft.trackmap.core.platform.LocationHandler
 import com.handysparksoft.trackmap.core.platform.PermissionChecker
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.features.create.CreateActivity
@@ -61,10 +60,10 @@ class MainActivity : AppCompatActivity() {
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_create_map -> {
+                /*R.id.navigation_create_map -> {
                     CreateActivity.startActivityForResult(this)
                     return@OnNavigationItemSelectedListener true
-                }
+                }*/
                 R.id.navigation_dashboard -> {
                     return@OnNavigationItemSelectedListener true
                 }
@@ -75,10 +74,10 @@ class MainActivity : AppCompatActivity() {
                     MainActivity.start(this)
                     return@OnNavigationItemSelectedListener true
                 }*/
-                R.id.navigation_force_crash -> {
+                /*R.id.navigation_force_crash -> {
                     Crashlytics.getInstance().crash()
                     return@OnNavigationItemSelectedListener true
-                }
+                }*/
             }
             false
         }
@@ -146,6 +145,9 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
+        }
+        createTrackMapFAB.setOnClickListener {
+            CreateActivity.startActivityForResult(this)
         }
     }
 
