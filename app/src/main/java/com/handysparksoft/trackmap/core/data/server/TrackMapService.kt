@@ -50,4 +50,16 @@ interface TrackMapService {
         @Path("userId") userId: String,
         @Body user: UserLocationData
     )
+
+    @DELETE("users/{userId}/trackMaps/{trackMapId}.json")
+    suspend fun deleteUserTrackMap(
+        @Path("userId") userId: String,
+        @Path("trackMapId") trackMapId: String
+    )
+
+    @PATCH("trackMaps/{trackMapId}.json")
+    suspend fun deleteTrackMapParticipantId(
+        @Path("trackMapId") trackMapId: String,
+        @Body trackMapParticipant: TrackMapParticipant
+    )
 }

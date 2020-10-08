@@ -27,8 +27,8 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
         remoteDataSource.saveUserTrackMap(userId, trackMapId, trackMap)
     }
 
-    suspend fun joinTrackMap(userId: String, trackMapId: String, trackMap: TrackMap, trackMapParticipant: TrackMapParticipant) {
-        remoteDataSource.joinTrackMap(userId, trackMapId, trackMap, trackMapParticipant)
+    suspend fun joinTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
+        remoteDataSource.joinTrackMap(userId, trackMapId, trackMapParticipant)
     }
 
     suspend fun getTrackMapById(trackMapId: String): TrackMap? {
@@ -37,5 +37,9 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
 
     suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
         return remoteDataSource.updateUserLocation(userId, latitude, longitude)
+    }
+
+    suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
+        remoteDataSource.leaveTrackMap(userId, trackMapId, trackMapParticipant)
     }
 }

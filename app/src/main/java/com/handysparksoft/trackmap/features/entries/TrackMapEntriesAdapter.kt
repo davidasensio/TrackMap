@@ -11,7 +11,8 @@ import com.handysparksoft.trackmap.core.platform.DateUtils
 import kotlinx.android.synthetic.main.item_trackmap.view.*
 
 class TrackMapEntriesAdapter(
-    val listener: (trackMap: TrackMap) -> Unit
+    val onGoListener: (trackMap: TrackMap) -> Unit,
+    val onLeaveListener: (trackMap: TrackMap) -> Unit
 ) : RecyclerView.Adapter<TrackMapEntriesAdapter.ViewHolder>() {
 
     var items: List<TrackMap> = emptyList()
@@ -41,7 +42,10 @@ class TrackMapEntriesAdapter(
             itemView.codeTextView.text = trackMap.trackMapId
             itemView.participantsTextView.text = (trackMap.participantIds.size).toString()
             itemView.goButton.setOnClickListener {
-                listener.invoke(trackMap)
+                onGoListener.invoke(trackMap)
+            }
+            itemView.leaveButton.setOnClickListener {
+                onLeaveListener.invoke(trackMap)
             }
         }
 

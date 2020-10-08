@@ -18,6 +18,7 @@ class MainViewModel(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
+    private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val updateUserLocationUseCase: UpdateUserLocationUseCase,
     private val userHandler: UserHandler
@@ -38,9 +39,13 @@ class MainViewModel(
             return _model
         }
 
-    private val _navigation = MutableLiveData<Event<TrackMap>>()
-    val navigation: LiveData<Event<TrackMap>>
-        get() = _navigation
+    private val _goEvent = MutableLiveData<Event<TrackMap>>()
+    val goEvent: LiveData<Event<TrackMap>>
+        get() = _goEvent
+
+    private val _leaveEvent = MutableLiveData<Event<TrackMap>>()
+    val leaveEvent: LiveData<Event<TrackMap>>
+        get() = _leaveEvent
 
     init {
         initScope()
@@ -60,8 +65,12 @@ class MainViewModel(
         }
     }
 
-    fun onCurrentTrackMapClicked(trackMap: TrackMap) {
-        _navigation.value = Event(trackMap)
+    fun onGoTrackMapClicked(trackMap: TrackMap) {
+        _goEvent.value = Event(trackMap)
+    }
+
+    fun onLeaveTrackMapClicked(trackMap: TrackMap) {
+        _leaveEvent.value = Event(trackMap)
     }
 
     fun saveUser() {
@@ -84,6 +93,15 @@ class MainViewModel(
         }
     }
 
+    fun leave(trackMap: TrackMap) {
+        val userId = userHandler.getUserId()
+        launch(Dispatchers.Main) {
+            leaveTrackMapUseCase.execute(userId, trackMap.trackMapId)
+
+            refresh()
+        }
+    }
+
     fun updateUserLocation(userUpdatedLocation: Location) {
         launch(Dispatchers.Main) {
             with(userUpdatedLocation) {
@@ -97,6 +115,7 @@ class MainViewModelFactory(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
+    private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val updateUserLocationUseCase: UpdateUserLocationUseCase,
     private val userHandler: UserHandler
@@ -107,6 +126,7 @@ class MainViewModelFactory(
             getTrackMapsUseCase::class.java,
             saveUserUseCase::class.java,
             joinTrackMapUseCase::class.java,
+            leaveTrackMapUseCase::class.java,
             saveUserTrackMapUseCase::class.java,
             updateUserLocationUseCase::class.java,
             userHandler::class.java
@@ -114,6 +134,7 @@ class MainViewModelFactory(
             getTrackMapsUseCase,
             saveUserUseCase,
             joinTrackMapUseCase,
+            leaveTrackMapUseCase,
             saveUserTrackMapUseCase,
             updateUserLocationUseCase,
             userHandler

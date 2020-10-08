@@ -5,8 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
-    android:layout_marginEnd="16dp"
     android:layout_marginTop="8dp"
+    android:layout_marginEnd="16dp"
     android:layout_marginBottom="8dp"
     android:background="@color/ThemeItemBackgroundColor"
     android:elevation="4dp"
@@ -18,9 +18,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:maxWidth="100dp"
+        android:maxLines="2"
         android:textSize="10sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/labelParticipantsTextView"
         tools:text="Created by on 22-06-2020" />
 
     <TextView
@@ -54,8 +58,8 @@
     <TextView
         android:id="@+id/descriptionTextView"
         android:layout_width="0dp"
-        android:layout_marginStart="16dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
         android:ellipsize="end"
         android:lines="1"
         android:maxLines="2"
@@ -103,15 +107,35 @@
         app:layout_constraintTop_toTopOf="@id/labelParticipantsTextView"
         tools:text="15" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/goButton"
-        style="@style/Primary.Medium"
+    <LinearLayout
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="8dp"
-        android:text="Go!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/codeTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/participantsTextView">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/leaveButton"
+            style="@style/Primary.Medium"
+            android:layout_width="wrap_content"
+            android:backgroundTint="@color/colorNotification"
+            android:text="Leave"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/codeTextView" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/goButton"
+            style="@style/Primary.Medium"
+            android:layout_width="wrap_content"
+            android:text="Go!"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/codeTextView" />
+    </LinearLayout>
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"

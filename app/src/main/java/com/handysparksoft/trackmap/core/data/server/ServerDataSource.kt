@@ -30,10 +30,7 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
         service.saveUserTrackMap(userId, trackMapId, trackMap)
     }
 
-    override suspend fun joinTrackMap(userId: String, trackMapId: String, trackMap: TrackMap, trackMapParticipant: TrackMapParticipant) {
-        val participantIdsUpdated = trackMap.participantIds.toMutableList()
-        participantIdsUpdated.add(userId)
-
+    override suspend fun joinTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
         service.joinTrackMap(trackMapId, trackMapParticipant)
     }
 
@@ -43,5 +40,14 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
 
     override suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
         service.updateUserLocation(userId, UserLocationData(latitude, longitude))
+    }
+
+    override suspend fun leaveTrackMap(
+        userId: String,
+        trackMapId: String,
+        trackMapParticipant: TrackMapParticipant
+    ) {
+        service.deleteUserTrackMap(userId, trackMapId)
+        service.deleteTrackMapParticipantId(trackMapId, trackMapParticipant)
     }
 }

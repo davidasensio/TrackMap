@@ -15,15 +15,13 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.extension.toast
-import com.handysparksoft.trackmap.core.platform.LocationForegroundService
-import com.handysparksoft.trackmap.core.platform.LocationHandler
-import com.handysparksoft.trackmap.core.platform.PermissionChecker
-import com.handysparksoft.trackmap.core.platform.Prefs
+import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
@@ -92,11 +90,8 @@ class MainActivity : AppCompatActivity() {
         setAdapter()
 
         viewModel.model.observe(this, Observer(::updateUi))
-        viewModel.navigation.observe(this, Observer { event ->
-            event.getContentIfNotHandled()?.let {
-                TrackMapActivity.start(this, it)
-            }
-        })
+        viewModel.goEvent.observe(this, Observer(::onGoEvent))
+        viewModel.leaveEvent.observe(this, Observer(::onLeaveEvent))
         viewModel.saveUser()
 
         setupUI()
@@ -122,9 +117,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setAdapter() {
-        adapter = TrackMapEntriesAdapter {
-            viewModel.onCurrentTrackMapClicked(it)
-        }
+        adapter = TrackMapEntriesAdapter(
+            onGoListener = {
+                viewModel.onGoTrackMapClicked(it)
+            },
+            onLeaveListener = {
+                viewModel.onLeaveTrackMapClicked(it)
+            }
+        )
 
         recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
         recycler.adapter = adapter
@@ -138,6 +138,27 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
                 swipeRefreshLayout.isRefreshing = false
             }
+        }
+    }
+
+    private fun onGoEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            TrackMapActivity.start(this, it)
+        }
+    }
+
+    private fun onLeaveEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            val leaveDialog = AlertDialog.Builder(this)
+            leaveDialog.setMessage(getString(R.string.leave_trackmap_question, it.name))
+            leaveDialog.setPositiveButton(R.string.leave) { dialog, _ ->
+                viewModel.leave(it)
+                dialog.dismiss()
+            }
+            leaveDialog.setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            leaveDialog.show()
         }
     }
 
