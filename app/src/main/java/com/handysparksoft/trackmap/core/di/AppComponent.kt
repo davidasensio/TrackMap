@@ -5,6 +5,7 @@ import com.handysparksoft.trackmap.core.platform.LocationForegroundService
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
 import com.handysparksoft.trackmap.features.entries.MainActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
+import com.handysparksoft.trackmap.features.splash.SplashActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
 import dagger.BindsInstance
@@ -24,6 +25,7 @@ interface AppComponent {
     fun inject(mainActivity: MainActivity)
     fun inject(trackMapActivity: TrackMapActivity)
     fun inject(locationForegroundService: LocationForegroundService)
+    fun inject(splashActivity: SplashActivity)
 
     @Component.Factory
     interface Factory {

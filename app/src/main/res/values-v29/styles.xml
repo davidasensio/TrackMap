@@ -9,6 +9,10 @@
 
         <item name="android:windowBackground">@color/ThemeBackgroundColor</item>
         <item name="android:forceDarkAllowed">true</item>
+        <item name="toolbarStyle">@style/CustomToolBarStyle</item>
+    </style>
 
+    <style name="CustomToolBarStyle" parent="@style/Widget.AppCompat.Toolbar">
+        <item name="titleTextColor">@color/colorTextOnDark</item>
     </style>
 </resources>
