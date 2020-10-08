@@ -173,7 +173,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setTrackMapData() {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
-            setupTrackMap(it)
+            setupTrackMapForParticipantUpdates(it)
+            setupTrackMapForParticipantLocations(it)
         }
     }
 
@@ -191,7 +192,41 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setupTrackMap(trackMap: TrackMap) {
+    private fun setupTrackMapForParticipantUpdates(trackMap: TrackMap) {
+        subscribeForParticipantUpdates(trackMap.trackMapId)
+    }
+
+    private fun subscribeForParticipantUpdates(trackMapId: String) {
+        participantsLocationChildEventListener = object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                subscribeForParticipantLocationUpdates(snapshot.value as String)
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                val removedParticipantId = snapshot.value as String
+                participants.firstOrNull { it.userId == removedParticipantId }?.let {
+                    participants.remove(it)
+                }
+                refreshTrackMap()
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
+
+            override fun onCancelled(error: DatabaseError) {}
+        }
+
+        val defaultLatitude =
+            if (trackMapId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
+        val defaultLongitude =
+            if (trackMapId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
+        participants.add(ParticipantLocation(trackMapId, defaultLatitude, defaultLongitude))
+        firebaseHandler.getChildTrackMapId(trackMapId)
+            .addChildEventListener(participantsLocationChildEventListener)
+    }
+
+    private fun setupTrackMapForParticipantLocations(trackMap: TrackMap) {
         trackMap.participantIds.forEach { userId ->
             subscribeForParticipantLocationUpdates(userId)
         }
@@ -229,7 +264,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude))
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
-        refreshTrackMap()
     }
 
     private fun unsubscribeForParticipantLocationUpdates() {
