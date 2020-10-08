@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
+    <!--<item
         android:id="@+id/navigation_create_map"
         android:icon="@drawable/ic_map_black_24dp"
-        android:title="@string/title_home" />
+        android:title="@string/title_home" />-->
 
     <item
         android:id="@+id/navigation_join_map"
@@ -21,9 +21,9 @@
         android:icon="@drawable/ic_search_black_24dp"
         android:title="@string/title_current" />-->
 
-    <item
+    <!--<item
         android:id="@+id/navigation_force_crash"
         android:icon="@drawable/ic_error_black_24dp"
-        android:title="@string/title_crash" />
+        android:title="@string/title_crash" />-->
 
 </menu>

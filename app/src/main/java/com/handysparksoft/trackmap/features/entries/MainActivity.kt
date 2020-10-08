@@ -61,10 +61,10 @@ class MainActivity : AppCompatActivity() {
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.navigation_create_map -> {
+                /*R.id.navigation_create_map -> {
                     CreateActivity.startActivityForResult(this)
                     return@OnNavigationItemSelectedListener true
-                }
+                }*/
                 R.id.navigation_dashboard -> {
                     return@OnNavigationItemSelectedListener true
                 }
@@ -75,10 +75,10 @@ class MainActivity : AppCompatActivity() {
                     MainActivity.start(this)
                     return@OnNavigationItemSelectedListener true
                 }*/
-                R.id.navigation_force_crash -> {
+                /*R.id.navigation_force_crash -> {
                     Crashlytics.getInstance().crash()
                     return@OnNavigationItemSelectedListener true
-                }
+                }*/
             }
             false
         }
@@ -146,6 +146,9 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
             viewModel.refresh()
+        }
+        createTrackMapFAB.setOnClickListener {
+            CreateActivity.startActivityForResult(this)
         }
     }
 
