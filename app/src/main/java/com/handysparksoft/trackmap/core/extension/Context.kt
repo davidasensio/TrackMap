@@ -37,13 +37,13 @@ fun Intent.addClearTopFlag() {
     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
 }
 
-fun Any.logDebug(message: String) {
+fun Context.logDebug(message: String) {
     if (BuildConfig.DEBUG) {
         Log.d(this::class.java.simpleName, message)
     }
 }
 
-fun Any.logError(message: String) {
+fun Context.logError(message: String) {
     if (BuildConfig.DEBUG) {
         Log.e(this::class.java.simpleName, message)
     }

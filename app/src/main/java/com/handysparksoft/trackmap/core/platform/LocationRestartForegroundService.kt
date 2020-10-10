@@ -9,7 +9,7 @@ import com.handysparksoft.trackmap.core.extension.toast
 
 class LocationRestartForegroundService : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
-        logDebug("Broadcast listened")
+        context.logDebug("Broadcast listened")
 
         val locationForegroundService = LocationForegroundService()
         val serviceIntent = Intent(context, locationForegroundService::class.java)
