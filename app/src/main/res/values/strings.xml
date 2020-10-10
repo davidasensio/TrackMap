@@ -27,4 +27,5 @@
     <string name="splash_author">By Handysparksoft</string>
 
     <string name="leave_trackmap_question">Leave TrackMap \"%1$s\"?</string>
+    <string name="no_connection_error">No internet connection available</string>
 </resources>

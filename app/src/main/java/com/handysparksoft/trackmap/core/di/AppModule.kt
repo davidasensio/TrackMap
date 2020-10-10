@@ -3,9 +3,9 @@ package com.handysparksoft.trackmap.core.di
 import android.app.Application
 import android.content.Context
 import com.handysparksoft.data.source.RemoteDataSource
-import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.data.server.ServerDataSource
 import com.handysparksoft.trackmap.core.data.server.TrackMapDb
+import com.handysparksoft.trackmap.core.platform.ConnectionHandler
 import com.handysparksoft.trackmap.core.platform.GoogleMapHandler
 import dagger.Module
 import dagger.Provides
@@ -22,4 +22,8 @@ class AppModule {
 
     @Provides
     fun googleMapHandlerProvider(app: Application): GoogleMapHandler = GoogleMapHandler(app)
+
+    @Singleton
+    @Provides
+    fun connectionHandlerProvider(app: Application) = ConnectionHandler(app)
 }

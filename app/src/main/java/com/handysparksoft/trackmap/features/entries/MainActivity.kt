@@ -15,6 +15,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
@@ -50,6 +51,9 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var locationHandler: LocationHandler
 
+    @Inject
+    lateinit var connectionHandler: ConnectionHandler
+
     // FIXME make injectable
     private lateinit var permissionChecker: PermissionChecker
 
@@ -80,6 +84,10 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
+    override fun onStart() {
+        connectionHandler.registerNetworkCallback()
+        super.onStart()
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -165,7 +173,13 @@ class MainActivity : AppCompatActivity() {
     private fun setupUI() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
-            viewModel.refresh()
+            connectionHandler.registerNetworkCallback()
+            if (!connectionHandler.isNetworkConnected()) {
+                Snackbar.make(swipeRefreshLayout, R.string.no_connection_error, Snackbar.LENGTH_SHORT).show()
+                swipeRefreshLayout.isRefreshing = false
+            } else {
+                viewModel.refresh()
+            }
         }
         createTrackMapFAB.setOnClickListener {
             CreateActivity.startActivityForResult(this)
