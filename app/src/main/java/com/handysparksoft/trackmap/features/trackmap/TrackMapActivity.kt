@@ -3,6 +3,8 @@ package com.handysparksoft.trackmap.features.trackmap
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.GoogleMap
@@ -59,7 +61,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         ).get(TrackMapViewModel::class.java)
     }
 
-    private val participants = mutableListOf<ParticipantLocation>()
+    private val participants = mutableSetOf<ParticipantLocation>()
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
@@ -200,6 +202,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         participantsLocationChildEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 subscribeForParticipantLocationUpdates(snapshot.value as String)
+                logDebug("*** Child added: ${snapshot.value}")
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -210,6 +213,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     participants.remove(it)
                 }
                 refreshTrackMap()
+                logDebug("*** Child removed: ${snapshot.value}")
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -217,11 +221,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onCancelled(error: DatabaseError) {}
         }
 
-        val defaultLatitude =
-            if (trackMapId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
-        val defaultLongitude =
-            if (trackMapId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
-        participants.add(ParticipantLocation(trackMapId, defaultLatitude, defaultLongitude))
         firebaseHandler.getChildTrackMapId(trackMapId)
             .addChildEventListener(participantsLocationChildEventListener)
     }

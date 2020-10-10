@@ -80,7 +80,7 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
             context.resources, vectorResourceId, null
         )
         if (vectorDrawable == null) {
-            logError("Requested vector resource was not found")
+            context.logError("Requested vector resource was not found")
             return BitmapDescriptorFactory.defaultMarker()
         }
         val bitmap = Bitmap.createBitmap(
