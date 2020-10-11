@@ -15,6 +15,10 @@ android {
         versionCode getCustomVersionCode(referenceVersionCode)
         versionName getCustomVersionName(referenceVersionName)
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        manifestPlaceholders = [
+                deeplinkScheme: "trackmap.firebaseapp.com"
+        ]
     }
 
     buildTypes {

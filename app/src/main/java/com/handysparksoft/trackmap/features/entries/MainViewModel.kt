@@ -47,6 +47,14 @@ class MainViewModel(
     val leaveEvent: LiveData<Event<TrackMap>>
         get() = _leaveEvent
 
+    private val _shareEvent = MutableLiveData<Event<TrackMap>>()
+    val shareEvent: LiveData<Event<TrackMap>>
+        get() = _shareEvent
+
+    private val _joinFeedbackEvent = MutableLiveData<Event<TrackMap>>()
+    val joinFeedbackEvent: LiveData<Event<TrackMap>>
+        get() = _joinFeedbackEvent
+
     init {
         initScope()
     }
@@ -73,13 +81,17 @@ class MainViewModel(
         _leaveEvent.value = Event(trackMap)
     }
 
+    fun onShareTrackMapClicked(trackMap: TrackMap) {
+        _shareEvent.value = Event(trackMap)
+    }
+
     fun saveUser() {
         launch(Dispatchers.Main) {
             saveUserUseCase.execute(userHandler.getUserId(), "default")
         }
     }
 
-    fun joinTrackMap(trackMapCode: String) {
+    fun joinTrackMap(trackMapCode: String, showFeedback: Boolean = false) {
         launch(Dispatchers.Main) {
             val userId = userHandler.getUserId()
             val joinedTrackMap = joinTrackMapUseCase.execute(userId, trackMapCode)
@@ -87,8 +99,11 @@ class MainViewModel(
                 val ownerId = trackMap.ownerId
                 saveUserTrackMapUseCase.execute(userId, trackMap.trackMapId, trackMap)
                 saveUserTrackMapUseCase.execute(ownerId, trackMap.trackMapId, trackMap)
-            }
 
+                if (showFeedback) {
+                    _joinFeedbackEvent.value = Event(trackMap)
+                }
+            }
             refresh()
         }
     }

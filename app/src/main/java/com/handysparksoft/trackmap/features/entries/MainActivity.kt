@@ -20,8 +20,8 @@ import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.logDebug
+import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
@@ -31,11 +31,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    companion object {
-        fun start(context: Context) {
-            context.startActivity<MainActivity>()
-        }
-    }
 
     private lateinit var adapter: TrackMapEntriesAdapter
     private val viewModel: MainViewModel by lazy {
@@ -88,6 +83,7 @@ class MainActivity : AppCompatActivity() {
         connectionHandler.registerNetworkCallback()
         super.onStart()
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -100,6 +96,8 @@ class MainActivity : AppCompatActivity() {
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.goEvent.observe(this, Observer(::onGoEvent))
         viewModel.leaveEvent.observe(this, Observer(::onLeaveEvent))
+        viewModel.shareEvent.observe(this, Observer(::onShareEvent))
+        viewModel.joinFeedbackEvent.observe(this, Observer(::onJoinFeedbackEvent))
         viewModel.saveUser()
 
         setupUI()
@@ -109,6 +107,8 @@ class MainActivity : AppCompatActivity() {
 //            startUserTrackLocation()
             startUserTrackLocationService()
         })
+
+        checkDeepLink()
     }
 
     private fun updateLastLocation() {
@@ -131,6 +131,9 @@ class MainActivity : AppCompatActivity() {
             },
             onLeaveListener = {
                 viewModel.onLeaveTrackMapClicked(it)
+            },
+            onShareListener = {
+                viewModel.onShareTrackMapClicked(it)
             }
         )
 
@@ -170,12 +173,34 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun onShareEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            DeeplinkHandler.generateDeeplink(this, it.trackMapId, it.name)
+        }
+    }
+
+    private fun onJoinFeedbackEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            bottomNavigation.snackbar(
+                message = "You just joined TrackMap \"${it.name}\"",
+                length = Snackbar.LENGTH_INDEFINITE,
+                actionListener = {
+                    // Nothing to do
+                }
+            )
+        }
+    }
+
     private fun setupUI() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
             connectionHandler.registerNetworkCallback()
             if (!connectionHandler.isNetworkConnected()) {
-                Snackbar.make(swipeRefreshLayout, R.string.no_connection_error, Snackbar.LENGTH_SHORT).show()
+                Snackbar.make(
+                    swipeRefreshLayout,
+                    R.string.no_connection_error,
+                    Snackbar.LENGTH_SHORT
+                ).show()
                 swipeRefreshLayout.isRefreshing = false
             } else {
                 viewModel.refresh()
@@ -183,6 +208,14 @@ class MainActivity : AppCompatActivity() {
         }
         createTrackMapFAB.setOnClickListener {
             CreateActivity.startActivityForResult(this)
+        }
+    }
+
+    private fun checkDeepLink() {
+        val trackMapCodeExtra = intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
+        if (trackMapCodeExtra != null) {
+            val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
+            viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
         }
     }
 
@@ -220,9 +253,9 @@ class MainActivity : AppCompatActivity() {
             } else {
                 startService(serviceIntent)
             }
-            toast("Service initialized")
+            logDebug("Service initialized")
         } else {
-            toast("Service already initialized!")
+            logDebug("Service already initialized!")
         }
     }
 
@@ -246,5 +279,14 @@ class MainActivity : AppCompatActivity() {
         return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
+    }
+
+
+    companion object {
+        const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
+
+        fun start(context: Context) {
+            context.startActivity<MainActivity>()
+        }
     }
 }
