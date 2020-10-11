@@ -3,14 +3,14 @@ package com.handysparksoft.trackmap.features.trackmap
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.os.Handler
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -22,6 +22,7 @@ import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
+import kotlinx.android.synthetic.main.activity_trackmap.*
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -67,6 +68,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val userMarkerMap = hashMapOf<String, Int>()
 
+    private var viewAllParticipantsInMap = true
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trackmap)
@@ -97,6 +100,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setupUI() {
         title = getString(R.string.app_name)
+
+        viewAllMarkersInMapImageView?.setOnClickListener {
+            viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_fullscreen_exit_black else R.drawable.ic_fullscreen_black)
+            viewAllParticipantsInMap = !viewAllParticipantsInMap
+        }
 
 //        myPositionImageView?.setOnClickListener {
 //            toggleView()
@@ -274,21 +282,22 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun refreshTrackMap() {
         googleMap.clear()
-        participants.forEach { participantLocation ->
+        participants.filter(::withAvailableLatLng).forEach { participantLocation ->
             val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
             val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
-            LatLng(
-                participantLocation.latitude,
-                participantLocation.longitude
-            ).whenAvailable { latLng ->
-                googleMapHandler.addMarker(
-                    latLng,
-                    participantLocation.userAlias(isUserSession),
-                    participantIcon
-                )
-            }
+            val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
+
+            googleMapHandler.addMarker(
+                latLng,
+                participantLocation.userAlias(isUserSession),
+                participantIcon
+            )
+        }
+        if (viewAllParticipantsInMap) {
+            frameAllParticipants()
         }
     }
+
 
     private fun getParticipantMarker(userId: String, isUserSession: Boolean): Int {
         var participantIcon = userMarkerMap[userId]
@@ -301,6 +310,24 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             userMarkerMap[userId] = participantIcon
         }
         return participantIcon
+    }
+
+
+    private fun frameAllParticipants() {
+        val boundsBuilder = LatLngBounds.Builder()
+
+        participants.filter(::withAvailableLatLng).forEach { participant ->
+            boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
+        }
+
+        val padding = 50
+        val build = boundsBuilder.build()
+        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, padding)
+        this.googleMap.animateCamera(cameraUpdateAction)
+    }
+
+    private fun withAvailableLatLng(participantLocation: ParticipantLocation): Boolean {
+        return participantLocation.latitude != 0.0 && participantLocation.longitude != 0.0
     }
 }
 
