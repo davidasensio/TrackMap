@@ -5,10 +5,6 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven {
-            url "https://maven.fabric.io/public"
-        }
-
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.0.1'
@@ -19,8 +15,8 @@ buildscript {
         // Check for v3.1.2 or higher
         classpath "com.google.gms:google-services:4.3.3"  // Google Services plugin
 
-        // Add dependency
-        classpath "io.fabric.tools:gradle:1.31.2"  // Crashlytics plugin
+        // Add the Firebase Crashlytics Gradle plugin.
+        classpath 'com.google.firebase:firebase-crashlytics-gradle:2.3.0'
     }
 }
 
@@ -97,8 +93,8 @@ allprojects {
         ]
 
         libs = [
-                crashlytics: "com.crashlytics.sdk.android:crashlytics:2.10.1",
-                analytics  : "com.google.firebase:firebase-analytics:17.5.0",
+                firebaseCrashlytics: "com.google.firebase:firebase-crashlytics:17.2.1",
+                googleAnalytics  : "com.google.firebase:firebase-analytics:17.5.0",
                 //splitties  : "com.louiscad.splitties:splitties-activities:$splitties_version",
                 dexter     : "com.karumi:dexter:6.0.2",
                 dagger     : "com.google.dagger:dagger:2.26",
