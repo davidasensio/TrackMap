@@ -31,11 +31,6 @@ import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    companion object {
-        fun start(context: Context) {
-            context.startActivity<MainActivity>()
-        }
-    }
 
     private lateinit var adapter: TrackMapEntriesAdapter
     private val viewModel: MainViewModel by lazy {
@@ -100,6 +95,7 @@ class MainActivity : AppCompatActivity() {
         viewModel.model.observe(this, Observer(::updateUi))
         viewModel.goEvent.observe(this, Observer(::onGoEvent))
         viewModel.leaveEvent.observe(this, Observer(::onLeaveEvent))
+        viewModel.shareEvent.observe(this, Observer(::onShareEvent))
         viewModel.saveUser()
 
         setupUI()
@@ -109,6 +105,8 @@ class MainActivity : AppCompatActivity() {
 //            startUserTrackLocation()
             startUserTrackLocationService()
         })
+
+        checkDeepLink()
     }
 
     private fun updateLastLocation() {
@@ -131,6 +129,9 @@ class MainActivity : AppCompatActivity() {
             },
             onLeaveListener = {
                 viewModel.onLeaveTrackMapClicked(it)
+            },
+            onShareListener = {
+                viewModel.onShareTrackMapClicked(it)
             }
         )
 
@@ -170,6 +171,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun onShareEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            DeeplinkHandler.generateDeeplink(this, it.trackMapId, it.name)
+        }
+    }
+
     private fun setupUI() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
@@ -183,6 +190,14 @@ class MainActivity : AppCompatActivity() {
         }
         createTrackMapFAB.setOnClickListener {
             CreateActivity.startActivityForResult(this)
+        }
+    }
+
+    private fun checkDeepLink() {
+        val trackMapCodeExtra = intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
+        if (trackMapCodeExtra != null) {
+            viewModel.joinTrackMap(trackMapCodeExtra)
+            toast("Just joined to $trackMapCodeExtra")
         }
     }
 
@@ -246,5 +261,14 @@ class MainActivity : AppCompatActivity() {
         return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
+    }
+
+
+    companion object {
+        const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
+
+        fun start(context: Context) {
+            context.startActivity<MainActivity>()
+        }
     }
 }

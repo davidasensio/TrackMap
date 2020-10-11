@@ -47,6 +47,10 @@ class MainViewModel(
     val leaveEvent: LiveData<Event<TrackMap>>
         get() = _leaveEvent
 
+    private val _shareEvent = MutableLiveData<Event<TrackMap>>()
+    val shareEvent: LiveData<Event<TrackMap>>
+        get() = _shareEvent
+
     init {
         initScope()
     }
@@ -71,6 +75,10 @@ class MainViewModel(
 
     fun onLeaveTrackMapClicked(trackMap: TrackMap) {
         _leaveEvent.value = Event(trackMap)
+    }
+
+    fun onShareTrackMapClicked(trackMap: TrackMap) {
+        _shareEvent.value = Event(trackMap)
     }
 
     fun saveUser() {

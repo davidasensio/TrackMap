@@ -12,7 +12,8 @@ import kotlinx.android.synthetic.main.item_trackmap.view.*
 
 class TrackMapEntriesAdapter(
     val onGoListener: (trackMap: TrackMap) -> Unit,
-    val onLeaveListener: (trackMap: TrackMap) -> Unit
+    val onLeaveListener: (trackMap: TrackMap) -> Unit,
+    val onShareListener: (trackMap: TrackMap) -> Unit
 ) : RecyclerView.Adapter<TrackMapEntriesAdapter.ViewHolder>() {
 
     var items: List<TrackMap> = emptyList()
@@ -46,6 +47,9 @@ class TrackMapEntriesAdapter(
             }
             itemView.leaveButton.setOnClickListener {
                 onLeaveListener.invoke(trackMap)
+            }
+            itemView.trackMapShareImageButton.setOnClickListener {
+                onShareListener.invoke(trackMap)
             }
         }
 
