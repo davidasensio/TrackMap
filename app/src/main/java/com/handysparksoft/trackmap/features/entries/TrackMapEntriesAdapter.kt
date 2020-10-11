@@ -50,7 +50,7 @@ class TrackMapEntriesAdapter(
         }
 
         private fun getCreationText(view: View, owner: String, creationDate: Long): String {
-            val dateFromTime = DateUtils.getDateFromTime(creationDate)
+            val dateFromTime = DateUtils.getRelativeDateFromTime(view.context, creationDate)
             return view.context.getString(R.string.creation_template, dateFromTime, owner)
         }
     }

@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity() {
                     CreateActivity.startActivityForResult(this)
                     return@OnNavigationItemSelectedListener true
                 }*/
-                R.id.navigation_dashboard -> {
+                R.id.navigation_home -> {
                     return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_join_map -> {
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                     return@OnNavigationItemSelectedListener true
                 }*/
             }
-            false
+            true
         }
 
     override fun onStart() {

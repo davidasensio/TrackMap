@@ -11,21 +11,38 @@
     android:background="@color/ThemeItemBackgroundColor"
     android:elevation="4dp"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="8dp">
+
+    <ImageButton
+        android:id="@+id/trackMapShareImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_share"
+        android:padding="8dp"
+        android:src="@drawable/ic_share_black"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/creationDateTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:layout_marginTop="6dp"
         android:maxWidth="100dp"
-        android:maxLines="2"
+        android:maxLines="3"
+        android:textAlignment="center"
         android:textSize="10sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/labelParticipantsTextView"
-        tools:text="Created by on 22-06-2020" />
+        tools:text="Created by on 22-06-2020"
+        tools:ignore="SmallSp" />
 
     <TextView
         android:id="@+id/labelNameTextView"
@@ -110,19 +127,19 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="6dp"
         android:orientation="horizontal"
-        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/participantsTextView">
+        app:layout_constraintTop_toBottomOf="@+id/creationDateTextView">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/leaveButton"
             style="@style/Primary.Medium"
             android:layout_width="wrap_content"
+            android:layout_marginEnd="16dp"
             android:backgroundTint="@color/colorNotification"
             android:text="Leave"
-            android:layout_marginEnd="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codeTextView" />

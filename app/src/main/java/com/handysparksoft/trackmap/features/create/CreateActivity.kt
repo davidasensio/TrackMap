@@ -7,10 +7,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.handysparksoft.trackmap.databinding.ActivityCreateBinding
+import com.google.android.material.snackbar.Snackbar
+import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.core.extension.toast
+import com.handysparksoft.trackmap.databinding.ActivityCreateBinding
 import kotlinx.android.synthetic.main.activity_create.*
 
 class CreateActivity : AppCompatActivity() {
@@ -20,6 +21,7 @@ class CreateActivity : AppCompatActivity() {
                 //putExtra("param1", 5)
             }
         }
+
         fun startActivityForResult(activity: Activity) {
             activity.startActivityForResult(Intent(activity, CreateActivity::class.java), 1)
         }
@@ -68,8 +70,24 @@ class CreateActivity : AppCompatActivity() {
         viewModel.getTrackMapCode().observe(this, Observer(::trackMapCodeObserver))
 
         createTrackmapButton?.setOnClickListener {
-            onCreateAction()
+            validateForm { success ->
+                if (success) {
+                    onCreateAction()
+                } else {
+                    Snackbar.make(
+                        createTrackmapButton,
+                        getString(R.string.create_trackmap_validation),
+                        Snackbar.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
+    }
+
+    private fun validateForm(callback: (success: Boolean) -> Unit) {
+        val success = (createNameEditText?.text?.isNotEmpty() == true &&
+                createDescriptionEditText?.text?.isNotEmpty() == true)
+        callback(success)
     }
 
     private fun trackMapCodeObserver(generatedCode: String) {

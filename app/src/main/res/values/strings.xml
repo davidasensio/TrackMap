@@ -4,8 +4,8 @@
     <string name="cancel">Cancel</string>
     <string name="leave">Leave</string>
 
-    <string name="title_home">Create</string>
-    <string name="title_dashboard">Share</string>
+    <string name="title_home">Home</string>
+    <string name="title_share">Share</string>
     <string name="title_current">Current TrackMaps</string>
     <string name="title_join">Join</string>
     <string name="title_notifications">Notifications</string>
@@ -17,11 +17,12 @@
     <string name="create_code">Code</string>
     <string name="create_name">Name</string>
     <string name="create_description">Description</string>
-    <string name="create_trackmap">Create Trackmap</string>
+    <string name="create_trackmap">Create TrackMap</string>
+    <string name="create_trackmap_validation">Please, provide all the info to create the TrackMap</string>
     <string name="code_helper_text">Unique TrackMap code</string>
     <string name="name_helper_text">Name for the trackmap</string>
     <string name="description_helper_text">Short trackmap description</string>
-    <string name="creation_template">Created on <b>%1$s</b> by %2$s</string>
+    <string name="creation_template">Created <b>%1$s</b> by %2$s</string>
 
     <string name="splash_slogan">Share your location with everybody you want</string>
     <string name="splash_author">By Handysparksoft</string>
