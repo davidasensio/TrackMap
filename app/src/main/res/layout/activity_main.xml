@@ -1,75 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mainContentLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/app_background"
-    tools:context=".features.entries.MainActivity">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/textview"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/your_trackmaps"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-        android:id="@+id/swipeRefreshLayout"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginTop="16dp"
-        app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textview">
+        android:layout_height="match_parent"
+        android:background="@drawable/app_background"
+        tools:context=".features.entries.MainActivity">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/textview"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            tools:itemCount="2"
-            tools:listitem="@layout/item_trackmap" />
-    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+            android:layout_margin="16dp"
+            android:text="@string/your_trackmaps"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipeRefreshLayout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintBottom_toTopOf="@id/bottomNavigation"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textview">
 
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:visibility="visible" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                tools:itemCount="2"
+                tools:listitem="@layout/item_trackmap" />
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:background="?android:attr/windowBackground"
-        app:labelVisibilityMode="labeled"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/swipeRefreshLayout"
-        app:menu="@menu/bottom_navigation" />
+        <ProgressBar
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/createTrackMapFAB"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:backgroundTint="@color/colorAccent"
-        android:src="@drawable/ic_create_trackmap"
-        app:layout_constraintBottom_toBottomOf="@+id/swipeRefreshLayout"
-        app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:visibility="visible" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottomNavigation"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/windowBackground"
+            app:labelVisibilityMode="labeled"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/swipeRefreshLayout"
+            app:menu="@menu/bottom_navigation" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/createTrackMapFAB"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:backgroundTint="@color/colorAccent"
+            android:src="@drawable/ic_create_trackmap"
+            app:layout_constraintBottom_toBottomOf="@+id/swipeRefreshLayout"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
