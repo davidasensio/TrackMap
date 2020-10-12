@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.core.platform
+package com.handysparksoft.trackmap.core.platform.network
 
 import android.content.Context
 import android.net.ConnectivityManager
@@ -9,16 +9,16 @@ import javax.inject.Inject
 
 class ConnectionHandler @Inject constructor(private val context: Context) {
     companion object {
-        var isNetworkConnected = false
+        var isNetworkAvailable = false
     }
 
     private val networkCallback = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
-            isNetworkConnected = true
+            isNetworkAvailable = true
         }
 
         override fun onLost(network: Network) {
-            isNetworkConnected = false
+            isNetworkAvailable = false
         }
     }
 
@@ -35,5 +35,6 @@ class ConnectionHandler @Inject constructor(private val context: Context) {
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
 
-    fun isNetworkConnected() = isNetworkConnected
+    fun isNetworkAvailable() = isNetworkAvailable
 }
+

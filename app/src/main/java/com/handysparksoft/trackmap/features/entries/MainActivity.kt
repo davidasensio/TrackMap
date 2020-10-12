@@ -23,6 +23,7 @@ import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.*
+import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
@@ -195,7 +196,7 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
             connectionHandler.registerNetworkCallback()
-            if (!connectionHandler.isNetworkConnected()) {
+            if (!connectionHandler.isNetworkAvailable()) {
                 Snackbar.make(
                     swipeRefreshLayout,
                     R.string.no_connection_error,
