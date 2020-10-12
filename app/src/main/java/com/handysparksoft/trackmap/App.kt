@@ -3,7 +3,7 @@ package com.handysparksoft.trackmap
 import android.app.Application
 import com.handysparksoft.trackmap.core.di.AppComponent
 import com.handysparksoft.trackmap.core.di.DaggerAppComponent
-import com.handysparksoft.trackmap.core.platform.ConnectionHandler
+import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import javax.inject.Inject
 
 class App : Application() {

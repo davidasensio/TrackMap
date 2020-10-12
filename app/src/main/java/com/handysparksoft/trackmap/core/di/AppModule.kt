@@ -5,7 +5,7 @@ import android.content.Context
 import com.handysparksoft.data.source.RemoteDataSource
 import com.handysparksoft.trackmap.core.data.server.ServerDataSource
 import com.handysparksoft.trackmap.core.data.server.TrackMapDb
-import com.handysparksoft.trackmap.core.platform.ConnectionHandler
+import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.core.platform.GoogleMapHandler
 import dagger.Module
 import dagger.Provides

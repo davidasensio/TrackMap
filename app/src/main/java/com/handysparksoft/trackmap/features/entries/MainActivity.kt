@@ -23,9 +23,9 @@ import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.*
+import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
-import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Content
-import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.Loading
+import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -149,6 +149,19 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
                 swipeRefreshLayout.isRefreshing = false
             }
+            is Error -> {
+                swipeRefreshLayout.isRefreshing = false
+                val message =
+                    if (model.isNetworkError) {
+                        getString(R.string.no_connection_error)
+                    } else {
+                        "Unknown error occurred. ${model.message}"
+                    }
+                bottomNavigation.snackbar(
+                    message = message,
+                    length = Snackbar.LENGTH_SHORT
+                )
+            }
         }
     }
 
@@ -195,16 +208,16 @@ class MainActivity : AppCompatActivity() {
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
             connectionHandler.registerNetworkCallback()
-            if (!connectionHandler.isNetworkConnected()) {
-                Snackbar.make(
-                    swipeRefreshLayout,
-                    R.string.no_connection_error,
-                    Snackbar.LENGTH_SHORT
-                ).show()
-                swipeRefreshLayout.isRefreshing = false
-            } else {
-                viewModel.refresh()
-            }
+//            if (!connectionHandler.isNetworkAvailable()) {
+//                Snackbar.make(
+//                    swipeRefreshLayout,
+//                    R.string.no_connection_error,
+//                    Snackbar.LENGTH_SHORT
+//                ).show()
+//                swipeRefreshLayout.isRefreshing = false
+//            } else {
+            viewModel.refresh()
+//            }
         }
         createTrackMapFAB.setOnClickListener {
             CreateActivity.startActivityForResult(this)
