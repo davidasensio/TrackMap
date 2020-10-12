@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
@@ -28,6 +29,7 @@ class MainViewModel(
     sealed class UiModel {
         object Loading : UiModel()
         class Content(val data: List<TrackMap>) : UiModel()
+        class Error(val isNetworkError: Boolean, val message: String) : UiModel()
     }
 
     private val _model = MutableLiveData<UiModel>()
@@ -69,7 +71,13 @@ class MainViewModel(
         launch(Dispatchers.Main) {
             val userId = userHandler.getUserId()
             _model.value = UiModel.Loading
-            _model.value = UiModel.Content(ArrayList(getTrackMapsUseCase.execute(userId).values))
+
+            val userTrackMaps = getTrackMapsUseCase.execute(userId)
+            if (userTrackMaps is Result.Success) {
+                _model.value = UiModel.Content(ArrayList(userTrackMaps.data.values))
+            } else if (userTrackMaps is Result.Error) {
+                _model.value = UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")
+            }
         }
     }
 

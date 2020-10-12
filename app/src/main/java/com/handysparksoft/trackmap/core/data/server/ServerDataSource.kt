@@ -1,33 +1,32 @@
 package com.handysparksoft.trackmap.core.data.server
 
+import com.handysparksoft.data.Result
 import com.handysparksoft.data.source.RemoteDataSource
 import com.handysparksoft.domain.model.*
+import com.handysparksoft.trackmap.core.data.server.NetworkHelper.safeApiCall
 
 class ServerDataSource(private val service: TrackMapService) : RemoteDataSource {
 
+
     override suspend fun saveUser(userId: String) {
         val user = User(userId, System.currentTimeMillis())
-        service.saveUser(userId, user)
+        safeApiCall { service.saveUser(userId, user) }
     }
 
     override suspend fun updateUser(userId: String, userProfileData: UserProfileData) {
-        service.updateUserName(userId, userProfileData)
+        safeApiCall { service.updateUserName(userId, userProfileData) }
     }
 
-    override suspend fun getUserTrackMaps(userId: String): Map<String, TrackMap> {
-        return try {
-            service.getUserTrackMaps(userId)
-        } catch (e: Exception) {
-            HashMap() // Return an empty HashMap when a request returns null
-        }
+    override suspend fun getUserTrackMaps(userId: String): Result<Map<String, TrackMap>> {
+        return safeApiCall { service.getUserTrackMaps(userId) }
     }
 
     override suspend fun saveTrackMap(trackMapId: String, trackMap: TrackMap) {
-        service.saveTrackMap(trackMapId, trackMap)
+        safeApiCall { service.saveTrackMap(trackMapId, trackMap) }
     }
 
     override suspend fun saveUserTrackMap(userId: String, trackMapId: String, trackMap: TrackMap) {
-        service.saveUserTrackMap(userId, trackMapId, trackMap)
+        safeApiCall { service.saveUserTrackMap(userId, trackMapId, trackMap) }
     }
 
     override suspend fun joinTrackMap(
@@ -35,16 +34,27 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
         trackMapId: String,
         trackMapParticipant: TrackMapParticipant
     ) {
-        service.joinTrackMap(trackMapId, trackMapParticipant)
+        safeApiCall { service.joinTrackMap(trackMapId, trackMapParticipant) }
     }
 
-    override suspend fun getTrackMapById(trackMapId: String): TrackMap? {
-        return service.getTrackMaps().values.firstOrNull { it.trackMapId == trackMapId }
-        return null
+    override suspend fun getTrackMapById(trackMapId: String): Result<TrackMap?> {
+        val result = safeApiCall { service.getTrackMaps() }
+        return when (result) {
+            is Result.Success -> {
+                val data = result.data.values.firstOrNull { it.trackMapId == trackMapId }
+                if (data != null) {
+                    Result.Success(data)
+                } else {
+                    Result.Error(false, null, null)
+                }
+            }
+            is Result.Error -> Result.Error(result.isNetworkError, result.code, result.errorResponse)
+            is Result.Loading -> Result.Loading
+        }
     }
 
     override suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
-        service.updateUserLocation(userId, UserLocationData(latitude, longitude))
+        safeApiCall { service.updateUserLocation(userId, UserLocationData(latitude, longitude)) }
     }
 
     override suspend fun leaveTrackMap(
@@ -52,7 +62,9 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
         trackMapId: String,
         trackMapParticipant: TrackMapParticipant
     ) {
-        service.deleteUserTrackMap(userId, trackMapId)
-        service.deleteTrackMapParticipantId(trackMapId, trackMapParticipant)
+        safeApiCall {
+            service.deleteUserTrackMap(userId, trackMapId)
+            service.deleteTrackMapParticipantId(trackMapId, trackMapParticipant)
+        }
     }
 }
