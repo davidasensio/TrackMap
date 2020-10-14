@@ -62,4 +62,11 @@
         <item name="cornerRadius">20dp</item>
     </style>
 
+    <style name="TrackMapCodeFontStyle">
+        <item name="android:letterSpacing">0.2</item>
+        <item name="android:singleLine">true</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textAppearance">@style/TextAppearance.AppCompat.Medium</item>
+    </style>
+
 </resources>

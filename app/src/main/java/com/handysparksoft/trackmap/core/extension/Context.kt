@@ -1,5 +1,6 @@
 package com.handysparksoft.trackmap.core.extension
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
@@ -18,6 +19,12 @@ inline fun <reified T> Context.startActivity(configIntent: Intent.() -> Unit = {
     val intent = Intent(this, T::class.java)
     intent.apply(configIntent)
     this.startActivity(intent)
+}
+
+inline fun <reified T> Activity.startActivityForResult(requestCode: Int, configIntent: Intent.() -> Unit = {}) {
+    val intent = Intent(this, T::class.java)
+    intent.apply(configIntent)
+    this.startActivityForResult(intent, requestCode)
 }
 
 fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT) {

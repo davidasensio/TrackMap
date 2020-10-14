@@ -3,12 +3,10 @@ package com.handysparksoft.trackmap.features.entries
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -26,6 +24,7 @@ import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.features.create.CreateActivity
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
+import com.handysparksoft.trackmap.features.join.JoinActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
@@ -233,7 +232,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun joinTrackMapTemporal() {
-        val promptJoinDialog = AlertDialog.Builder(this)
+        JoinActivity.startForResult(this, JoinActivity.REQUEST_CODE)
+
+        /*val promptJoinDialog = AlertDialog.Builder(this)
         val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
         promptJoinDialog.setView(promptDialogView)
 
@@ -248,7 +249,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             })
             .create()
-            .show()
+            .show()*/
     }
 
     private fun startUserTrackLocation() {
@@ -293,7 +294,6 @@ class MainActivity : AppCompatActivity() {
             LocationManager.NETWORK_PROVIDER
         )
     }
-
 
     companion object {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"

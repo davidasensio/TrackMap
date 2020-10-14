@@ -40,26 +40,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".features.deeplink.DeepLinkActivity">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+
                 <data
                     android:host="${deeplinkScheme}"
                     android:scheme="https" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".features.entries.MainActivity" />
+        <activity android:name=".features.entries.MainActivity" />
         <activity
             android:name=".features.trackmap.TrackMapActivity"
             android:label="@string/app_name" />
         <activity
             android:name=".features.create.CreateActivity"
             android:label="@string/create_trackmap" />
+        <activity
+            android:name=".features.join.JoinActivity"
+            android:windowSoftInputMode="adjustResize" />
 
         <service
             android:name=".core.platform.LocationForegroundService"
