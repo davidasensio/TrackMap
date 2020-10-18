@@ -33,7 +33,7 @@
     <string name="leave_trackmap_question">Leave TrackMap \"%1$s\"?</string>
     <string name="no_connection_error">No internet connection available</string>
 
-    <string name="join_trackmap_code">TrackMap code</string>
+    <string name="join_trackmap_code">Code</string>
     <string name="join_trackmap_code_helper">Enter TrackMap code to join</string>
     <string name="join_trackmap_validation">Please, provide a valid TrackMap code</string>
     <string name="permission_need">Location permission is needed</string>
