@@ -72,6 +72,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var viewAllParticipantsInMap = true
 
+    private val mapStyles = arrayOf(
+        GoogleMap.MAP_TYPE_NORMAL,
+        GoogleMap.MAP_TYPE_SATELLITE
+    )
+    private var mapStyleCounter = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trackmap)
@@ -106,6 +112,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         viewAllMarkersInMapImageView?.setOnClickListener {
             viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
             viewAllParticipantsInMap = !viewAllParticipantsInMap
+        }
+
+        setMapStyleImageView?.setOnClickListener {
+            val nextTypeIndex = ++mapStyleCounter % mapStyles.size
+            mapActionHelper.mapType = mapStyles[nextTypeIndex]
         }
 
 //        myPositionImageView?.setOnClickListener {

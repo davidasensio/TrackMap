@@ -37,5 +37,6 @@
     <string name="join_trackmap_code_helper">Enter TrackMap code to join</string>
     <string name="join_trackmap_validation">Please, provide a valid TrackMap code</string>
     <string name="permission_need">Location permission is needed</string>
-    <string name="frame_all_participants">Frame all participants</string>
+    <string name="tooltip_frame_all_participants">Frame all participants</string>
+    <string name="tooltip_map_style">Change map style</string>
 </resources>
