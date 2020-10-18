@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
 import android.util.Log
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import com.handysparksoft.trackmap.App
 import com.handysparksoft.trackmap.BuildConfig
@@ -34,6 +35,14 @@ fun Context.toast(message: String, length: Int = Toast.LENGTH_SHORT) {
 fun Context.isDarkModeActive(): Boolean {
     val darkModeFlags = this.resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
     return darkModeFlags == Configuration.UI_MODE_NIGHT_YES
+}
+
+fun Activity.hideKeyBoard() {
+    (this.getSystemService(Context.INPUT_METHOD_SERVICE) as? InputMethodManager)?.let {
+        this.currentFocus?.let { view ->
+            it.hideSoftInputFromWindow(view.windowToken, 0)
+        }
+    }
 }
 
 fun Intent.addClearAllFlags() {

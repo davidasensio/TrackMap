@@ -10,11 +10,11 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.platform.DateUtils
 import kotlinx.android.synthetic.main.item_trackmap.view.*
 
-class TrackMapEntriesAdapter(
+class EntriesAdapter(
     val onGoListener: (trackMap: TrackMap) -> Unit,
     val onLeaveListener: (trackMap: TrackMap) -> Unit,
     val onShareListener: (trackMap: TrackMap) -> Unit
-) : RecyclerView.Adapter<TrackMapEntriesAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<EntriesAdapter.ViewHolder>() {
 
     var items: List<TrackMap> = emptyList()
 

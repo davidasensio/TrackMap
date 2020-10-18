@@ -102,7 +102,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.app_name)
 
         viewAllMarkersInMapImageView?.setOnClickListener {
-            viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_fullscreen_exit_black else R.drawable.ic_fullscreen_black)
+            viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
             viewAllParticipantsInMap = !viewAllParticipantsInMap
         }
 
@@ -154,31 +154,38 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun startMap() {
-        googleMap.isMyLocationEnabled = true
-        googleMap.setOnMyLocationButtonClickListener {
-            myPositionState = if (myPositionState == Located) {
-                LocatedAndTilted
-            } else {
-                Located
-            }
-            tiltView()
-            true
-        }
+        try {
 
-        googleMap.setOnCameraMoveStartedListener(object : GoogleMap.OnCameraMoveStartedListener {
-            override fun onCameraMoveStarted(reason: Int) {
-                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                    myPositionState = Unallocated
+
+            googleMap.isMyLocationEnabled = true
+            googleMap.setOnMyLocationButtonClickListener {
+                myPositionState = if (myPositionState == Located) {
+                    LocatedAndTilted
+                } else {
+                    Located
                 }
+                tiltView()
+                true
             }
-        })
 
-        // Add a marker in Sydney and move the camera
+            googleMap.setOnCameraMoveStartedListener(object :
+                GoogleMap.OnCameraMoveStartedListener {
+                override fun onCameraMoveStarted(reason: Int) {
+                    if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                        myPositionState = Unallocated
+                    }
+                }
+            })
+
+            // Add a marker in Sydney and move the camera
 //        val sydney = LatLng(39.46, -0.35)
 //        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        } catch (e: SecurityException) {
+            // Non granted permissions
+            finish()
+        }
     }
 
     private fun setTrackMapData() {
@@ -320,7 +327,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
         }
 
-        val padding = 50
+        val padding = 200
         val build = boundsBuilder.build()
         val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, padding)
         this.googleMap.animateCamera(cameraUpdateAction)

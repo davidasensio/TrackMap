@@ -2,7 +2,10 @@ package com.handysparksoft.trackmap.core.platform
 
 import android.app.Activity
 import android.view.View
-import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.handysparksoft.trackmap.R
+import com.handysparksoft.trackmap.core.extension.SnackbarType
+import com.handysparksoft.trackmap.core.extension.snackbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionDeniedResponse
@@ -31,7 +34,7 @@ class PermissionChecker(private val activity: Activity, private val snackView: V
 
                 override fun onPermissionDenied(response: PermissionDeniedResponse?) {
                     if (response?.isPermanentlyDenied == true) {
-                        showSettingsButton = false
+                         showSettingsButton = false
                     }
                     showSnackbarMessage(onGrantedPermission)
                 }
@@ -40,16 +43,17 @@ class PermissionChecker(private val activity: Activity, private val snackView: V
     }
 
     private fun showSnackbarMessage(onGrantedPermission: () -> Unit) {
-        val snackbar = Snackbar.make(
-            snackView ?: activity.window.decorView,
-            "Trackmap needs location permission to work correctly",
-            Snackbar.LENGTH_SHORT
-        )
-        if (showSettingsButton) {
-            snackbar.setAction("Settings") {
-                requestLocationPermission(onGrantedPermission)
-            }
+        val actionListener = if (showSettingsButton) {
+            { _: View -> requestLocationPermission(onGrantedPermission) }
+        } else {
+            null
         }
-        snackbar.show()
+        (snackView ?: activity.window.decorView).snackbar(
+            message = activity.getString(R.string.permission_need),
+            length = BaseTransientBottomBar.LENGTH_INDEFINITE,
+            type = SnackbarType.WARNING,
+            actionResId = R.string.settings,
+            actionListener = actionListener
+        )
     }
 }

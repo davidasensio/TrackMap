@@ -19,7 +19,7 @@
         map:layout_constraintTop_toTopOf="parent"
         tools:context="com.handysparksoft.trackmap.features.trackmap.TrackMapActivity" />
 
-    <ImageView
+    <!--<ImageView
         android:id="@+id/viewAllMarkersInMapImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,7 +29,19 @@
         android:src="@drawable/ic_fullscreen_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />
+        tools:ignore="ContentDescription" />-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/viewAllMarkersInMapImageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:tooltipText="@string/frame_all_participants"
+        android:scaleType="fitXY"
+        android:backgroundTint="@color/colorAccent"
+        android:src="@drawable/ic_frame_on"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <!--
     <ImageView

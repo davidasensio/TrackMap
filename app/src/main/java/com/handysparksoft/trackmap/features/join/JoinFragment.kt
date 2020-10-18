@@ -5,34 +5,43 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import androidx.appcompat.app.AppCompatActivity
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.core.extension.app
-import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.core.extension.startActivityForResult
+import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.Event
-import com.handysparksoft.trackmap.databinding.ActivityJoinBinding
+import com.handysparksoft.trackmap.databinding.FragmentJoinBinding
+import com.handysparksoft.trackmap.features.main.MainActivity
 
-class JoinActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityJoinBinding
+
+class JoinFragment : Fragment() {
+    private lateinit var binding: FragmentJoinBinding
+
     private val viewModel: JoinViewModel by lazy {
         ViewModelProvider(
             this,
-            app.component.joinViewModelFactory
+            (activity as Context).app.component.joinViewModelFactory
         ).get(JoinViewModel::class.java)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentJoinBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
 
-        binding = ActivityJoinBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
 
-        viewModel.joinFeedbackEvent.observe(this, Observer(::onJoinFeedbackEvent))
+        viewModel.joinFeedbackEvent.observe(viewLifecycleOwner, Observer(::onJoinFeedbackEvent))
 
         setupUI()
     }
@@ -45,15 +54,17 @@ class JoinActivity : AppCompatActivity() {
                     val trackMapCode = binding.joinCodeEditText.text.toString()
                     viewModel.joinTrackMap(trackMapCode, true)
                 } else {
-                    Snackbar.make(
-                        binding.root,
-                        getString(R.string.join_trackmap_validation),
-                        Snackbar.LENGTH_SHORT
-                    ).show()
+                    binding.root.snackbar(
+                        message = getString(R.string.join_trackmap_validation),
+                        type = SnackbarType.ERROR
+                    )
                 }
             }
+            activity?.hideKeyBoard()
         }
     }
+
+
 
     private fun validateForm(callback: (success: Boolean) -> Unit) {
         val success = (binding.joinCodeEditText.text?.matches(TRACKMAP_CODE_REGEX)) ?: false
@@ -81,8 +92,7 @@ class JoinActivity : AppCompatActivity() {
 
     private fun onJoinFeedbackEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            setResult(RESULT_OK)
-            finish()
+            requireActivity().onBackPressed()
         }
     }
 
@@ -90,12 +100,14 @@ class JoinActivity : AppCompatActivity() {
         const val REQUEST_CODE = 111
         private val TRACKMAP_CODE_REGEX = """\d{3}-\d{3}""".toRegex()
 
+        fun newInstance() = JoinFragment()
+
         fun start(context: Context) {
-            context.startActivity<JoinActivity>()
+            context.startActivity<JoinFragment>()
         }
 
         fun startForResult(activity: Activity, requestCode: Int) {
-            activity.startActivityForResult<JoinActivity>(requestCode)
+            activity.startActivityForResult<JoinFragment>(requestCode)
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.handysparksoft.trackmap.core.extension
 
+import android.R
 import android.view.View
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
@@ -19,16 +20,27 @@ fun View.gone() {
     this.visibility = View.GONE
 }
 
+enum class SnackbarType { DEFAULT, OK, WARNING, ERROR }
+
 fun View.snackbar(
     message: String,
     length: Int = Snackbar.LENGTH_SHORT,
-    @StringRes actionResId: Int = android.R.string.ok,
-    actionListener: View.OnClickListener? = null
+    type: SnackbarType = SnackbarType.DEFAULT,
+    @StringRes actionResId: Int = R.string.ok,
+    actionListener: ((View) -> Unit)? = null
 ) {
-    Snackbar.make(this, message, length).apply {
+    val text = when (type) {
+        SnackbarType.DEFAULT -> message
+        SnackbarType.OK -> "✅    $message"
+        SnackbarType.WARNING -> "⚠️    $message"
+        SnackbarType.ERROR -> "❌    $message"
+    }
+
+    Snackbar.make(this, text, length).apply {
         actionListener?.let {
             setAction(actionResId, actionListener)
         }
         show()
     }
 }
+

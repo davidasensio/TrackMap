@@ -6,7 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.platform.Prefs
-import com.handysparksoft.trackmap.features.entries.MainActivity
+import com.handysparksoft.trackmap.features.main.MainActivity
 import javax.inject.Inject
 
 class SplashActivity : AppCompatActivity() {
