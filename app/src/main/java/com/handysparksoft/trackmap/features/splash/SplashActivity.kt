@@ -19,11 +19,15 @@ class SplashActivity : AppCompatActivity() {
 
         app.component.inject(this)
 
-        val splashDelay = if (!prefs.splashScreenViewed) {
-            prefs.splashScreenViewed = true
+        val splashDelay = if (!prefs.splashScreenViewedForFirstTime) {
+            prefs.splashScreenViewedForFirstTime = true
             FIRST_DELAY_MS
         } else {
-            REST_DELAY_MS
+            if (prefs.splashScreenAfterDestroy) {
+                AFTER_DESTROY_DELAY_MS
+            } else {
+                REST_DELAY_MS
+            }
         }
         Handler().postDelayed({
             startMainActivity()
@@ -36,7 +40,8 @@ class SplashActivity : AppCompatActivity() {
     }
 
     companion object {
-        private const val FIRST_DELAY_MS = 2000L
-        private const val REST_DELAY_MS = 500L
+        private const val FIRST_DELAY_MS = 2500L
+        private const val AFTER_DESTROY_DELAY_MS = 1250L
+        private const val REST_DELAY_MS = 750L
     }
 }

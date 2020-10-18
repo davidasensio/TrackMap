@@ -8,14 +8,20 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.handysparksoft.trackmap.R
+import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
-import com.handysparksoft.trackmap.databinding.ActivityPrincipalBinding
+import com.handysparksoft.trackmap.core.platform.Prefs
+import com.handysparksoft.trackmap.databinding.ActivityMainlBinding
 import com.handysparksoft.trackmap.features.create.CreateFragment
 import com.handysparksoft.trackmap.features.entries.EntriesFragment
 import com.handysparksoft.trackmap.features.join.JoinFragment
+import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
-    lateinit var binding: ActivityPrincipalBinding
+    @Inject
+    lateinit var prefs: Prefs
+
+    lateinit var binding: ActivityMainlBinding
 
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
@@ -55,10 +61,18 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityPrincipalBinding.inflate(layoutInflater)
+        app.component.inject(this)
+        prefs.splashScreenAfterDestroy = false
+
+        binding = ActivityMainlBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupUI()
+    }
+
+    override fun onDestroy() {
+        prefs.splashScreenAfterDestroy = true
+        super.onDestroy()
     }
 
     private fun setupUI() {
