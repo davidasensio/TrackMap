@@ -46,24 +46,22 @@ class CreateFragment : Fragment() {
         viewModel.trackMapCreation.observe(this, Observer {
             it.getContentIfNotHandled()?.let { created ->
                 if (created) {
-                    // FIXME
-//                    setResult(RESULT_OK)
-//                    finish()
+                    requireActivity().onBackPressed()
                 }
             }
         })
 
-        initToolbar(toolbar)
+        //initToolbar(toolbar)
         setupUI()
     }
 
-    private fun initToolbar(toolbar: androidx.appcompat.widget.Toolbar) {
+    /*private fun initToolbar(toolbar: androidx.appcompat.widget.Toolbar) {
         activity?.apply {
-//            setSupportActionBar(toolbar)
-//            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-//            supportActionBar?.setDisplayShowHomeEnabled(true)
+            setSupportActionBar(toolbar)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            supportActionBar?.setDisplayShowHomeEnabled(true)
         }
-    }
+    }*/
 
 //    override fun onSupportNavigateUp(): Boolean {
 ////        onBackPressed()

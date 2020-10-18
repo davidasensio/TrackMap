@@ -28,6 +28,8 @@ import javax.inject.Inject
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
         private const val TRACKMAP_PARAM = "trackMapId"
+        private const val GOOGLE_MAP_FRAME_PADDING_DP = 64
+        private const val GOOGLE_MAP_TOP_PADDING_DP = 32
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {
@@ -137,6 +139,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setMapStyle() {
+        setMapPadding()
         if (isDarkModeActive()) {
             try {
                 googleMap.setMapStyle(
@@ -154,10 +157,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun setMapPadding() {
+        val topPadding = dip(GOOGLE_MAP_TOP_PADDING_DP)
+        googleMap.setPadding(0, topPadding, 0, 0)
+    }
+
     private fun startMap() {
         try {
-
-
             googleMap.isMyLocationEnabled = true
             googleMap.setOnMyLocationButtonClickListener {
                 myPositionState = if (myPositionState == Located) {
@@ -327,9 +333,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
         }
 
-        val padding = 200
+        val framePadding = dip(GOOGLE_MAP_FRAME_PADDING_DP)
         val build = boundsBuilder.build()
-        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, padding)
+        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
         this.googleMap.animateCamera(cameraUpdateAction)
     }
 
