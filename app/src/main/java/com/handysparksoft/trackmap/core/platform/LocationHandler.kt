@@ -16,7 +16,8 @@ class LocationHandler @Inject constructor(private val context: Context) {
     companion object {
         private val LOCATION_MIN_TIME_MILLIS = if (BuildConfig.DEBUG) 500L else 1000L
         private val LOCATION_PRIORITY = if (BuildConfig.DEBUG) {
-            LocationRequest.PRIORITY_HIGH_ACCURACY
+            // LocationRequest.PRIORITY_HIGH_ACCURACY
+            LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         } else {
             LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
         }

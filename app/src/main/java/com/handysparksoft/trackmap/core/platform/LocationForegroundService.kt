@@ -11,6 +11,7 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.whenAvailable
 import com.handysparksoft.trackmap.features.entries.EntriesFragment
+import com.handysparksoft.trackmap.features.main.MainActivity
 import com.handysparksoft.usecases.UpdateUserLocationUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,7 +106,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
 
         val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
 
-        val notificationIntent = Intent(this, EntriesFragment::class.java)
+        val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
         val notification = notificationBuilder
             .setOngoing(true)

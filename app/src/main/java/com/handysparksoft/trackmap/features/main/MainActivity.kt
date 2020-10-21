@@ -40,7 +40,6 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_join_map -> {
                     loadFragment(joinFragment)
-                    //joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
                 }
                 R.id.navigation_create_map -> {
                     loadFragment(createFragment)
