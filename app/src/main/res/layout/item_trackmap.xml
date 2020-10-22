@@ -140,6 +140,7 @@
             android:layout_marginEnd="16dp"
             android:backgroundTint="@color/colorNotification"
             android:text="Leave"
+            app:icon="@drawable/ic_delete"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codeTextView" />
@@ -149,6 +150,7 @@
             style="@style/Primary.Medium"
             android:layout_width="wrap_content"
             android:text="Go!"
+            app:icon="@drawable/ic_trackmap"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/codeTextView" />

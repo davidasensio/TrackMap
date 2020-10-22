@@ -3,18 +3,17 @@ package com.handysparksoft.trackmap.features.entries
 import android.app.Activity
 import android.app.ActivityManager
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.location.LocationManager
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
-import android.widget.EditText
+import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
@@ -24,19 +23,23 @@ import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
-import com.handysparksoft.trackmap.features.create.CreateActivity
+import com.handysparksoft.trackmap.databinding.FragmentEntriesBinding
+import com.handysparksoft.trackmap.features.create.CreateFragment
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
+import com.handysparksoft.trackmap.features.join.JoinFragment
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_entries.*
 import javax.inject.Inject
 
-class MainActivity : AppCompatActivity() {
+class EntriesFragment : Fragment() {
+    private lateinit var binding: FragmentEntriesBinding
 
-    private lateinit var adapter: TrackMapEntriesAdapter
+    private lateinit var adapter: EntriesAdapter
+
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(
             this,
-            app.component.mainViewModelFactory
+            requireActivity().app.component.mainViewModelFactory
         ).get(MainViewModel::class.java)
     }
 
@@ -54,42 +57,26 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var locationForegroundService: LocationForegroundService
 
-    private val mOnNavigationItemSelectedListener =
-        BottomNavigationView.OnNavigationItemSelectedListener { item ->
-            when (item.itemId) {
-                /*R.id.navigation_create_map -> {
-                    CreateActivity.startActivityForResult(this)
-                    return@OnNavigationItemSelectedListener true
-                }*/
-                R.id.navigation_home -> {
-                    return@OnNavigationItemSelectedListener true
-                }
-                R.id.navigation_join_map -> {
-                    joinTrackMapTemporal() //FIXME: needs to be refactored to fragment or FragmentDialog
-                }
-                /*R.id.navigation_search_trackmap -> {
-                    MainActivity.start(this)
-                    return@OnNavigationItemSelectedListener true
-                }*/
-                /*R.id.navigation_force_crash -> {
-                    Crashlytics.getInstance().crash()
-                    return@OnNavigationItemSelectedListener true
-                }*/
-            }
-            true
-        }
-
     override fun onStart() {
         connectionHandler.registerNetworkCallback()
         super.onStart()
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        binding = FragmentEntriesBinding.inflate(layoutInflater, container, false)
+        return binding.root
+    }
 
-        app.component.inject(this)
-        permissionChecker = PermissionChecker(this, mainContentLayout)
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+
+        activity?.let { fragmentActivity ->
+            fragmentActivity.app.component.inject(this)
+            permissionChecker = PermissionChecker(fragmentActivity, mainContentLayout)
+        }
 
         setAdapter()
 
@@ -104,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
         permissionChecker.requestLocationPermission(onGrantedPermission = {
             updateLastLocation()
-//            startUserTrackLocation()
+            //startUserTrackLocation()
             startUserTrackLocationService()
         })
 
@@ -119,13 +106,13 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK) {
             viewModel.refresh()
         }
     }
 
     private fun setAdapter() {
-        adapter = TrackMapEntriesAdapter(
+        adapter = EntriesAdapter(
             onGoListener = {
                 viewModel.onGoTrackMapClicked(it)
             },
@@ -137,7 +124,7 @@ class MainActivity : AppCompatActivity() {
             }
         )
 
-        recycler.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        recycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         recycler.adapter = adapter
     }
 
@@ -157,9 +144,8 @@ class MainActivity : AppCompatActivity() {
                     } else {
                         "Unknown error occurred. ${model.message}"
                     }
-                bottomNavigation.snackbar(
-                    message = message,
-                    length = Snackbar.LENGTH_SHORT
+                binding.recycler.snackbar(
+                    message = message
                 )
             }
         }
@@ -167,13 +153,13 @@ class MainActivity : AppCompatActivity() {
 
     private fun onGoEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            TrackMapActivity.start(this, it)
+            TrackMapActivity.start(requireContext(), it)
         }
     }
 
     private fun onLeaveEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            val leaveDialog = AlertDialog.Builder(this)
+            val leaveDialog = AlertDialog.Builder(requireContext())
             leaveDialog.setMessage(getString(R.string.leave_trackmap_question, it.name))
             leaveDialog.setPositiveButton(R.string.leave) { dialog, _ ->
                 viewModel.leave(it)
@@ -188,24 +174,23 @@ class MainActivity : AppCompatActivity() {
 
     private fun onShareEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            DeeplinkHandler.generateDeeplink(this, it.trackMapId, it.name)
+            DeeplinkHandler.generateDeeplink(requireActivity(), it.trackMapId, it.name)
         }
     }
 
     private fun onJoinFeedbackEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            bottomNavigation.snackbar(
+            binding.recycler.snackbar(
                 message = "You just joined TrackMap \"${it.name}\"",
-                length = Snackbar.LENGTH_INDEFINITE,
-                actionListener = {
-                    // Nothing to do
-                }
-            )
+                length = Snackbar.LENGTH_INDEFINITE
+            ) {
+                // Nothing to do
+            }
         }
     }
 
     private fun setupUI() {
-        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+//        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         swipeRefreshLayout.setOnRefreshListener {
             connectionHandler.registerNetworkCallback()
 //            if (!connectionHandler.isNetworkAvailable()) {
@@ -219,13 +204,10 @@ class MainActivity : AppCompatActivity() {
             viewModel.refresh()
 //            }
         }
-        createTrackMapFAB.setOnClickListener {
-            CreateActivity.startActivityForResult(this)
-        }
     }
 
     private fun checkDeepLink() {
-        val trackMapCodeExtra = intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
+        val trackMapCodeExtra = requireActivity().intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
             viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
@@ -233,7 +215,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun joinTrackMapTemporal() {
-        val promptJoinDialog = AlertDialog.Builder(this)
+        JoinFragment.startForResult(requireActivity(), JoinFragment.REQUEST_CODE)
+
+        /*val promptJoinDialog = AlertDialog.Builder(this)
         val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
         promptJoinDialog.setView(promptDialogView)
 
@@ -248,7 +232,7 @@ class MainActivity : AppCompatActivity() {
                 dialog.cancel()
             })
             .create()
-            .show()
+            .show()*/
     }
 
     private fun startUserTrackLocation() {
@@ -258,17 +242,19 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun startUserTrackLocationService() {
-        locationForegroundService = LocationForegroundService()
-        val serviceIntent = Intent(this, locationForegroundService::class.java)
-        if (!isMyServiceRunning(locationForegroundService::class.java, this)) {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent)
+        requireActivity().apply {
+            locationForegroundService = LocationForegroundService()
+            val serviceIntent = Intent(requireContext(), locationForegroundService::class.java)
+            if (!isMyServiceRunning(locationForegroundService::class.java, this)) {
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    startForegroundService(serviceIntent)
+                } else {
+                    startService(serviceIntent)
+                }
+                logDebug("Service initialized")
             } else {
-                startService(serviceIntent)
+                logDebug("Service already initialized!")
             }
-            logDebug("Service initialized")
-        } else {
-            logDebug("Service already initialized!")
         }
     }
 
@@ -277,29 +263,30 @@ class MainActivity : AppCompatActivity() {
             mActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
         for (service in manager.getRunningServices(Int.MAX_VALUE)) {
             if (serviceClass.name == service.service.getClassName()) {
-                logDebug("Service status - Running")
+                requireContext().logDebug("Service status - Running")
                 return true
             }
         }
-        logDebug("Service status - Not Running")
+        requireContext().logDebug("Service status - Not Running")
         return false
     }
 
     fun isLocationEnabledOrNot(context: Context): Boolean {
         var locationManager: LocationManager? = null
         locationManager =
-            context!!.getSystemService(Context.LOCATION_SERVICE) as LocationManager?
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager?
         return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(
             LocationManager.NETWORK_PROVIDER
         )
     }
 
-
     companion object {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
 
+        fun newInstance() = EntriesFragment()
+
         fun start(context: Context) {
-            context.startActivity<MainActivity>()
+            context.startActivity<EntriesFragment>()
         }
     }
 }

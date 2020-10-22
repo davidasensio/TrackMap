@@ -10,7 +10,8 @@ import androidx.core.app.NotificationCompat
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.whenAvailable
-import com.handysparksoft.trackmap.features.entries.MainActivity
+import com.handysparksoft.trackmap.features.entries.EntriesFragment
+import com.handysparksoft.trackmap.features.main.MainActivity
 import com.handysparksoft.usecases.UpdateUserLocationUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

@@ -28,6 +28,8 @@ import javax.inject.Inject
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     companion object {
         private const val TRACKMAP_PARAM = "trackMapId"
+        private const val GOOGLE_MAP_FRAME_PADDING_DP = 64
+        private const val GOOGLE_MAP_TOP_PADDING_DP = 32
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {
@@ -70,6 +72,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var viewAllParticipantsInMap = true
 
+    private val mapStyles = arrayOf(
+        GoogleMap.MAP_TYPE_NORMAL,
+        GoogleMap.MAP_TYPE_SATELLITE
+    )
+    private var mapStyleCounter = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trackmap)
@@ -102,8 +110,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.app_name)
 
         viewAllMarkersInMapImageView?.setOnClickListener {
-            viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_fullscreen_exit_black else R.drawable.ic_fullscreen_black)
+            viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
             viewAllParticipantsInMap = !viewAllParticipantsInMap
+        }
+
+        setMapStyleImageView?.setOnClickListener {
+            val nextTypeIndex = ++mapStyleCounter % mapStyles.size
+            mapActionHelper.mapType = mapStyles[nextTypeIndex]
         }
 
 //        myPositionImageView?.setOnClickListener {
@@ -137,6 +150,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setMapStyle() {
+        setMapPadding()
         if (isDarkModeActive()) {
             try {
                 googleMap.setMapStyle(
@@ -154,31 +168,41 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    @SuppressLint("MissingPermission")
+    private fun setMapPadding() {
+        val topPadding = dip(GOOGLE_MAP_TOP_PADDING_DP)
+        googleMap.setPadding(0, topPadding, 0, 0)
+    }
+
     private fun startMap() {
-        googleMap.isMyLocationEnabled = true
-        googleMap.setOnMyLocationButtonClickListener {
-            myPositionState = if (myPositionState == Located) {
-                LocatedAndTilted
-            } else {
-                Located
-            }
-            tiltView()
-            true
-        }
-
-        googleMap.setOnCameraMoveStartedListener(object : GoogleMap.OnCameraMoveStartedListener {
-            override fun onCameraMoveStarted(reason: Int) {
-                if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                    myPositionState = Unallocated
+        try {
+            googleMap.isMyLocationEnabled = true
+            googleMap.setOnMyLocationButtonClickListener {
+                myPositionState = if (myPositionState == Located) {
+                    LocatedAndTilted
+                } else {
+                    Located
                 }
+                tiltView()
+                true
             }
-        })
 
-        // Add a marker in Sydney and move the camera
+            googleMap.setOnCameraMoveStartedListener(object :
+                GoogleMap.OnCameraMoveStartedListener {
+                override fun onCameraMoveStarted(reason: Int) {
+                    if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                        myPositionState = Unallocated
+                    }
+                }
+            })
+
+            // Add a marker in Sydney and move the camera
 //        val sydney = LatLng(39.46, -0.35)
 //        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        } catch (e: SecurityException) {
+            // Non granted permissions
+            finish()
+        }
     }
 
     private fun setTrackMapData() {
@@ -320,9 +344,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
         }
 
-        val padding = 50
+        val framePadding = dip(GOOGLE_MAP_FRAME_PADDING_DP)
         val build = boundsBuilder.build()
-        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, padding)
+        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
         this.googleMap.animateCamera(cameraUpdateAction)
     }
 

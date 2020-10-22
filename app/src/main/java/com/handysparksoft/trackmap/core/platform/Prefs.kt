@@ -9,9 +9,13 @@ class Prefs @Inject constructor(context: Context) {
     private val prefsFilename = "com.handysparksoft.trackmap.platform.prefs"
     private val prefs: SharedPreferences = context.getSharedPreferences(prefsFilename, 0)
 
-    var splashScreenViewed: Boolean
-        get() = prefs.getBoolean(KEY_SPLASH_SCREEN_VIEWED, false)
-        set(value) = prefs.edit().putBoolean(KEY_SPLASH_SCREEN_VIEWED, value).apply()
+    var splashScreenViewedForFirstTime: Boolean
+        get() = prefs.getBoolean(KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME, false)
+        set(value) = prefs.edit().putBoolean(KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME, value).apply()
+
+    var splashScreenAfterDestroy: Boolean
+        get() = prefs.getBoolean(KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY, false)
+        set(value) = prefs.edit().putBoolean(KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY, value).apply()
 
     var lastLocationLatitude: Float
         get() = prefs.getFloat(KEY_LAST_LOCATION_LATITUDE, 0f)
@@ -30,7 +34,8 @@ class Prefs @Inject constructor(context: Context) {
 
 
     companion object {
-        private const val KEY_SPLASH_SCREEN_VIEWED = "key_splash_screen_viewed"
+        private const val KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME = "key_splash_screen_viewed_first"
+        private const val KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY = "key_splash_screen_viewed_after"
         private const val KEY_LAST_LOCATION_LATITUDE = "key_last_location_latitude"
         private const val KEY_LAST_LOCATION_LONGITUDE = "key_last_location_longitude"
     }

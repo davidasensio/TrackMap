@@ -3,6 +3,7 @@ package com.handysparksoft.trackmap.core.di
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
 import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
+import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
 import com.handysparksoft.usecases.*
 import dagger.Module
@@ -42,4 +43,16 @@ class ViewModelModule {
     @Provides
     fun trackMapViewModelFactoryProvider(userHandler: UserHandler) =
         TrackMapViewModelFactory(userHandler)
+
+    @Provides
+    fun joinViewModelFactoryProvider(
+        joinTrackMapUseCase: JoinTrackMapUseCase,
+        saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
+        userHandler: UserHandler
+    ) =
+        JoinViewModelFactory(
+            joinTrackMapUseCase,
+            saveUserTrackMapUseCase,
+            userHandler
+        )
 }

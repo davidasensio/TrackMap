@@ -15,7 +15,6 @@
     -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!--<uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />-->
 
     <application
         android:name=".App"
@@ -30,6 +29,20 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
 
+
+        <activity android:name=".features.deeplink.DeepLinkActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="${deeplinkScheme}"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".features.splash.SplashActivity"
             android:launchMode="singleInstance"
@@ -41,25 +54,12 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".features.deeplink.DeepLinkActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:host="${deeplinkScheme}"
-                    android:scheme="https" />
-            </intent-filter>
-        </activity>
+        <activity android:name=".features.main.MainActivity"/>
 
         <activity
-            android:name=".features.entries.MainActivity" />
-        <activity
             android:name=".features.trackmap.TrackMapActivity"
+            android:theme="@style/TranslucentStatusTheme"
             android:label="@string/app_name" />
-        <activity
-            android:name=".features.create.CreateActivity"
-            android:label="@string/create_trackmap" />
 
         <service
             android:name=".core.platform.LocationForegroundService"

@@ -1,4 +1,4 @@
-package com.handysparksoft.trackmap.features.entries
+package com.handysparksoft.trackmap.features.join
 
 import android.location.Location
 import androidx.annotation.CallSuper
@@ -15,16 +15,11 @@ import com.handysparksoft.usecases.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainViewModel(
-    private val getTrackMapsUseCase: GetTrackMapsUseCase,
-    private val saveUserUseCase: SaveUserUseCase,
+class JoinViewModel(
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
-    private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-    private val updateUserLocationUseCase: UpdateUserLocationUseCase,
     private val userHandler: UserHandler
-) : ViewModel(),
-    Scope by Scope.Impl() {
+) : ViewModel(), Scope by Scope.Impl() {
 
     sealed class UiModel {
         object Loading : UiModel()
@@ -36,7 +31,7 @@ class MainViewModel(
     val model: MutableLiveData<UiModel>
         get() {
             if (_model.value == null) {
-                refresh()
+//                refresh()
             }
             return _model
         }
@@ -67,19 +62,20 @@ class MainViewModel(
         super.onCleared()
     }
 
-    fun refresh() {
-        launch(Dispatchers.Main) {
-            val userId = userHandler.getUserId()
-            _model.value = UiModel.Loading
-
-            val userTrackMaps = getTrackMapsUseCase.execute(userId)
-            if (userTrackMaps is Result.Success) {
-                _model.value = UiModel.Content(ArrayList(userTrackMaps.data.values))
-            } else if (userTrackMaps is Result.Error) {
-                _model.value = UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")
-            }
-        }
-    }
+//    fun refresh() {
+//        launch(Dispatchers.Main) {
+//            val userId = userHandler.getUserId()
+//            _model.value = UiModel.Loading
+//
+//            val userTrackMaps = getTrackMapsUseCase.execute(userId)
+//            if (userTrackMaps is Result.Success) {
+//                _model.value = UiModel.Content(ArrayList(userTrackMaps.data.values))
+//            } else if (userTrackMaps is Result.Error) {
+//                _model.value =
+//                    UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")
+//            }
+//        }
+//    }
 
     fun onGoTrackMapClicked(trackMap: TrackMap) {
         _goEvent.value = Event(trackMap)
@@ -91,12 +87,6 @@ class MainViewModel(
 
     fun onShareTrackMapClicked(trackMap: TrackMap) {
         _shareEvent.value = Event(trackMap)
-    }
-
-    fun saveUser() {
-        launch(Dispatchers.Main) {
-            saveUserUseCase.execute(userHandler.getUserId(), "default")
-        }
     }
 
     fun joinTrackMap(trackMapCode: String, showFeedback: Boolean = false) {
@@ -112,54 +102,25 @@ class MainViewModel(
                     _joinFeedbackEvent.value = Event(trackMap)
                 }
             }
-            refresh()
-        }
-    }
-
-    fun leave(trackMap: TrackMap) {
-        val userId = userHandler.getUserId()
-        launch(Dispatchers.Main) {
-            leaveTrackMapUseCase.execute(userId, trackMap.trackMapId)
-
-            refresh()
-        }
-    }
-
-    fun updateUserLocation(userUpdatedLocation: Location) {
-        launch(Dispatchers.Main) {
-            with(userUpdatedLocation) {
-                updateUserLocationUseCase.execute(userHandler.getUserId(), latitude, longitude)
-            }
+            //refresh()
         }
     }
 }
 
-class MainViewModelFactory(
-    private val getTrackMapsUseCase: GetTrackMapsUseCase,
-    private val saveUserUseCase: SaveUserUseCase,
+class JoinViewModelFactory(
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
-    private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-    private val updateUserLocationUseCase: UpdateUserLocationUseCase,
     private val userHandler: UserHandler
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return modelClass.getConstructor(
-            getTrackMapsUseCase::class.java,
-            saveUserUseCase::class.java,
             joinTrackMapUseCase::class.java,
-            leaveTrackMapUseCase::class.java,
             saveUserTrackMapUseCase::class.java,
-            updateUserLocationUseCase::class.java,
             userHandler::class.java
         ).newInstance(
-            getTrackMapsUseCase,
-            saveUserUseCase,
             joinTrackMapUseCase,
-            leaveTrackMapUseCase,
             saveUserTrackMapUseCase,
-            updateUserLocationUseCase,
             userHandler
         )
     }

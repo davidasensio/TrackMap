@@ -5,7 +5,7 @@ import android.net.Uri
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.handysparksoft.trackmap.core.platform.DeeplinkHandler
-import com.handysparksoft.trackmap.features.entries.MainActivity
+import com.handysparksoft.trackmap.features.entries.EntriesFragment
 
 class DeepLinkActivity : AppCompatActivity() {
 
@@ -26,8 +26,8 @@ class DeepLinkActivity : AppCompatActivity() {
 
         if (Intent.ACTION_VIEW == action) {
             data?.getQueryParameter(DeeplinkHandler.PARAM_TRACKMAP_CODE)?.let { trackMapCode ->
-                val intentTrackMap = Intent(this@DeepLinkActivity, MainActivity::class.java)
-                intentTrackMap.putExtra(MainActivity.KEY_INTENT_TRACKMAP_CODE, trackMapCode)
+                val intentTrackMap = Intent(this@DeepLinkActivity, EntriesFragment::class.java)
+                intentTrackMap.putExtra(EntriesFragment.KEY_INTENT_TRACKMAP_CODE, trackMapCode)
                 finish()
                 startActivity(intentTrackMap)
             }
