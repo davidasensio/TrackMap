@@ -10,19 +10,18 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.SnackbarType
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.extension.startActivity
+import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentCreateBinding
-import com.handysparksoft.trackmap.features.join.JoinFragment
-import kotlinx.android.synthetic.main.fragment_create.*
 
 class CreateFragment : Fragment() {
 
-    private lateinit var binding: FragmentCreateBinding
+    private val bindingHolder = FragmentViewBindingHolder<FragmentCreateBinding>()
+    private val binding get() = bindingHolder.binding
 
     private val viewModel: CreateViewModel by lazy {
         ViewModelProvider(
@@ -36,8 +35,10 @@ class CreateFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentCreateBinding.inflate(layoutInflater, container, false)
-        return binding.root
+        bindingHolder.createBinding(this) {
+            FragmentCreateBinding.inflate(layoutInflater, container, false)
+        }
+        return bindingHolder.binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -71,12 +72,12 @@ class CreateFragment : Fragment() {
     private fun setupUI() {
         viewModel.getTrackMapCode().observe(this, Observer(::trackMapCodeObserver))
 
-        createTrackmapButton?.setOnClickListener {
+        binding.createTrackmapButton?.setOnClickListener {
             validateForm { success ->
                 if (success) {
                     onCreateAction()
                 } else {
-                    createTrackmapButton.snackbar(
+                    binding.createTrackmapButton.snackbar(
                         message = getString(R.string.create_trackmap_validation),
                         type = SnackbarType.ERROR
                     )
@@ -86,19 +87,19 @@ class CreateFragment : Fragment() {
     }
 
     private fun validateForm(callback: (success: Boolean) -> Unit) {
-        val success = (createNameEditText?.text?.isNotEmpty() == true &&
-                createDescriptionEditText?.text?.isNotEmpty() == true)
+        val success = (binding.createNameEditText.text?.isNotEmpty() == true &&
+                binding.createDescriptionEditText.text?.isNotEmpty() == true)
         callback(success)
     }
 
     private fun trackMapCodeObserver(generatedCode: String) {
-        createCodeEditText?.setText(generatedCode)
+        binding.createCodeEditText.setText(generatedCode)
     }
 
     private fun onCreateAction() {
-        val code = createCodeEditText?.text.toString()
-        val name = createNameEditText?.text.toString()
-        val description = createDescriptionEditText?.text.toString()
+        val code = binding.createCodeEditText.text.toString()
+        val name = binding.createNameEditText.text.toString()
+        val description = binding.createDescriptionEditText.text.toString()
         viewModel.createTrackMap(code, name, description)
     }
 

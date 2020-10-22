@@ -21,8 +21,8 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
+import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
 import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
-import kotlinx.android.synthetic.main.activity_trackmap.*
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -77,10 +77,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         GoogleMap.MAP_TYPE_SATELLITE
     )
     private var mapStyleCounter = 0
+    private lateinit var binding: ActivityTrackmapBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_trackmap)
+        binding = ActivityTrackmapBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         injectComponents()
 
@@ -109,12 +111,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupUI() {
         title = getString(R.string.app_name)
 
-        viewAllMarkersInMapImageView?.setOnClickListener {
-            viewAllMarkersInMapImageView?.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+        binding.viewAllMarkersInMapImageView.setOnClickListener {
+            binding.viewAllMarkersInMapImageView.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
             viewAllParticipantsInMap = !viewAllParticipantsInMap
         }
 
-        setMapStyleImageView?.setOnClickListener {
+        binding.setMapStyleImageView.setOnClickListener {
             val nextTypeIndex = ++mapStyleCounter % mapStyles.size
             mapActionHelper.mapType = mapStyles[nextTypeIndex]
         }
