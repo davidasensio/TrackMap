@@ -1,6 +1,5 @@
 package com.handysparksoft.trackmap.features.join
 
-import android.app.Activity
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -11,13 +10,15 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.snackbar.Snackbar
+import androidx.navigation.fragment.findNavController
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
-import com.handysparksoft.trackmap.core.extension.*
+import com.handysparksoft.trackmap.core.extension.SnackbarType
+import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.hideKeyBoard
+import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.databinding.FragmentJoinBinding
-import com.handysparksoft.trackmap.features.main.MainActivity
 
 
 class JoinFragment : Fragment() {
@@ -92,12 +93,11 @@ class JoinFragment : Fragment() {
 
     private fun onJoinFeedbackEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            requireActivity().onBackPressed()
+            findNavController().navigate(R.id.action_joinFragment_to_entriesFragment)
         }
     }
 
     companion object {
-        const val REQUEST_CODE = 111
         private val TRACKMAP_CODE_REGEX = """\d{3}-\d{3}""".toRegex()
 
         fun newInstance() = JoinFragment()
