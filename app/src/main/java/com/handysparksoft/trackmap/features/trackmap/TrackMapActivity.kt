@@ -22,21 +22,10 @@ import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
-import com.handysparksoft.trackmap.features.trackmap.MyPositionState.*
+import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
-    companion object {
-        private const val TRACKMAP_PARAM = "trackMapId"
-        private const val GOOGLE_MAP_FRAME_PADDING_DP = 64
-        private const val GOOGLE_MAP_TOP_PADDING_DP = 32
-
-        fun start(context: Context, trackMap: TrackMap) {
-            context.startActivity<TrackMapActivity> {
-                putExtra(TRACKMAP_PARAM, trackMap)
-            }
-        }
-    }
 
     @Inject
     lateinit var userHandler: UserHandler
@@ -120,10 +109,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             val nextTypeIndex = ++mapStyleCounter % mapStyles.size
             mapActionHelper.mapType = mapStyles[nextTypeIndex]
         }
-
-//        myPositionImageView?.setOnClickListener {
-//            toggleView()
-//        }
     }
 
     @SuppressLint("MissingPermission")
@@ -162,7 +147,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     )
                 )
             } catch (e: Exception) {
-                logError("Can't map find style. Error: ${e.message}")
+                logError("Can't find map style. Error: ${e.message}")
                 mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
             }
         } else {
@@ -196,11 +181,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     }
                 }
             })
-
-            // Add a marker in Sydney and move the camera
-//        val sydney = LatLng(39.46, -0.35)
-//        googleMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-//        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
         } catch (e: SecurityException) {
             // Non granted permissions
             finish()
@@ -211,13 +191,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
-        }
-    }
-
-    private fun toggleView() {
-        prefs.lastLocation?.let {
-            val tilt = if (myPositionState == LocatedAndTilted) 30f else 0f
-            mapActionHelper.moveToPosition(latLng = it, tilt = tilt)
         }
     }
 
@@ -305,7 +278,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-
     fun refreshTrackMap() {
         googleMap.clear()
         participants.filter(::withAvailableLatLng).forEach { participantLocation ->
@@ -355,10 +327,22 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun withAvailableLatLng(participantLocation: ParticipantLocation): Boolean {
         return participantLocation.latitude != 0.0 && participantLocation.longitude != 0.0
     }
-}
 
-sealed class MyPositionState {
-    object Unallocated : MyPositionState()
-    object Located : MyPositionState()
-    object LocatedAndTilted : MyPositionState()
+    sealed class MyPositionState {
+        object Unallocated : MyPositionState()
+        object Located : MyPositionState()
+        object LocatedAndTilted : MyPositionState()
+    }
+
+    companion object {
+        private const val TRACKMAP_PARAM = "trackMapId"
+        private const val GOOGLE_MAP_FRAME_PADDING_DP = 64
+        private const val GOOGLE_MAP_TOP_PADDING_DP = 32
+
+        fun start(context: Context, trackMap: TrackMap) {
+            context.startActivity<TrackMapActivity> {
+                putExtra(TRACKMAP_PARAM, trackMap)
+            }
+        }
+    }
 }

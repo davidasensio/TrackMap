@@ -13,5 +13,3 @@ sealed class Result<out T : Any?> {
 
     object Loading : Result<Nothing>()
 }
-
-

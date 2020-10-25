@@ -123,14 +123,6 @@ class MainViewModel(
             refresh()
         }
     }
-
-    fun updateUserLocation(userUpdatedLocation: Location) {
-        launch(Dispatchers.Main) {
-            with(userUpdatedLocation) {
-                updateUserLocationUseCase.execute(userHandler.getUserId(), latitude, longitude)
-            }
-        }
-    }
 }
 
 class MainViewModelFactory(

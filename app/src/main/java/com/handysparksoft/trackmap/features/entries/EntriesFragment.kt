@@ -93,7 +93,6 @@ class EntriesFragment : Fragment() {
 
         permissionChecker.requestLocationPermission(onGrantedPermission = {
             updateLastLocation()
-            //startUserTrackLocation()
             startUserTrackLocationService()
         })
 
@@ -192,19 +191,9 @@ class EntriesFragment : Fragment() {
     }
 
     private fun setupUI() {
-//        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         binding.swipeRefreshLayout.setOnRefreshListener {
             connectionHandler.registerNetworkCallback()
-//            if (!connectionHandler.isNetworkAvailable()) {
-//                Snackbar.make(
-//                    swipeRefreshLayout,
-//                    R.string.no_connection_error,
-//                    Snackbar.LENGTH_SHORT
-//                ).show()
-//                swipeRefreshLayout.isRefreshing = false
-//            } else {
             viewModel.refresh()
-//            }
         }
     }
 
@@ -213,33 +202,6 @@ class EntriesFragment : Fragment() {
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
             viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
-        }
-    }
-
-    private fun joinTrackMapTemporal() {
-        JoinFragment.startForResult(requireActivity(), JoinFragment.REQUEST_CODE)
-
-        /*val promptJoinDialog = AlertDialog.Builder(this)
-        val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
-        promptJoinDialog.setView(promptDialogView)
-
-        promptJoinDialog
-            .setCancelable(true)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                val trackMapCodeEditText =
-                    promptDialogView.findViewById<EditText>(R.id.trackMapCodeEditText)
-                viewModel.joinTrackMap(trackMapCodeEditText.text.toString())
-            })
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, _ ->
-                dialog.cancel()
-            })
-            .create()
-            .show()*/
-    }
-
-    private fun startUserTrackLocation() {
-        locationHandler.subscribeLocationUpdates {
-            viewModel.updateUserLocation(it)
         }
     }
 
@@ -286,9 +248,5 @@ class EntriesFragment : Fragment() {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
 
         fun newInstance() = EntriesFragment()
-
-        fun start(context: Context) {
-            context.startActivity<EntriesFragment>()
-        }
     }
 }

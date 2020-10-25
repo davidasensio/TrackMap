@@ -19,18 +19,6 @@
         map:layout_constraintTop_toTopOf="parent"
         tools:context="com.handysparksoft.trackmap.features.trackmap.TrackMapActivity" />
 
-    <!--<ImageView
-        android:id="@+id/viewAllMarkersInMapImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        android:elevation="24dp"
-        android:src="@drawable/ic_fullscreen_black"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />-->
-
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/setMapStyleImageView"
         android:layout_width="wrap_content"
@@ -57,17 +45,4 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!--
-    <ImageView
-        android:id="@+id/myPositionImageView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        android:elevation="124dp"
-        android:src="@drawable/ic_gps_fixed"
-        app:layout_constraintBottom_toTopOf="@+id/bottomNavigation"
-        app:layout_constraintEnd_toEndOf="parent"
-        tools:ignore="ContentDescription" />
-        -->
 </androidx.constraintlayout.widget.ConstraintLayout>

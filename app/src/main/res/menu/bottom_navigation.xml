@@ -16,14 +16,4 @@
         android:icon="@drawable/ic_create_trackmap"
         android:title="@string/title_create" />
 
-    <!--<item
-        android:id="@+id/navigation_search_trackmap"
-        android:icon="@drawable/ic_search_black_24dp"
-        android:title="@string/title_current" />-->
-
-    <!--<item
-        android:id="@+id/navigation_force_crash"
-        android:icon="@drawable/ic_error_black_24dp"
-        android:title="@string/title_crash" />-->
-
 </menu>

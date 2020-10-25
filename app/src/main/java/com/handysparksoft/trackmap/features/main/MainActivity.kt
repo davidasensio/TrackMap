@@ -40,19 +40,12 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_join_map -> {
                     loadFragment(joinFragment)
+                    return@OnNavigationItemSelectedListener true
                 }
                 R.id.navigation_create_map -> {
                     loadFragment(createFragment)
                     return@OnNavigationItemSelectedListener true
                 }
-                /*R.id.navigation_search_trackmap -> {
-                    MainActivity.start(this)
-                    return@OnNavigationItemSelectedListener true
-                }*/
-                /*R.id.navigation_force_crash -> {
-                    Crashlytics.getInstance().crash()
-                    return@OnNavigationItemSelectedListener true
-                }*/
             }
             true
         }
@@ -87,7 +80,7 @@ class MainActivity : AppCompatActivity() {
             .replace(R.id.fragment_container, fragment)
             .also {
                 if (backStack != null) {
-                   it.addToBackStack(backStack)
+                    it.addToBackStack(backStack)
                 }
             }
             .commit()

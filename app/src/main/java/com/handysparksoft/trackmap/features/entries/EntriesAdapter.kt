@@ -20,8 +20,6 @@ class EntriesAdapter(
     var items: List<TrackMap> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-//        val view =
-//            LayoutInflater.from(parent.context).inflate(R.layout.item_trackmap, parent, false)
         binding = ItemTrackmapBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ViewHolder(binding.root)
     }

@@ -101,13 +101,5 @@ class JoinFragment : Fragment() {
         private val TRACKMAP_CODE_REGEX = """\d{3}-\d{3}""".toRegex()
 
         fun newInstance() = JoinFragment()
-
-        fun start(context: Context) {
-            context.startActivity<JoinFragment>()
-        }
-
-        fun startForResult(activity: Activity, requestCode: Int) {
-            activity.startActivityForResult<JoinFragment>(requestCode)
-        }
     }
 }

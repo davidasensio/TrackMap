@@ -1,8 +1,6 @@
 package com.handysparksoft.trackmap.features.create
 
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +12,6 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.SnackbarType
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.snackbar
-import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentCreateBinding
 
@@ -52,22 +49,8 @@ class CreateFragment : Fragment() {
             }
         })
 
-        //initToolbar(toolbar)
         setupUI()
     }
-
-    /*private fun initToolbar(toolbar: androidx.appcompat.widget.Toolbar) {
-        activity?.apply {
-            setSupportActionBar(toolbar)
-            supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            supportActionBar?.setDisplayShowHomeEnabled(true)
-        }
-    }*/
-
-//    override fun onSupportNavigateUp(): Boolean {
-////        onBackPressed()
-//        return true
-//    }
 
     private fun setupUI() {
         viewModel.getTrackMapCode().observe(this, Observer(::trackMapCodeObserver))
@@ -105,15 +88,5 @@ class CreateFragment : Fragment() {
 
     companion object {
         fun newInstance() = CreateFragment()
-
-        fun start(context: Context) {
-            context.startActivity<CreateFragment>() {
-                //putExtra("param1", 5)
-            }
-        }
-
-        fun startActivityForResult(activity: Activity) {
-            activity.startActivityForResult(Intent(activity, CreateFragment::class.java), 1)
-        }
     }
 }
