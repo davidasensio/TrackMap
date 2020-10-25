@@ -23,16 +23,16 @@ import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
+import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentEntriesBinding
-import com.handysparksoft.trackmap.features.create.CreateFragment
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
 import com.handysparksoft.trackmap.features.join.JoinFragment
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
-import kotlinx.android.synthetic.main.fragment_entries.*
 import javax.inject.Inject
 
 class EntriesFragment : Fragment() {
-    private lateinit var binding: FragmentEntriesBinding
+    private val bindingHolder = FragmentViewBindingHolder<FragmentEntriesBinding>()
+    private val binding get() = bindingHolder.binding
 
     private lateinit var adapter: EntriesAdapter
 
@@ -66,8 +66,10 @@ class EntriesFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        binding = FragmentEntriesBinding.inflate(layoutInflater, container, false)
-        return binding.root
+        bindingHolder.createBinding(this) {
+            FragmentEntriesBinding.inflate(layoutInflater, container, false)
+        }
+        return bindingHolder.binding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
@@ -75,7 +77,7 @@ class EntriesFragment : Fragment() {
 
         activity?.let { fragmentActivity ->
             fragmentActivity.app.component.inject(this)
-            permissionChecker = PermissionChecker(fragmentActivity, mainContentLayout)
+            permissionChecker = PermissionChecker(fragmentActivity, binding.mainContentLayout)
         }
 
         setAdapter()
@@ -91,7 +93,6 @@ class EntriesFragment : Fragment() {
 
         permissionChecker.requestLocationPermission(onGrantedPermission = {
             updateLastLocation()
-            //startUserTrackLocation()
             startUserTrackLocationService()
         })
 
@@ -124,20 +125,20 @@ class EntriesFragment : Fragment() {
             }
         )
 
-        recycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        recycler.adapter = adapter
+        binding.recycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.recycler.adapter = adapter
     }
 
     private fun updateUi(model: MainViewModel.UiModel) {
-        progress.visibility = if (model == Loading) View.VISIBLE else View.GONE
+        binding.progress.visibility = if (model == Loading) View.VISIBLE else View.GONE
         when (model) {
             is Content -> {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
-                swipeRefreshLayout.isRefreshing = false
+                binding.swipeRefreshLayout.isRefreshing = false
             }
             is Error -> {
-                swipeRefreshLayout.isRefreshing = false
+                binding.swipeRefreshLayout.isRefreshing = false
                 val message =
                     if (model.isNetworkError) {
                         getString(R.string.no_connection_error)
@@ -190,19 +191,9 @@ class EntriesFragment : Fragment() {
     }
 
     private fun setupUI() {
-//        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
-        swipeRefreshLayout.setOnRefreshListener {
+        binding.swipeRefreshLayout.setOnRefreshListener {
             connectionHandler.registerNetworkCallback()
-//            if (!connectionHandler.isNetworkAvailable()) {
-//                Snackbar.make(
-//                    swipeRefreshLayout,
-//                    R.string.no_connection_error,
-//                    Snackbar.LENGTH_SHORT
-//                ).show()
-//                swipeRefreshLayout.isRefreshing = false
-//            } else {
             viewModel.refresh()
-//            }
         }
     }
 
@@ -211,33 +202,6 @@ class EntriesFragment : Fragment() {
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
             viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
-        }
-    }
-
-    private fun joinTrackMapTemporal() {
-        JoinFragment.startForResult(requireActivity(), JoinFragment.REQUEST_CODE)
-
-        /*val promptJoinDialog = AlertDialog.Builder(this)
-        val promptDialogView = layoutInflater.inflate(R.layout.dialog_prompt_join, null)
-        promptJoinDialog.setView(promptDialogView)
-
-        promptJoinDialog
-            .setCancelable(true)
-            .setPositiveButton("OK", DialogInterface.OnClickListener { _, _ ->
-                val trackMapCodeEditText =
-                    promptDialogView.findViewById<EditText>(R.id.trackMapCodeEditText)
-                viewModel.joinTrackMap(trackMapCodeEditText.text.toString())
-            })
-            .setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, _ ->
-                dialog.cancel()
-            })
-            .create()
-            .show()*/
-    }
-
-    private fun startUserTrackLocation() {
-        locationHandler.subscribeLocationUpdates {
-            viewModel.updateUserLocation(it)
         }
     }
 
@@ -284,9 +248,5 @@ class EntriesFragment : Fragment() {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
 
         fun newInstance() = EntriesFragment()
-
-        fun start(context: Context) {
-            context.startActivity<EntriesFragment>()
-        }
     }
 }

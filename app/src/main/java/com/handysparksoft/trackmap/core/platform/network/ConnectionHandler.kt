@@ -34,7 +34,5 @@ class ConnectionHandler @Inject constructor(private val context: Context) {
         }
         connectivityManager.registerNetworkCallback(networkRequest, networkCallback)
     }
-
-    fun isNetworkAvailable() = isNetworkAvailable
 }
 
