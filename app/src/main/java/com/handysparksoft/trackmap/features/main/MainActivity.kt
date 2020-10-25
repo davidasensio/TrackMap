@@ -11,7 +11,7 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.Prefs
-import com.handysparksoft.trackmap.databinding.ActivityMainlBinding
+import com.handysparksoft.trackmap.databinding.ActivityMainBinding
 import com.handysparksoft.trackmap.features.create.CreateFragment
 import com.handysparksoft.trackmap.features.entries.EntriesFragment
 import com.handysparksoft.trackmap.features.join.JoinFragment
@@ -21,7 +21,7 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var prefs: Prefs
 
-    lateinit var binding: ActivityMainlBinding
+    lateinit var binding: ActivityMainBinding
 
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         app.component.inject(this)
         prefs.splashScreenAfterDestroy = false
 
-        binding = ActivityMainlBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupUI()
