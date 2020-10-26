@@ -85,6 +85,7 @@ obj/
 .idea/uiDesigner.xml
 .idea/assetWizardSettings.xml
 .idea/detekt.xml
+.idea/navEditor.xml
 
 # OS-specific files
 .DS_Store

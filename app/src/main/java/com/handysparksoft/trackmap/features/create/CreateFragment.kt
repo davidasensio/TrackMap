@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.SnackbarType
 import com.handysparksoft.trackmap.core.extension.app
@@ -44,7 +45,7 @@ class CreateFragment : Fragment() {
         viewModel.trackMapCreation.observe(this, Observer {
             it.getContentIfNotHandled()?.let { created ->
                 if (created) {
-                    requireActivity().onBackPressed()
+                    findNavController().navigate(R.id.action_createFragment_to_entriesFragment)
                 }
             }
         })
