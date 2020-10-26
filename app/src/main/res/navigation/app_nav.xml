@@ -8,7 +8,8 @@
     <fragment
         android:id="@+id/entriesFragment"
         android:name="com.handysparksoft.trackmap.features.entries.EntriesFragment"
-        android:label="Entries">
+        android:label="Entries"
+        tools:layout="@layout/fragment_entries">
         <action
             android:id="@+id/action_entriesFragment_to_joinFragment"
             app:destination="@id/joinFragment" />
@@ -20,7 +21,7 @@
         android:id="@+id/joinFragment"
         android:name="com.handysparksoft.trackmap.features.join.JoinFragment"
         android:label="Join"
-        tools:layout="@layout/fragment_join" >
+        tools:layout="@layout/fragment_join">
         <action
             android:id="@+id/action_joinFragment_to_entriesFragment"
             app:destination="@id/entriesFragment" />
@@ -29,7 +30,7 @@
         android:id="@+id/createFragment"
         android:name="com.handysparksoft.trackmap.features.create.CreateFragment"
         android:label="Create"
-        tools:layout="@layout/fragment_create" >
+        tools:layout="@layout/fragment_create">
         <action
             android:id="@+id/action_createFragment_to_entriesFragment"
             app:destination="@id/entriesFragment" />

@@ -20,13 +20,11 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.snackbar
-import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentEntriesBinding
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
-import com.handysparksoft.trackmap.features.join.JoinFragment
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import javax.inject.Inject
 
