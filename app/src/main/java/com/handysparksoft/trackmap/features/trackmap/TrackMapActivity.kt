@@ -1,9 +1,13 @@
 package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
+import android.app.PictureInPictureParams
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
+import android.util.Rational
 import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -68,6 +72,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var mapStyleCounter = 0
     private lateinit var binding: ActivityTrackmapBinding
 
+    private var pipModeEnabled = true
+    private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTrackmapBinding.inflate(layoutInflater)
@@ -86,6 +93,48 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         super.onDestroy()
     }
 
+    override fun onUserLeaveHint() {
+        if (pipModeEnabled) {
+            when {
+                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O -> {
+                    val params = PictureInPictureParams.Builder()
+                    params.setAspectRatio(Rational(3, 4))
+                    enterPictureInPictureMode(params.build())
+                }
+                android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N -> {
+                    enterPictureInPictureMode()
+                }
+                else -> {
+                    super.onUserLeaveHint()
+                }
+            }
+        }
+    }
+
+    override fun onPictureInPictureModeChanged(
+        isInPictureInPictureMode: Boolean,
+        newConfig: Configuration?
+    ) {
+        setControlsVisibility(isInPictureInPictureMode)
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun setControlsVisibility(inPictureInPictureMode: Boolean) {
+        if (inPictureInPictureMode) {
+            binding.switchMapStyleButton.gone()
+            binding.frameAllParticipantsInMapButton.gone()
+            binding.trackMapBottomCardView.visible()
+            googleMap.isMyLocationEnabled = false
+            googleMapFramePadding = GOOGLE_MAP_FRAME_MIN_PADDING_DP
+        } else {
+            binding.switchMapStyleButton.visible()
+            binding.frameAllParticipantsInMapButton.visible()
+            binding.trackMapBottomCardView.gone()
+            googleMap.isMyLocationEnabled = true
+            googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
+        }
+    }
+
     private fun injectComponents() {
         app.component.inject(this) // Equals to DaggerAppComponent.factory().create(applicationContext as Application).inject(this)
     }
@@ -100,15 +149,31 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupUI() {
         title = getString(R.string.app_name)
 
-        binding.viewAllMarkersInMapImageView.setOnClickListener {
-            binding.viewAllMarkersInMapImageView.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+        binding.frameAllParticipantsInMapButton.setOnClickListener {
+            binding.frameAllParticipantsInMapButton.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
             viewAllParticipantsInMap = !viewAllParticipantsInMap
         }
 
-        binding.setMapStyleImageView.setOnClickListener {
+        binding.switchMapStyleButton.setOnClickListener {
             val nextTypeIndex = ++mapStyleCounter % mapStyles.size
             mapActionHelper.mapType = mapStyles[nextTypeIndex]
         }
+
+        getNavigationBarHeight().also { height ->
+            if (height > 0) {
+                val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
+                (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                    setMargins(marginStart, topMargin, marginEnd, bottomMargin + height)
+                }
+            }
+        }
+    }
+
+    private fun getNavigationBarHeight(): Int {
+        val resourceId: Int = resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            resources.getDimensionPixelSize(resourceId)
+        } else 0
     }
 
     @SuppressLint("MissingPermission")
@@ -318,7 +383,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
         }
 
-        val framePadding = dip(GOOGLE_MAP_FRAME_PADDING_DP)
+        val framePadding = dip(googleMapFramePadding)
         val build = boundsBuilder.build()
         val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
         this.googleMap.animateCamera(cameraUpdateAction)
@@ -336,7 +401,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     companion object {
         private const val TRACKMAP_PARAM = "trackMapId"
-        private const val GOOGLE_MAP_FRAME_PADDING_DP = 64
+        private const val GOOGLE_MAP_FRAME_MIN_PADDING_DP = 16
+        private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_TOP_PADDING_DP = 32
 
         fun start(context: Context, trackMap: TrackMap) {
