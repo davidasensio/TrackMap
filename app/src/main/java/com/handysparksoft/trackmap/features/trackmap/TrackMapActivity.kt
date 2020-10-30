@@ -5,6 +5,7 @@ import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.util.Rational
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -27,6 +28,7 @@ import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
+import java.util.*
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -256,6 +258,26 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
+
+            // FIXME: remove after tests
+            val taskLog = object : TimerTask() {
+                override fun run() {
+                    runOnUiThread {
+                        binding.tempLog.text = LocationHandler.nmeaLog.toString()
+                    }
+                }
+            }
+            Timer().scheduleAtFixedRate(taskLog, 0, 1500)
+            binding.tempLog.movementMethod = ScrollingMovementMethod()
+            binding.tempLog.setOnLongClickListener {
+                binding.tempLogContainer.alpha = if (binding.tempLogContainer.alpha == 1f) 0f else 1f
+                true
+            }
+            binding.tempLogClearButton.setOnClickListener {
+                LocationHandler.nmeaLog.clear()
+                binding.tempLog.text = ""
+            }
+            // END FIXME
         }
     }
 
@@ -305,17 +327,23 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun subscribeForParticipantLocationUpdates(userId: String) {
         participantsLocationChildEventListener = object : ChildEventListener {
-            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-            }
-
-            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+            private fun onParticipantDataUpdate(snapshot: DataSnapshot) {
                 participants.firstOrNull { it.userId == userId }?.let {
                     when (snapshot.key) {
                         "latitude" -> it.latitude = snapshot.value as Double
                         "longitude" -> it.longitude = snapshot.value as Double
+                        "altitudeAMSL" -> it.altitudeAMSL = snapshot.value as Long
+                        "altitudeGeoid" -> it.altitudeGeoid = snapshot.value as Long
                     }
                 }
                 refreshTrackMap()
+            }
+
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                onParticipantDataUpdate(snapshot)
             }
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
@@ -332,7 +360,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (userId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
         val defaultLongitude =
             if (userId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
-        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude))
+        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude, 0, 0))
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
     }
@@ -350,11 +378,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
             val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
 
-            googleMapHandler.addMarker(
+            val marker = googleMapHandler.addMarker(
                 latLng,
-                participantLocation.userAlias(isUserSession),
+                participantLocation.userAlias(isUserSession) +
+                        " AMSL: " + participantLocation.altitudeAMSL +
+                        " Geoid: " + participantLocation.altitudeGeoid,
+                null,
                 participantIcon
             )
+            marker.showInfoWindow()
         }
         if (viewAllParticipantsInMap) {
             frameAllParticipants()
@@ -412,3 +444,4 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 }
+

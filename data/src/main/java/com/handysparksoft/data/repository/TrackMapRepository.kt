@@ -40,6 +40,10 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
         return remoteDataSource.updateUserLocation(userId, latitude, longitude)
     }
 
+    suspend fun updateUserAltitude(userId: String, altitudeAMSL: Long, altitudeGeoid: Long) {
+        return remoteDataSource.updateUserAltitude(userId, altitudeAMSL, altitudeGeoid)
+    }
+
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
         remoteDataSource.leaveTrackMap(userId, trackMapId, trackMapParticipant)
     }

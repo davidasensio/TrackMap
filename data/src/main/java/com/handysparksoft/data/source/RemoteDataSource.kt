@@ -14,5 +14,6 @@ interface RemoteDataSource {
     suspend fun joinTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant)
     suspend fun getTrackMapById(trackMapId: String): Result<TrackMap?>
     suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double)
+    suspend fun updateUserAltitude(userId: String, altitudeAMSL: Long, altitudeGeoid: Long)
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant)
 }

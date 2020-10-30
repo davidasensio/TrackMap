@@ -48,13 +48,21 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
                     Result.Error(false, null, null)
                 }
             }
-            is Result.Error -> Result.Error(result.isNetworkError, result.code, result.errorResponse)
+            is Result.Error -> Result.Error(
+                result.isNetworkError,
+                result.code,
+                result.errorResponse
+            )
             is Result.Loading -> Result.Loading
         }
     }
 
     override suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
         safeApiCall { service.updateUserLocation(userId, UserLocationData(latitude, longitude)) }
+    }
+
+    override suspend fun updateUserAltitude(userId: String, altitudeAMSL: Long, altitudeGeoid: Long) {
+        safeApiCall { service.updateUserAltitude(userId, UserAltitudeData(altitudeAMSL, altitudeGeoid)) }
     }
 
     override suspend fun leaveTrackMap(

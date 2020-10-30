@@ -51,6 +51,12 @@ interface TrackMapService {
         @Body user: UserLocationData
     )
 
+    @PATCH("users/{userId}.json")
+    suspend fun updateUserAltitude(
+        @Path("userId") userId: String,
+        @Body user: UserAltitudeData
+    )
+
     @DELETE("users/{userId}/trackMaps/{trackMapId}.json")
     suspend fun deleteUserTrackMap(
         @Path("userId") userId: String,
