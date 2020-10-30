@@ -7,12 +7,13 @@ import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.handysparksoft.domain.model.UserGPSData
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.whenAvailable
 import com.handysparksoft.trackmap.features.main.MainActivity
-import com.handysparksoft.usecases.UpdateUserAltitudeUseCase
+import com.handysparksoft.usecases.UpdateUserGPSDataUseCase
 import com.handysparksoft.usecases.UpdateUserLocationUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -33,7 +34,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     lateinit var updateUserLocationUseCase: UpdateUserLocationUseCase
 
     @Inject
-    lateinit var updateUserAltitudeUseCase: UpdateUserAltitudeUseCase
+    lateinit var updateUserAltitudeUseCase: UpdateUserGPSDataUseCase
 
     private var manuallyStopped: Boolean = false
 
@@ -164,16 +165,19 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     private fun requestGPSLocationUpdates() {
         // Reset altitude to 0 before start listening
         launch {
-            updateUserAltitudeUseCase.execute(userHandler.getUserId(), 0, 0)
+            updateUserAltitudeUseCase.execute(userHandler.getUserId(), UserGPSData(0, 0, 0))
         }
 
-        // Start listening NMEA messages
-        locationHandler.subscribeToNMEAMessages { nmeaMessage ->
+        // Start listening to NMEA messages
+        locationHandler.subscribeToNMEAMessagesAndSpeed { nmeaMessage, speed ->
             nmeaMessage.altitudeAMSL?.let { altitudeAMSL ->
                 logDebug("*** Altitude: $altitudeAMSL - (${nmeaMessage.type})")
                 launch(Dispatchers.IO) {
                     val altitudeGeoid = nmeaMessage.altitudeGeoid ?: 0
-                    updateUserAltitudeUseCase.execute(userHandler.getUserId(), altitudeAMSL, altitudeGeoid)
+                    updateUserAltitudeUseCase.execute(
+                        userHandler.getUserId(),
+                        UserGPSData(altitudeAMSL, altitudeGeoid, speed)
+                    )
                 }
             }
         }

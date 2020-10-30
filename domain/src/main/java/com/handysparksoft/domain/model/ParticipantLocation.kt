@@ -5,15 +5,17 @@ data class ParticipantLocation(
     var latitude: Double,
     var longitude: Double,
     var altitudeAMSL: Long,
-    var altitudeGeoid: Long
+    var altitudeGeoid: Long,
+    var speed: Long
 ) {
     fun isSessionUser(userSessionId: String) = userId == userSessionId
 
-    fun userAlias(sessionUser: Boolean): String {
+    fun userAlias(sessionUser: Boolean, shortIt: Boolean = false): String {
+        val userIdText = if (shortIt) userId.take(10) +  "..." else userId
         return if (sessionUser) {
-            "$userId (you)"
+            "$userIdText (you)"
         } else {
-            userId
+            userIdText
         }
     }
 }

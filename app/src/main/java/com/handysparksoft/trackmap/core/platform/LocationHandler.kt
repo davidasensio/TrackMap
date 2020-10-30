@@ -80,10 +80,15 @@ class LocationHandler @Inject constructor(private val context: Context) {
      * NMEA message sample: $GNGGA,130657.00,3929.215732,N,00022.071493,W,1,05,1.8,21.3,M,51.3,M,,*54
      */
     @SuppressLint("MissingPermission")
-    fun subscribeToNMEAMessages(listener: (NMEAMessage) -> Unit) {
+    fun subscribeToNMEAMessagesAndSpeed(listener: (message: NMEAMessage, speed: Long) -> Unit) {
+        var currentSpeed = 0L
         locationManagerGPS = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationListenerGPS = object : LocationListener {
-            override fun onLocationChanged(location: Location) {}
+            override fun onLocationChanged(location: Location) {
+                if (location.hasSpeed()) {
+                    currentSpeed = (location.speed * 3.6).toLong()
+                }
+            }
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
             override fun onProviderEnabled(provider: String) {}
             override fun onProviderDisabled(provider: String) {}
@@ -100,14 +105,14 @@ class LocationHandler @Inject constructor(private val context: Context) {
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             locationManagerGPS.addNmeaListener { message, timestamp ->
                 onValidMessage(message) {
-                    nmeaLog.append("$message")
-                    listener(it)
+                    nmeaLog.append(message)
+                    listener(it, currentSpeed)
                 }
             }
         } else {
             val nmeaListenerDeprecated = GpsStatus.NmeaListener { timestamp, message ->
                 onValidMessage(message) {
-                    listener(it)
+                    listener(it, currentSpeed)
                 }
             }
             try {

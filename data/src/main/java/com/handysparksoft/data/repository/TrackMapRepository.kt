@@ -4,6 +4,7 @@ import com.handysparksoft.data.Result
 import com.handysparksoft.data.source.RemoteDataSource
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.TrackMapParticipant
+import com.handysparksoft.domain.model.UserGPSData
 import com.handysparksoft.domain.model.UserProfileData
 
 class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
@@ -40,8 +41,8 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
         return remoteDataSource.updateUserLocation(userId, latitude, longitude)
     }
 
-    suspend fun updateUserAltitude(userId: String, altitudeAMSL: Long, altitudeGeoid: Long) {
-        return remoteDataSource.updateUserAltitude(userId, altitudeAMSL, altitudeGeoid)
+    suspend fun updateUserGPSData(userId: String, userGPSData: UserGPSData) {
+        return remoteDataSource.updateUserGPSData(userId, userGPSData)
     }
 
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
