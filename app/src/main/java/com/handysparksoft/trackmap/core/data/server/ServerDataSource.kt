@@ -61,8 +61,8 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
         safeApiCall { service.updateUserLocation(userId, UserLocationData(latitude, longitude)) }
     }
 
-    override suspend fun updateUserAltitude(userId: String, altitudeAMSL: Long, altitudeGeoid: Long) {
-        safeApiCall { service.updateUserAltitude(userId, UserAltitudeData(altitudeAMSL, altitudeGeoid)) }
+    override suspend fun updateUserGPSData(userId: String, userGPSData: UserGPSData) {
+        safeApiCall { service.updateUserAltitude(userId, userGPSData) }
     }
 
     override suspend fun leaveTrackMap(

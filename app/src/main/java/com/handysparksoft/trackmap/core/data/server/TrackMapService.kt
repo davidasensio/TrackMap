@@ -54,7 +54,7 @@ interface TrackMapService {
     @PATCH("users/{userId}.json")
     suspend fun updateUserAltitude(
         @Path("userId") userId: String,
-        @Body user: UserAltitudeData
+        @Body user: UserGPSData
     )
 
     @DELETE("users/{userId}/trackMaps/{trackMapId}.json")

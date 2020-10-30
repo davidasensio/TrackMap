@@ -334,6 +334,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "longitude" -> it.longitude = snapshot.value as Double
                         "altitudeAMSL" -> it.altitudeAMSL = snapshot.value as Long
                         "altitudeGeoid" -> it.altitudeGeoid = snapshot.value as Long
+                        "speed" -> it.speed = snapshot.value as Long
                     }
                 }
                 refreshTrackMap()
@@ -360,7 +361,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (userId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
         val defaultLongitude =
             if (userId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
-        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude, 0, 0))
+        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude, 0, 0, 0))
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
     }
@@ -380,9 +381,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             val marker = googleMapHandler.addMarker(
                 latLng,
-                participantLocation.userAlias(isUserSession) +
-                        " AMSL: " + participantLocation.altitudeAMSL +
-                        " Geoid: " + participantLocation.altitudeGeoid,
+                participantLocation.userAlias(isUserSession, true) +
+                        " AMSL: " + participantLocation.altitudeAMSL + " m" +
+                        " Geoid: " + participantLocation.altitudeGeoid + " m" +
+                        " Speed: " + participantLocation.speed + " Km/h",
                 null,
                 participantIcon
             )
