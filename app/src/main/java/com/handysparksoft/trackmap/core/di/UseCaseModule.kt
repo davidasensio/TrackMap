@@ -33,6 +33,10 @@ class UseCaseModule {
         UpdateUserLocationUseCase(trackMapRepository)
 
     @Provides
+    fun updateUserAltitudeUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        UpdateUserAltitudeUseCase(trackMapRepository)
+
+    @Provides
     fun leaveTrackMapUseCaseProvider(trackMapRepository: TrackMapRepository) =
         LeaveTrackMapUseCase(trackMapRepository)
 

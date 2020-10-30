@@ -9,9 +9,10 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.whenAvailable
-import com.handysparksoft.trackmap.features.entries.EntriesFragment
 import com.handysparksoft.trackmap.features.main.MainActivity
+import com.handysparksoft.usecases.UpdateUserAltitudeUseCase
 import com.handysparksoft.usecases.UpdateUserLocationUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -22,7 +23,6 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         const val ACTION_STOP = "ACTION_STOP"
     }
 
-
     @Inject
     lateinit var userHandler: UserHandler
 
@@ -31,6 +31,9 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
 
     @Inject
     lateinit var updateUserLocationUseCase: UpdateUserLocationUseCase
+
+    @Inject
+    lateinit var updateUserAltitudeUseCase: UpdateUserAltitudeUseCase
 
     private var manuallyStopped: Boolean = false
 
@@ -50,6 +53,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         }
 
         requestLocationUpdates()
+        requestGPSLocationUpdates()
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -75,6 +79,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
 
     override fun onDestroy() {
         stopRequestLocationUpdates()
+        stopRequestGPSLocationUpdates()
         destroyScope()
         super.onDestroy()
 
@@ -141,7 +146,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     private fun requestLocationUpdates() {
         locationHandler.subscribeLocationUpdates { location ->
             location.whenAvailable {
-                launch(Dispatchers.Default) {
+                launch(Dispatchers.IO) {
                     updateUserLocationUseCase.execute(
                         userHandler.getUserId(),
                         it.latitude,
@@ -154,5 +159,27 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
 
     private fun stopRequestLocationUpdates() {
         locationHandler.unsubscribeLocationUpdates()
+    }
+
+    private fun requestGPSLocationUpdates() {
+        // Reset altitude to 0 before start listening
+        launch {
+            updateUserAltitudeUseCase.execute(userHandler.getUserId(), 0, 0)
+        }
+
+        // Start listening NMEA messages
+        locationHandler.subscribeToNMEAMessages { nmeaMessage ->
+            nmeaMessage.altitudeAMSL?.let { altitudeAMSL ->
+                logDebug("*** Altitude: $altitudeAMSL - (${nmeaMessage.type})")
+                launch(Dispatchers.IO) {
+                    val altitudeGeoid = nmeaMessage.altitudeGeoid ?: 0
+                    updateUserAltitudeUseCase.execute(userHandler.getUserId(), altitudeAMSL, altitudeGeoid)
+                }
+            }
+        }
+    }
+
+    private fun stopRequestGPSLocationUpdates() {
+        locationHandler.unsubscribeToNMEAMessages()
     }
 }

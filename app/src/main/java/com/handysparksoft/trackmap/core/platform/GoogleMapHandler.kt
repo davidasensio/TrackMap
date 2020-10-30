@@ -8,10 +8,7 @@ import androidx.annotation.DrawableRes
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import com.google.android.gms.maps.GoogleMap
-import com.google.android.gms.maps.model.BitmapDescriptor
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.logError
 import javax.inject.Inject
@@ -55,14 +52,13 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
         this.googleMap = googleMap
     }
 
-    fun addMarker(latlng: LatLng, text: String, icon: Int = R.drawable.ic_marker_green) {
-        this.googleMap.addMarker(
-            MarkerOptions().position(latlng).title(
-                text
-            )
-                .icon(
-                    getBitmapFromVector(context, icon)
-                )
+    fun addMarker(latlng: LatLng, title: String, snippet: String?, icon: Int = R.drawable.ic_marker_green): Marker {
+        return this.googleMap.addMarker(
+            MarkerOptions()
+                .position(latlng)
+                .title(title)
+                .snippet(snippet)
+                .icon(getBitmapFromVector(context, icon))
             //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
         )
     }
@@ -97,6 +93,7 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
     }
 
     fun getRandomMarker(ignoreList: List<Int> = listOf(MARKER_ICON_DEFAULT_GREEN)): Int {
-        return availableMarkers.filter { !ignoreList.contains(it) }.shuffled().firstOrNull() ?: MARKER_ICON_TRIANGLE_BROWN
+        return availableMarkers.filter { !ignoreList.contains(it) }.shuffled().firstOrNull()
+            ?: MARKER_ICON_TRIANGLE_BROWN
     }
 }
