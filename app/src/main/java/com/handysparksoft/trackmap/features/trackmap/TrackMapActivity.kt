@@ -20,6 +20,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -76,6 +77,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var pipModeEnabled = true
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
+    private val participantMarkers = mutableListOf<Marker>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -194,17 +196,26 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapTypeBinging.mapTypeDefaultImageView.setOnClickListener {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
-            selectMapType(mapTypeBinging.mapTypeDefaultImageView, mapTypeBinging.mapTypeDefaultTextView)
+            selectMapType(
+                mapTypeBinging.mapTypeDefaultImageView,
+                mapTypeBinging.mapTypeDefaultTextView
+            )
         }
 
         mapTypeBinging.mapTypeSatelliteImageView.setOnClickListener {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_SATELLITE
-            selectMapType(mapTypeBinging.mapTypeSatelliteImageView, mapTypeBinging.mapTypeSatelliteTextView)
+            selectMapType(
+                mapTypeBinging.mapTypeSatelliteImageView,
+                mapTypeBinging.mapTypeSatelliteTextView
+            )
         }
 
         mapTypeBinging.mapTypeTerrainImageView.setOnClickListener {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_TERRAIN
-            selectMapType(mapTypeBinging.mapTypeTerrainImageView, mapTypeBinging.mapTypeTerrainTextView)
+            selectMapType(
+                mapTypeBinging.mapTypeTerrainImageView,
+                mapTypeBinging.mapTypeTerrainTextView
+            )
         }
 
         // Round shape
@@ -436,6 +447,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     fun refreshTrackMap() {
         googleMap.clear()
+        participantMarkers.clear()
+
         participants.filter(::withAvailableLatLng).forEach { participantLocation ->
             val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
             val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
@@ -451,6 +464,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 participantIcon
             )
             marker.showInfoWindow()
+            participantMarkers.add(marker)
         }
         if (frameAllParticipantsInMap) {
             frameAllParticipants()
@@ -473,16 +487,41 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
     private fun frameAllParticipants() {
-        val boundsBuilder = LatLngBounds.Builder()
+        if (participantMarkers.size == 1) {
+            // Move the camera to unique participant location with a zoom of 17.
+            participants.firstOrNull(::withAvailableLatLng)?.let { participant ->
+                val latLng = LatLng(participant.latitude, participant.longitude)
+                val zoomLevel = getZoomLevelAccordingSpeed(participant.speed)
+                this.googleMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        latLng,
+                        zoomLevel
+                    )
+                )
+            }
+        } else {
+            val boundsBuilder = LatLngBounds.Builder()
 
-        participants.filter(::withAvailableLatLng).forEach { participant ->
-            boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
+            participants.filter(::withAvailableLatLng).forEach { participant ->
+                boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
+            }
+
+            val framePadding = dip(googleMapFramePadding)
+            val build = boundsBuilder.build()
+            val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
+            this.googleMap.animateCamera(cameraUpdateAction)
         }
+    }
 
-        val framePadding = dip(googleMapFramePadding)
-        val build = boundsBuilder.build()
-        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
-        this.googleMap.animateCamera(cameraUpdateAction)
+    private fun getZoomLevelAccordingSpeed(speed: Long): Float {
+        return when {
+            speed > 120 -> 12f
+            speed > 100 -> 13f
+            speed > 80 -> 14f
+            speed > 50 -> 15f
+            speed > 30 -> 16f
+            else -> MapActionHelper.DEFAULT_ZOOM_LEVEL
+        }
     }
 
     private fun withAvailableLatLng(participantLocation: ParticipantLocation): Boolean {

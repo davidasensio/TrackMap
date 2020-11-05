@@ -80,13 +80,13 @@ class LocationHandler @Inject constructor(private val context: Context) {
      * NMEA message sample: $GNGGA,130657.00,3929.215732,N,00022.071493,W,1,05,1.8,21.3,M,51.3,M,,*54
      */
     @SuppressLint("MissingPermission")
-    fun subscribeToNMEAMessagesAndSpeed(listener: (message: NMEAMessage, speed: Long) -> Unit) {
+    fun subscribeToNMEAMessagesAndSpeed(listener: (message: NMEAMessage, speedInKmh: Long) -> Unit) {
         var currentSpeed = 0L
         locationManagerGPS = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
         locationListenerGPS = object : LocationListener {
             override fun onLocationChanged(location: Location) {
                 if (location.hasSpeed()) {
-                    currentSpeed = (location.speed * 3.6).toLong()
+                    currentSpeed = (location.speed * MS_TO_KMH_FACTOR).toLong()
                 }
             }
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
@@ -159,5 +159,6 @@ class LocationHandler @Inject constructor(private val context: Context) {
         private val LOCATION_GPS_MIN_TIME_MILLIS = if (BuildConfig.DEBUG) 0 else 2000L
         private val LOCATION_GPS_MIN_DISTANCE_METERS = if (BuildConfig.DEBUG) 0f else 2f
         private const val REGEX_GGA_MESSAGE = "\\\$G[PLN]GGA.*"
+        private const val MS_TO_KMH_FACTOR = 3.6
     }
 }
