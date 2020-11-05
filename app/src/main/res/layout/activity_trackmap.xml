@@ -19,17 +19,18 @@
         map:layout_constraintTop_toTopOf="parent"
         tools:context="com.handysparksoft.trackmap.features.trackmap.TrackMapActivity" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <ImageButton
         android:id="@+id/switchMapStyleButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="112dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
-        android:backgroundTint="@color/colorAccent"
-        android:scaleType="fitXY"
+        android:background="@drawable/map_type_round_button_shape_background"
+        android:contentDescription="@string/switch_to_map_type"
+        android:elevation="4dp"
         android:src="@drawable/ic_layers"
-        app:layout_constraintBottom_toTopOf="@id/frameAllParticipantsInMapButton"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:tooltipText="@string/tooltip_map_style" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -73,9 +74,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:alpha="0"
         android:layout_marginTop="96dp"
         android:layout_marginEnd="8dp"
+        android:alpha="0"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -108,5 +109,14 @@
             android:padding="8dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
     </RelativeLayout>
+
+    <include
+        android:id="@+id/dialogMapTypeLayout"
+        layout="@layout/dialog_map_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="@id/switchMapStyleButton"
+        app:layout_constraintTop_toTopOf="@+id/switchMapStyleButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

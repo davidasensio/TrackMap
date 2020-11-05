@@ -7,6 +7,9 @@ import android.content.res.Configuration
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.util.Rational
+import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
@@ -27,6 +30,7 @@ import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
+import com.handysparksoft.trackmap.databinding.DialogMapTypeBinding
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
 import java.util.*
 import javax.inject.Inject
@@ -67,12 +71,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var viewAllParticipantsInMap = true
 
-    private val mapStyles = arrayOf(
-        GoogleMap.MAP_TYPE_NORMAL,
-        GoogleMap.MAP_TYPE_SATELLITE
-    )
-    private var mapStyleCounter = 0
     private lateinit var binding: ActivityTrackmapBinding
+    private lateinit var mapTypeBinging: DialogMapTypeBinding
 
     private var pipModeEnabled = true
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
@@ -80,6 +80,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTrackmapBinding.inflate(layoutInflater)
+        mapTypeBinging = binding.dialogMapTypeLayout
         setContentView(binding.root)
 
         injectComponents()
@@ -156,11 +157,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             viewAllParticipantsInMap = !viewAllParticipantsInMap
         }
 
-        binding.switchMapStyleButton.setOnClickListener {
-            val nextTypeIndex = ++mapStyleCounter % mapStyles.size
-            mapActionHelper.mapType = mapStyles[nextTypeIndex]
-        }
-
         getNavigationBarHeight().also { height ->
             if (height > 0) {
                 val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
@@ -168,6 +164,65 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     setMargins(marginStart, topMargin, marginEnd, bottomMargin + height)
                 }
             }
+        }
+
+        setupMapTypeSwitcher()
+    }
+
+    private fun setupMapTypeSwitcher() {
+        fun selectMapType(imageViewToSelect: ImageView, textViewToSelect: TextView) {
+            mapTypeBinging.mapTypeDefaultImageView.isSelected = false
+            mapTypeBinging.mapTypeDefaultTextView.isSelected = false
+
+            mapTypeBinging.mapTypeSatelliteImageView.isSelected = false
+            mapTypeBinging.mapTypeSatelliteTextView.isSelected = false
+
+            mapTypeBinging.mapTypeTerrainImageView.isSelected = false
+            mapTypeBinging.mapTypeTerrainTextView.isSelected = false
+
+            imageViewToSelect.isSelected = true
+            textViewToSelect.isSelected = true
+        }
+
+
+        binding.switchMapStyleButton.setOnClickListener {
+            showMapStyleLayers()
+        }
+
+        mapTypeBinging.mapTypeDefaultImageView.isSelected = true
+        mapTypeBinging.mapTypeDefaultTextView.isSelected = true
+
+        mapTypeBinging.mapTypeDefaultImageView.setOnClickListener {
+            mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
+            selectMapType(mapTypeBinging.mapTypeDefaultImageView, mapTypeBinging.mapTypeDefaultTextView)
+        }
+
+        mapTypeBinging.mapTypeSatelliteImageView.setOnClickListener {
+            mapActionHelper.mapType = GoogleMap.MAP_TYPE_SATELLITE
+            selectMapType(mapTypeBinging.mapTypeSatelliteImageView, mapTypeBinging.mapTypeSatelliteTextView)
+        }
+
+        mapTypeBinging.mapTypeTerrainImageView.setOnClickListener {
+            mapActionHelper.mapType = GoogleMap.MAP_TYPE_TERRAIN
+            selectMapType(mapTypeBinging.mapTypeTerrainImageView, mapTypeBinging.mapTypeTerrainTextView)
+        }
+
+        // Round shape
+        mapTypeBinging.mapTypeDefaultImageView.clipToOutline = true
+        mapTypeBinging.mapTypeSatelliteImageView.clipToOutline = true
+        mapTypeBinging.mapTypeTerrainImageView.clipToOutline = true
+    }
+
+    private fun showMapStyleLayers() {
+        binding.switchMapStyleButton.showTransitionTo(mapTypeBinging.mapTypeCaradView, Easing.Enter)
+    }
+
+    private fun dismissMapStyleLayers() {
+        if (mapTypeBinging.mapTypeCaradView.visibility == View.VISIBLE) {
+            mapTypeBinging.mapTypeCaradView.showTransitionTo(
+                binding.switchMapStyleButton,
+                Easing.Leave
+            )
         }
     }
 
@@ -220,6 +275,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
         }
+
+        googleMap.setOnMapClickListener {
+            dismissMapStyleLayers()
+        }
     }
 
     private fun setMapPadding() {
@@ -270,7 +329,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             Timer().scheduleAtFixedRate(taskLog, 0, 1500)
             binding.tempLog.movementMethod = ScrollingMovementMethod()
             binding.tempLog.setOnLongClickListener {
-                binding.tempLogContainer.alpha = if (binding.tempLogContainer.alpha == 1f) 0f else 1f
+                binding.tempLogContainer.alpha =
+                    if (binding.tempLogContainer.alpha == 1f) 0f else 1f
                 true
             }
             binding.tempLogClearButton.setOnClickListener {

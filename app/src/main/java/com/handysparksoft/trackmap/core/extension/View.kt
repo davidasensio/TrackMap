@@ -1,9 +1,15 @@
 package com.handysparksoft.trackmap.core.extension
 
 import android.R
+import android.graphics.Color
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
+import androidx.transition.Transition
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialContainerTransform
+import com.handysparksoft.trackmap.core.platform.Easing
 
 /**
  * Extension functions of: View
@@ -44,3 +50,19 @@ fun View.snackbar(
     }
 }
 
+fun View.showTransitionTo(endView: View, easing: Easing) {
+    // Construct a container transform transition between two views
+    val transition = com.google.android.material.transition.platform.MaterialContainerTransform()
+    transition.scrimColor = Color.TRANSPARENT
+    transition.interpolator = easing.interpolator
+
+    // Define the start and the end view
+    transition.startView = this
+    transition.endView = endView
+    transition.addTarget(endView)
+
+    // Trigger the container transform transition
+    TransitionManager.beginDelayedTransition(this.rootView as ViewGroup?, transition as android.transition.Transition)
+    this.visibility = View.INVISIBLE
+    endView.visibility = View.VISIBLE
+}

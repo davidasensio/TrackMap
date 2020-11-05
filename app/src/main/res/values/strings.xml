@@ -38,5 +38,11 @@
     <string name="join_trackmap_validation">Please, provide a valid TrackMap code</string>
     <string name="permission_need">Location permission is needed</string>
     <string name="tooltip_frame_all_participants">Frame all participants</string>
+
     <string name="tooltip_map_style">Change map style</string>
+    <string name="map_type_title">Map type</string>
+    <string name="map_type_default">Default</string>
+    <string name="map_type_satellite">Satellite</string>
+    <string name="map_type_terrain">Terrain</string>
+    <string name="switch_to_map_type">Switch to map type</string>
 </resources>
