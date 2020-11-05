@@ -26,6 +26,7 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.handysparksoft.domain.model.ParticipantLocation
 import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.domain.model.UserMarkerData
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
@@ -68,7 +69,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
-    private val userMarkerMap = hashMapOf<String, Int>()
+    private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
     private var frameAllParticipantsInMap = true
 
@@ -237,6 +238,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun clearInfoWindows() {
+        userMarkerMap.values.forEach {
+            it.isShowingInfoWindow = false
+        }
+    }
+
     private fun getNavigationBarHeight(): Int {
         val resourceId: Int = resources.getIdentifier("navigation_bar_height", "dimen", "android")
         return if (resourceId > 0) {
@@ -289,6 +296,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         googleMap.setOnMapClickListener {
             dismissMapStyleLayers()
+            clearInfoWindows()
         }
     }
 
@@ -323,6 +331,16 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     binding.frameAllParticipantsInMapButton.performClick()
                 }
             }
+        }
+
+        googleMap.setOnMarkerClickListener {
+            clearInfoWindows()
+            it.showInfoWindow()
+            val tagId = it.tag.toString()
+            val userMarkerData = getParticipantMarker(tagId)
+            userMarkerData.isShowingInfoWindow = true
+            userMarkerMap[tagId] = userMarkerData
+            true
         }
     }
 
@@ -451,7 +469,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         participants.filter(::withAvailableLatLng).forEach { participantLocation ->
             val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
-            val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
+            val userMarkerData = getParticipantMarker(participantLocation.userId)
             val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
 
             val marker = googleMapHandler.addMarker(
@@ -461,9 +479,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         " Geoid: " + participantLocation.altitudeGeoid + " m" +
                         " Speed: " + participantLocation.speed + " Km/h",
                 null,
-                participantIcon
+                userMarkerData.icon
             )
-            marker.showInfoWindow()
+            marker.tag = participantLocation.userId
+
+            if (userMarkerData.isShowingInfoWindow) {
+                marker.showInfoWindow()
+            }
             participantMarkers.add(marker)
         }
         if (frameAllParticipantsInMap) {
@@ -472,17 +494,19 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
 
-    private fun getParticipantMarker(userId: String, isUserSession: Boolean): Int {
-        var participantIcon = userMarkerMap[userId]
-        if (participantIcon == null) {
-            participantIcon = if (isUserSession) {
+    private fun getParticipantMarker(userId: String): UserMarkerData {
+        var userMakerData = userMarkerMap[userId]
+        if (userMakerData == null) {
+            val isUserSession = userId == userHandler.getUserId()
+            val icon = if (isUserSession) {
                 GoogleMapHandler.MARKER_ICON_DEFAULT_GREEN
             } else {
                 googleMapHandler.getRandomMarker()
             }
-            userMarkerMap[userId] = participantIcon
+            userMakerData = UserMarkerData(icon, false)
+            userMarkerMap[userId] = userMakerData
         }
-        return participantIcon
+        return userMakerData
     }
 
 
