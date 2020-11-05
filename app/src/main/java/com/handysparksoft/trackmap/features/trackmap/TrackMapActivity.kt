@@ -69,7 +69,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val userMarkerMap = hashMapOf<String, Int>()
 
-    private var viewAllParticipantsInMap = true
+    private var frameAllParticipantsInMap = true
 
     private lateinit var binding: ActivityTrackmapBinding
     private lateinit var mapTypeBinging: DialogMapTypeBinding
@@ -153,8 +153,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.app_name)
 
         binding.frameAllParticipantsInMapButton.setOnClickListener {
-            binding.frameAllParticipantsInMapButton.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
-            viewAllParticipantsInMap = !viewAllParticipantsInMap
+            binding.frameAllParticipantsInMapButton.setImageResource(if (frameAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+            frameAllParticipantsInMap = !frameAllParticipantsInMap
         }
 
         getNavigationBarHeight().also { height ->
@@ -253,7 +253,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapActionHelper = MapActionHelper(googleMap)
 
         setMapStyle()
-        startMap()
+        bindMapListeners()
         moveToLastLocation()
         setTrackMapData()
     }
@@ -286,7 +286,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.setPadding(0, topPadding, 0, 0)
     }
 
-    private fun startMap() {
+    private fun bindMapListeners() {
         try {
             googleMap.isMyLocationEnabled = true
             googleMap.setOnMyLocationButtonClickListener {
@@ -298,18 +298,20 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 tiltView()
                 true
             }
-
-            googleMap.setOnCameraMoveStartedListener(object :
-                GoogleMap.OnCameraMoveStartedListener {
-                override fun onCameraMoveStarted(reason: Int) {
-                    if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                        myPositionState = Unallocated
-                    }
-                }
-            })
         } catch (e: SecurityException) {
             // Non granted permissions
             finish()
+        }
+
+        // Disable framing when gesture on Map detected
+        googleMap.setOnCameraMoveStartedListener { reason ->
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                myPositionState = Unallocated
+
+                if (frameAllParticipantsInMap) {
+                    binding.frameAllParticipantsInMapButton.performClick()
+                }
+            }
         }
     }
 
@@ -450,7 +452,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             )
             marker.showInfoWindow()
         }
-        if (viewAllParticipantsInMap) {
+        if (frameAllParticipantsInMap) {
             frameAllParticipants()
         }
     }
