@@ -45,4 +45,8 @@
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
     <string name="switch_to_map_type">Switch to map type</string>
+
+    <string name="altitude">Altitude</string>
+    <string name="speed">Speed</string>
+    <string name="distance">Distance</string>
 </resources>
