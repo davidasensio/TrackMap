@@ -3,6 +3,8 @@ package com.handysparksoft.trackmap.features.trackmap
 import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
@@ -100,7 +102,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onUserLeaveHint() {
-        if (pipModeEnabled) {
+        if (pipModeEnabled && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             when {
                 android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O -> {
                     val params = PictureInPictureParams.Builder()
@@ -127,6 +129,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun setControlsVisibility(inPictureInPictureMode: Boolean) {
         if (inPictureInPictureMode) {
+            dismissMapStyleLayers()
             binding.switchMapStyleButton.gone()
             binding.frameAllParticipantsInMapButton.gone()
             binding.trackMapBottomCardView.visible()
@@ -138,6 +141,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.trackMapBottomCardView.gone()
             googleMap.isMyLocationEnabled = true
             googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
+
+            // Allow  PIP mode only first time to avoid memory leaks
+            pipModeEnabled = false
         }
     }
 
@@ -566,6 +572,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra(TRACKMAP_PARAM, trackMap)
             }
         }

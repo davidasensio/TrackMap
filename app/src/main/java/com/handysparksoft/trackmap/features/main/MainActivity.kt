@@ -1,6 +1,7 @@
 package com.handysparksoft.trackmap.features.main
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -47,7 +48,9 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         fun start(context: Context) {
-            context.startActivity<MainActivity>()
+            context.startActivity<MainActivity>() {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            }
         }
     }
 }
