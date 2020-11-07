@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Location
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.util.Rational
 import android.view.View
 import android.widget.ImageView
@@ -417,7 +416,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             setupTrackMapForParticipantLocations(it)
 
             // FIXME: remove after tests
-            val taskLog = object : TimerTask() {
+            /*val taskLog = object : TimerTask() {
                 override fun run() {
                     runOnUiThread {
                         binding.tempLog.text = LocationHandler.nmeaLog.toString()
@@ -434,7 +433,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.tempLogClearButton.setOnClickListener {
                 LocationHandler.nmeaLog.clear()
                 binding.tempLog.text = ""
-            }
+            }*/
             // END FIXME
         }
     }

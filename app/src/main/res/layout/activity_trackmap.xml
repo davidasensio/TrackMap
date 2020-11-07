@@ -69,7 +69,7 @@
             android:textStyle="bold" />
     </com.google.android.material.card.MaterialCardView>
 
-    <RelativeLayout
+    <!--<RelativeLayout
         android:id="@+id/tempLogContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -108,7 +108,7 @@
             android:importantForAccessibility="no"
             android:padding="8dp"
             android:src="@android:drawable/ic_menu_close_clear_cancel" />
-    </RelativeLayout>
+    </RelativeLayout>-->
 
     <include
         android:id="@+id/dialogMapTypeLayout"
