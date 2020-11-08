@@ -14,7 +14,7 @@ class MapActionHelper(private val googleMap: GoogleMap) {
 
     fun moveToPosition(
         latLng: LatLng,
-        zoom: Float = 17f,
+        zoom: Float = DEFAULT_ZOOM_LEVEL,
         tilt: Float = 0f,
         bearing: Float = 0f
     ) {
@@ -28,7 +28,7 @@ class MapActionHelper(private val googleMap: GoogleMap) {
     }
 
     fun animateCamera(
-        zoom: Float = 17f,
+        zoom: Float = DEFAULT_ZOOM_LEVEL,
         tilt: Float = 0f,
         bearing: Float = 0f
     ) {
@@ -38,6 +38,10 @@ class MapActionHelper(private val googleMap: GoogleMap) {
             .tilt(tilt) // Sets the tilt of the camera to 30 degrees
             .build()
         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition))
+    }
+
+    companion object {
+        const val DEFAULT_ZOOM_LEVEL = 17f
     }
 
 }

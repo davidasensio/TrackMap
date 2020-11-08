@@ -169,14 +169,14 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         }
 
         // Start listening to NMEA messages
-        locationHandler.subscribeToNMEAMessagesAndSpeed { nmeaMessage, speed ->
+        locationHandler.subscribeToNMEAMessagesAndSpeed { nmeaMessage, speedInKmh ->
             nmeaMessage.altitudeAMSL?.let { altitudeAMSL ->
                 logDebug("*** Altitude: $altitudeAMSL - (${nmeaMessage.type})")
                 launch(Dispatchers.IO) {
                     val altitudeGeoid = nmeaMessage.altitudeGeoid ?: 0
                     updateUserAltitudeUseCase.execute(
                         userHandler.getUserId(),
-                        UserGPSData(altitudeAMSL, altitudeGeoid, speed)
+                        UserGPSData(altitudeAMSL, altitudeGeoid, speedInKmh)
                     )
                 }
             }

@@ -3,9 +3,11 @@ package com.handysparksoft.trackmap.features.trackmap
 import android.annotation.SuppressLint
 import android.app.PictureInPictureParams
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.location.Location
 import android.os.Bundle
-import android.text.method.ScrollingMovementMethod
 import android.util.Rational
 import android.view.View
 import android.widget.ImageView
@@ -20,11 +22,13 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
+import com.google.android.gms.maps.model.Marker
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.handysparksoft.domain.model.ParticipantLocation
 import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.domain.model.UserMarkerData
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
@@ -33,6 +37,7 @@ import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
 import com.handysparksoft.trackmap.databinding.DialogMapTypeBinding
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
 import java.util.*
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
@@ -67,15 +72,19 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
-    private val userMarkerMap = hashMapOf<String, Int>()
+    private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
-    private var viewAllParticipantsInMap = true
+    private var frameAllParticipantsInMap = true
 
     private lateinit var binding: ActivityTrackmapBinding
     private lateinit var mapTypeBinging: DialogMapTypeBinding
 
-    private var pipModeEnabled = true
+    private var pipModeEnabled = false
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
+    private val participantMarkers = mutableListOf<Marker>()
+    private var customMarker: Marker? = null
+    private var waitingForAnyMarkerIntentAction = false
+    private var taskClearWaitingState: TimerTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -97,7 +106,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onUserLeaveHint() {
-        if (pipModeEnabled) {
+        if (pipModeEnabled && packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)) {
             when {
                 android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O -> {
                     val params = PictureInPictureParams.Builder()
@@ -124,6 +133,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun setControlsVisibility(inPictureInPictureMode: Boolean) {
         if (inPictureInPictureMode) {
+            dismissMapStyleLayers()
+            clearInfoWindows()
             binding.switchMapStyleButton.gone()
             binding.frameAllParticipantsInMapButton.gone()
             binding.trackMapBottomCardView.visible()
@@ -135,6 +146,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.trackMapBottomCardView.gone()
             googleMap.isMyLocationEnabled = true
             googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
+
+            // Allow  PIP mode only first time to avoid memory leaks
+            pipModeEnabled = false
         }
     }
 
@@ -153,8 +167,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.app_name)
 
         binding.frameAllParticipantsInMapButton.setOnClickListener {
-            binding.frameAllParticipantsInMapButton.setImageResource(if (viewAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
-            viewAllParticipantsInMap = !viewAllParticipantsInMap
+            binding.frameAllParticipantsInMapButton.setImageResource(if (frameAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+            frameAllParticipantsInMap = !frameAllParticipantsInMap
         }
 
         getNavigationBarHeight().also { height ->
@@ -194,17 +208,26 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mapTypeBinging.mapTypeDefaultImageView.setOnClickListener {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
-            selectMapType(mapTypeBinging.mapTypeDefaultImageView, mapTypeBinging.mapTypeDefaultTextView)
+            selectMapType(
+                mapTypeBinging.mapTypeDefaultImageView,
+                mapTypeBinging.mapTypeDefaultTextView
+            )
         }
 
         mapTypeBinging.mapTypeSatelliteImageView.setOnClickListener {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_SATELLITE
-            selectMapType(mapTypeBinging.mapTypeSatelliteImageView, mapTypeBinging.mapTypeSatelliteTextView)
+            selectMapType(
+                mapTypeBinging.mapTypeSatelliteImageView,
+                mapTypeBinging.mapTypeSatelliteTextView
+            )
         }
 
         mapTypeBinging.mapTypeTerrainImageView.setOnClickListener {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_TERRAIN
-            selectMapType(mapTypeBinging.mapTypeTerrainImageView, mapTypeBinging.mapTypeTerrainTextView)
+            selectMapType(
+                mapTypeBinging.mapTypeTerrainImageView,
+                mapTypeBinging.mapTypeTerrainTextView
+            )
         }
 
         // Round shape
@@ -224,6 +247,18 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 Easing.Leave
             )
         }
+    }
+
+    private fun clearInfoWindows() {
+        userMarkerMap.values.forEach { markerData ->
+            markerData.isShowingInfoWindow = false
+            participantMarkers.firstOrNull() { it.tag == markerData.tag }?.hideInfoWindow()
+        }
+    }
+
+    private fun clearCustomMarker() {
+        customMarker?.remove()
+        customMarker = null
     }
 
     private fun getNavigationBarHeight(): Int {
@@ -253,7 +288,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         mapActionHelper = MapActionHelper(googleMap)
 
         setMapStyle()
-        startMap()
+        bindMapListeners()
         moveToLastLocation()
         setTrackMapData()
     }
@@ -275,18 +310,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
         }
-
-        googleMap.setOnMapClickListener {
-            dismissMapStyleLayers()
-        }
     }
 
     private fun setMapPadding() {
         val topPadding = dip(GOOGLE_MAP_TOP_PADDING_DP)
-        googleMap.setPadding(0, topPadding, 0, 0)
+        val bottomPadding = dip(GOOGLE_MAP_BOTTOM_PADDING_DP)
+        googleMap.setPadding(0, topPadding, 0, bottomPadding)
     }
 
-    private fun startMap() {
+    private fun bindMapListeners() {
         try {
             googleMap.isMyLocationEnabled = true
             googleMap.setOnMyLocationButtonClickListener {
@@ -298,19 +330,121 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 tiltView()
                 true
             }
-
-            googleMap.setOnCameraMoveStartedListener(object :
-                GoogleMap.OnCameraMoveStartedListener {
-                override fun onCameraMoveStarted(reason: Int) {
-                    if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
-                        myPositionState = Unallocated
-                    }
-                }
-            })
         } catch (e: SecurityException) {
             // Non granted permissions
             finish()
         }
+
+        // Disable framing when gesture on Map detected
+        googleMap.setOnCameraMoveStartedListener { reason ->
+            if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
+                myPositionState = Unallocated
+
+                if (frameAllParticipantsInMap) {
+                    binding.frameAllParticipantsInMapButton.performClick()
+                }
+            }
+        }
+
+        googleMap.setOnMarkerClickListener {
+            clearInfoWindows()
+            it.showInfoWindow()
+            animateFrameButtonToMakeSpace()
+
+            val tagId = it.tag.toString()
+            val userMarkerData = getParticipantMarker(tagId)
+            userMarkerData.isShowingInfoWindow = true
+            userMarkerMap[tagId] = userMarkerData
+
+            waitForAnyMarkerIntentAction()
+            false
+        }
+
+        googleMap.setOnMapClickListener {
+            dismissMapStyleLayers()
+            clearInfoWindows()
+            clearCustomMarker()
+            resetFrameButtonExtraSpace()
+        }
+
+        googleMap.setOnMapLongClickListener { point ->
+            customMarker?.remove()
+            addCustomLocatedMarker(point)
+            clearInfoWindows()
+            waitForAnyMarkerIntentAction()
+        }
+
+        googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this, ::onRenderMarkerWindowInfo))
+    }
+
+    private fun animateFrameButtonToMakeSpace() {
+        val value = this.dip(GOOGLE_MAP_MARKER_INTENT_SPACE) * -1f
+        binding.frameAllParticipantsInMapButton.animate().translationY(value).start()
+    }
+
+    private fun resetFrameButtonExtraSpace() {
+        binding.frameAllParticipantsInMapButton.animate().translationY(0f).start()
+    }
+
+    private fun reAddCustomLocatedMarker() {
+        customMarker?.let {
+            addCustomLocatedMarker(it.position)
+        }
+    }
+
+    private fun addCustomLocatedMarker(position: LatLng) {
+        googleMapHandler.addMarker(position, "", null, null).also {
+            it.tag = CustomInfoWindowAdapter.CUSTOM_LOCATED_MARKER_TAG
+            customMarker = it
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun onRenderMarkerWindowInfo(windowInfo: View, marker: Marker) {
+        fun <T> Int.findView(): T {
+            return windowInfo.findViewById(this) as T
+        }
+
+        fun Int.findTextView(): TextView {
+            return windowInfo.findViewById(this) as TextView
+        }
+
+        fun getDistanceFormatted(distance: Float): String {
+            return when {
+                distance >= 1000 -> String.format("%.1f km", distance / 1000)
+                else -> String.format("%.0f m", distance)
+            }
+        }
+
+        val userMarkerData = userMarkerMap[marker.tag.toString()]
+        userMarkerData?.participanLocation?.let {
+            val isUserSession = userHandler.getUserId() == marker.tag.toString()
+            val altitude = it.altitudeAMSL
+            val speed = it.speed
+            val distance = getUserSessionLocation()
+                ?.distanceTo(it.toLocation()) ?: 0f
+
+            R.id.markerTitle.findTextView().text = it.userAlias(isUserSession)
+            R.id.markerAltitudeValue.findTextView().text = "$altitude m"
+            R.id.markerSpeedValue.findTextView().text = "$speed Km/h"
+            R.id.markerDistanceValue.findTextView().text = getDistanceFormatted(distance)
+
+            // Hide distance when it is oneself marker
+            R.id.markerDistance.findTextView().visibleOrGone(!isUserSession)
+            R.id.markerDistanceValue.findTextView().visibleOrGone(!isUserSession)
+        }
+    }
+
+    private fun waitForAnyMarkerIntentAction(seconds: Long = ANY_MARKER_INTENT_ACTION_DELAY_SECS) {
+        waitingForAnyMarkerIntentAction = true
+
+        taskClearWaitingState?.cancel()
+        taskClearWaitingState = object : TimerTask() {
+            override fun run() {
+                waitingForAnyMarkerIntentAction = false
+            }
+        }
+        Timer().schedule(taskClearWaitingState, TimeUnit.SECONDS.toMillis(seconds))
     }
 
     private fun setTrackMapData() {
@@ -319,7 +453,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             setupTrackMapForParticipantLocations(it)
 
             // FIXME: remove after tests
-            val taskLog = object : TimerTask() {
+            /*val taskLog = object : TimerTask() {
                 override fun run() {
                     runOnUiThread {
                         binding.tempLog.text = LocationHandler.nmeaLog.toString()
@@ -336,7 +470,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             binding.tempLogClearButton.setOnClickListener {
                 LocationHandler.nmeaLog.clear()
                 binding.tempLog.text = ""
-            }
+            }*/
             // END FIXME
         }
     }
@@ -433,59 +567,119 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     fun refreshTrackMap() {
-        googleMap.clear()
-        participants.filter(::withAvailableLatLng).forEach { participantLocation ->
-            val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
-            val participantIcon = getParticipantMarker(participantLocation.userId, isUserSession)
-            val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
+        if (!waitingForAnyMarkerIntentAction) {
+            googleMap.clear()
+            participantMarkers.clear()
+            resetFrameButtonExtraSpace()
+            reAddCustomLocatedMarker()
+            // clearInfoWindows() // Uncomment if auto close marker windo info desired
 
-            val marker = googleMapHandler.addMarker(
-                latLng,
-                participantLocation.userAlias(isUserSession, true) +
-                        " AMSL: " + participantLocation.altitudeAMSL + " m" +
-                        " Geoid: " + participantLocation.altitudeGeoid + " m" +
-                        " Speed: " + participantLocation.speed + " Km/h",
-                null,
-                participantIcon
-            )
-            marker.showInfoWindow()
-        }
-        if (viewAllParticipantsInMap) {
-            frameAllParticipants()
+            participants.filter(::withAvailableLatLng).forEach { participantLocation ->
+                val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
+                val userMarkerData = getParticipantMarker(participantLocation.userId)
+                val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
+
+                val marker = googleMapHandler.addMarker(
+                    latLng,
+                    participantLocation.userAlias(isUserSession, true) +
+                            " AMSL: " + participantLocation.altitudeAMSL + " m" +
+                            " Geoid: " + participantLocation.altitudeGeoid + " m" +
+                            " Speed: " + participantLocation.speed + " Km/h",
+                    null,
+                    userMarkerData.icon
+                )
+                val userId = participantLocation.userId
+                marker.tag = userId
+                addUserMarkerData(participantLocation)
+
+                if (userMarkerData.isShowingInfoWindow) {
+                    marker.showInfoWindow()
+                }
+                participantMarkers.add(marker)
+            }
+            if (frameAllParticipantsInMap) {
+                frameAllParticipants()
+            }
         }
     }
 
+    private fun addUserMarkerData(participantLocation: ParticipantLocation) {
+        val userMarkerData = getParticipantMarker(participantLocation.userId)
+        userMarkerData.participanLocation = participantLocation
+        userMarkerMap[participantLocation.userId] = userMarkerData
+    }
 
-    private fun getParticipantMarker(userId: String, isUserSession: Boolean): Int {
-        var participantIcon = userMarkerMap[userId]
-        if (participantIcon == null) {
-            participantIcon = if (isUserSession) {
+    private fun getParticipantMarker(userId: String): UserMarkerData {
+        var userMakerData = userMarkerMap[userId]
+        if (userMakerData == null) {
+            val isUserSession = userId == userHandler.getUserId()
+            val icon = if (isUserSession) {
                 GoogleMapHandler.MARKER_ICON_DEFAULT_GREEN
             } else {
                 googleMapHandler.getRandomMarker()
             }
-            userMarkerMap[userId] = participantIcon
+            userMakerData = UserMarkerData(userId, icon, false, null)
+            userMarkerMap[userId] = userMakerData
         }
-        return participantIcon
+        return userMakerData
     }
 
 
     private fun frameAllParticipants() {
-        val boundsBuilder = LatLngBounds.Builder()
+        if (participantMarkers.size == 1) {
+            // Move the camera to unique participant location with a zoom of 17.
+            participants.firstOrNull(::withAvailableLatLng)?.let { participant ->
+                val latLng = LatLng(participant.latitude, participant.longitude)
+                val zoomLevel = getZoomLevelAccordingSpeed(participant.speed)
+                this.googleMap.animateCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        latLng,
+                        zoomLevel
+                    )
+                )
+            }
+        } else {
+            val boundsBuilder = LatLngBounds.Builder()
 
-        participants.filter(::withAvailableLatLng).forEach { participant ->
-            boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
+            participants.filter(::withAvailableLatLng).forEach { participant ->
+                boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
+            }
+
+            val framePadding = dip(googleMapFramePadding)
+            val build = boundsBuilder.build()
+            val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
+            this.googleMap.animateCamera(cameraUpdateAction)
         }
+    }
 
-        val framePadding = dip(googleMapFramePadding)
-        val build = boundsBuilder.build()
-        val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
-        this.googleMap.animateCamera(cameraUpdateAction)
+    private fun getZoomLevelAccordingSpeed(speed: Long): Float {
+        return when {
+            speed > 120 -> 12f
+            speed > 100 -> 13f
+            speed > 80 -> 14f
+            speed > 50 -> 15f
+            speed > 30 -> 16f
+            else -> MapActionHelper.DEFAULT_ZOOM_LEVEL
+        }
     }
 
     private fun withAvailableLatLng(participantLocation: ParticipantLocation): Boolean {
         return participantLocation.latitude != 0.0 && participantLocation.longitude != 0.0
     }
+
+    private fun getUserSessionLocation(): Location? {
+        participants
+            .filter(::withAvailableLatLng)
+            .firstOrNull { it.userId == userHandler.getUserId() }?.let {
+                return Location("adhoc").apply {
+                    latitude = it.latitude
+                    longitude = it.longitude
+                }
+            }
+        return null
+    }
+
+    private fun getCurrentZoomLevel() = googleMap.cameraPosition.zoom
 
     sealed class MyPositionState {
         object Unallocated : MyPositionState()
@@ -498,9 +692,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val GOOGLE_MAP_FRAME_MIN_PADDING_DP = 16
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_TOP_PADDING_DP = 32
+        private const val GOOGLE_MAP_BOTTOM_PADDING_DP = 36
+        private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
+        private const val ANY_MARKER_INTENT_ACTION_DELAY_SECS = 5L
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {
+                flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
                 putExtra(TRACKMAP_PARAM, trackMap)
             }
         }

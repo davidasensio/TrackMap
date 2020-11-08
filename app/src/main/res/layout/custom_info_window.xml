@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/ic_marker_balloon"
+    android:paddingStart="16dp"
+    android:paddingTop="8dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="32dp"
+    tools:ignore="RtlHardcoded,UseCompatTextViewDrawableXml">
+
+    <TextView
+        android:id="@+id/markerTitle"
+        style="@style/MarkerTextViewBoldStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_person_white"
+        android:drawablePadding="4dp"
+        android:maxWidth="200dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="User" />
+
+    <View
+        android:id="@+id/markerUserSeparator"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:layout_marginTop="7dp"
+        android:background="@android:color/white"
+        app:layout_constraintEnd_toEndOf="@id/markerTitle"
+        app:layout_constraintStart_toStartOf="@id/markerTitle"
+        app:layout_constraintTop_toBottomOf="@+id/markerTitle" />
+
+    <TextView
+        android:id="@+id/markerAltitude"
+        style="@style/MarkerTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:drawableLeft="@drawable/ic_trending_up"
+        android:drawablePadding="8dp"
+        android:text="@string/altitude"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/markerUserSeparator" />
+
+    <TextView
+        android:id="@+id/markerAltitudeValue"
+        style="@style/MarkerTextViewBoldStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/middle"
+        app:layout_constraintTop_toTopOf="@id/markerAltitude"
+        tools:text="1590 m" />
+
+    <TextView
+        android:id="@+id/markerSpeed"
+        style="@style/MarkerTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:drawableLeft="@drawable/ic_speed_white"
+        android:drawablePadding="8dp"
+        android:text="@string/speed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/markerAltitude" />
+
+    <TextView
+        android:id="@+id/markerSpeedValue"
+        style="@style/MarkerTextViewBoldStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/middle"
+        app:layout_constraintTop_toTopOf="@id/markerSpeed"
+        tools:text="120 Kmh" />
+
+    <TextView
+        android:id="@+id/markerDistance"
+        style="@style/MarkerTextViewStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:drawableLeft="@drawable/ic_ruler_white"
+        android:drawablePadding="8dp"
+        android:text="@string/distance"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/markerSpeed" />
+
+    <TextView
+        android:id="@+id/markerDistanceValue"
+        style="@style/MarkerTextViewBoldStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/middle"
+        app:layout_constraintTop_toTopOf="@id/markerDistance"
+        tools:text="2.3 Km" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/middle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="108dp" />
+</androidx.constraintlayout.widget.ConstraintLayout>
