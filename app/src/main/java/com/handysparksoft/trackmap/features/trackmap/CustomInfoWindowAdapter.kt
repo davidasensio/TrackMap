@@ -15,11 +15,17 @@ internal class CustomInfoWindowAdapter(
     )
 
     override fun getInfoWindow(marker: Marker): View? {
-        onRenderMarkerWindowInfo(windowInfo, marker)
-        return windowInfo
+        return if (marker.tag != CUSTOM_LOCATED_MARKER_TAG) {
+            onRenderMarkerWindowInfo(windowInfo, marker)
+            windowInfo
+        } else null
     }
 
     override fun getInfoContents(marker: Marker): View? {
         return null
+    }
+
+    companion object {
+        const val CUSTOM_LOCATED_MARKER_TAG = "CustomMarker"
     }
 }

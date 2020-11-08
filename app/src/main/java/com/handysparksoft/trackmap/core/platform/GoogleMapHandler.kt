@@ -52,15 +52,17 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
         this.googleMap = googleMap
     }
 
-    fun addMarker(latlng: LatLng, title: String, snippet: String?, icon: Int = R.drawable.ic_marker_green): Marker {
-        return this.googleMap.addMarker(
-            MarkerOptions()
-                .position(latlng)
-                .title(title)
-                .snippet(snippet)
-                .icon(getBitmapFromVector(context, icon))
+    fun addMarker(latLng: LatLng, title: String, snippet: String?, icon: Int? = null): Marker {
+        val markerOption = MarkerOptions()
+            .position(latLng)
+            .title(title)
+            .snippet(snippet)
+        if (icon != null) {
+            markerOption.icon(getBitmapFromVector(context, icon))
             //.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE))
-        )
+        }
+
+        return this.googleMap.addMarker(markerOption)
     }
 
     /**

@@ -35,21 +35,23 @@ class EntriesAdapter(
     inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
         @Suppress("DEPRECATION")
         fun bind(trackMap: TrackMap) {
-            binding.creationDateTextView.text = Html.fromHtml(
-                getCreationText(view, trackMap.ownerId, trackMap.creationDate)
-            )
-            binding.nameTextView.text = trackMap.name
-            binding.descriptionTextView.text = trackMap.description
-            binding.codeTextView.text = trackMap.trackMapId
-            binding.participantsTextView.text = (trackMap.participantIds.size).toString()
-            binding.goButton.setOnClickListener {
-                onGoListener.invoke(trackMap)
-            }
-            binding.leaveButton.setOnClickListener {
-                onLeaveListener.invoke(trackMap)
-            }
-            binding.trackMapShareImageButton.setOnClickListener {
-                onShareListener.invoke(trackMap)
+            if (trackMap.participantIds != null) {
+                binding.creationDateTextView.text = Html.fromHtml(
+                    getCreationText(view, trackMap.ownerId, trackMap.creationDate)
+                )
+                binding.nameTextView.text = trackMap.name
+                binding.descriptionTextView.text = trackMap.description
+                binding.codeTextView.text = trackMap.trackMapId
+                binding.participantsTextView.text = (trackMap.participantIds.size).toString()
+                binding.goButton.setOnClickListener {
+                    onGoListener.invoke(trackMap)
+                }
+                binding.leaveButton.setOnClickListener {
+                    onLeaveListener.invoke(trackMap)
+                }
+                binding.trackMapShareImageButton.setOnClickListener {
+                    onShareListener.invoke(trackMap)
+                }
             }
         }
 

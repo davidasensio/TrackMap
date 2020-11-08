@@ -82,7 +82,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var pipModeEnabled = false
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
     private val participantMarkers = mutableListOf<Marker>()
+    private var customMarker: Marker? = null
     private var waitingForAnyMarkerIntentAction = false
+    private var taskClearWaitingState: TimerTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -248,9 +250,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun clearInfoWindows() {
-        userMarkerMap.values.forEach {
-            it.isShowingInfoWindow = false
+        userMarkerMap.values.forEach { markerData ->
+            markerData.isShowingInfoWindow = false
+            participantMarkers.firstOrNull() { it.tag == markerData.tag }?.hideInfoWindow()
         }
+    }
+
+    private fun clearCustomMarker() {
+        customMarker?.remove()
+        customMarker = null
     }
 
     private fun getNavigationBarHeight(): Int {
@@ -302,16 +310,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             mapActionHelper.mapType = GoogleMap.MAP_TYPE_NORMAL
         }
-
-        googleMap.setOnMapClickListener {
-            dismissMapStyleLayers()
-            clearInfoWindows()
-        }
     }
 
     private fun setMapPadding() {
         val topPadding = dip(GOOGLE_MAP_TOP_PADDING_DP)
-        googleMap.setPadding(0, topPadding, 0, 0)
+        val bottomPadding = dip(GOOGLE_MAP_BOTTOM_PADDING_DP)
+        googleMap.setPadding(0, topPadding, 0, bottomPadding)
     }
 
     private fun bindMapListeners() {
@@ -356,6 +360,20 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             false
         }
 
+        googleMap.setOnMapClickListener {
+            dismissMapStyleLayers()
+            clearInfoWindows()
+            clearCustomMarker()
+            resetFrameButtonExtraSpace()
+        }
+
+        googleMap.setOnMapLongClickListener { point ->
+            customMarker?.remove()
+            addCustomLocatedMarker(point)
+            clearInfoWindows()
+            waitForAnyMarkerIntentAction()
+        }
+
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this, ::onRenderMarkerWindowInfo))
     }
 
@@ -366,6 +384,19 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun resetFrameButtonExtraSpace() {
         binding.frameAllParticipantsInMapButton.animate().translationY(0f).start()
+    }
+
+    private fun reAddCustomLocatedMarker() {
+        customMarker?.let {
+            addCustomLocatedMarker(it.position)
+        }
+    }
+
+    private fun addCustomLocatedMarker(position: LatLng) {
+        googleMapHandler.addMarker(position, "", null, null).also {
+            it.tag = CustomInfoWindowAdapter.CUSTOM_LOCATED_MARKER_TAG
+            customMarker = it
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -381,7 +412,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         fun getDistanceFormatted(distance: Float): String {
             return when {
                 distance >= 1000 -> String.format("%.1f km", distance / 1000)
-                else -> String.format("%.0f mts", distance)
+                else -> String.format("%.0f m", distance)
             }
         }
 
@@ -397,12 +428,18 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             R.id.markerAltitudeValue.findTextView().text = "$altitude m"
             R.id.markerSpeedValue.findTextView().text = "$speed Km/h"
             R.id.markerDistanceValue.findTextView().text = getDistanceFormatted(distance)
+
+            // Hide distance when it is oneself marker
+            R.id.markerDistance.findTextView().visibleOrGone(!isUserSession)
+            R.id.markerDistanceValue.findTextView().visibleOrGone(!isUserSession)
         }
     }
 
     private fun waitForAnyMarkerIntentAction(seconds: Long = ANY_MARKER_INTENT_ACTION_DELAY_SECS) {
         waitingForAnyMarkerIntentAction = true
-        val taskClearWaitingState = object : TimerTask() {
+
+        taskClearWaitingState?.cancel()
+        taskClearWaitingState = object : TimerTask() {
             override fun run() {
                 waitingForAnyMarkerIntentAction = false
             }
@@ -534,6 +571,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             googleMap.clear()
             participantMarkers.clear()
             resetFrameButtonExtraSpace()
+            reAddCustomLocatedMarker()
             // clearInfoWindows() // Uncomment if auto close marker windo info desired
 
             participants.filter(::withAvailableLatLng).forEach { participantLocation ->
@@ -580,7 +618,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             } else {
                 googleMapHandler.getRandomMarker()
             }
-            userMakerData = UserMarkerData(icon, false, null)
+            userMakerData = UserMarkerData(userId, icon, false, null)
             userMarkerMap[userId] = userMakerData
         }
         return userMakerData
@@ -641,6 +679,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         return null
     }
 
+    private fun getCurrentZoomLevel() = googleMap.cameraPosition.zoom
+
     sealed class MyPositionState {
         object Unallocated : MyPositionState()
         object Located : MyPositionState()
@@ -652,7 +692,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val GOOGLE_MAP_FRAME_MIN_PADDING_DP = 16
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_TOP_PADDING_DP = 32
-        private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 48
+        private const val GOOGLE_MAP_BOTTOM_PADDING_DP = 36
+        private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
         private const val ANY_MARKER_INTENT_ACTION_DELAY_SECS = 5L
 
         fun start(context: Context, trackMap: TrackMap) {

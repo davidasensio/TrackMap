@@ -6,9 +6,7 @@ import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.StringRes
-import androidx.transition.Transition
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.transition.MaterialContainerTransform
 import com.handysparksoft.trackmap.core.platform.Easing
 
 /**
@@ -24,6 +22,10 @@ fun View.invisible() {
 
 fun View.gone() {
     this.visibility = View.GONE
+}
+
+fun View.visibleOrGone(condition: Boolean) {
+    this.visibility = if (condition) View.VISIBLE else View.GONE
 }
 
 enum class SnackbarType { DEFAULT, OK, WARNING, ERROR }
