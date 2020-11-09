@@ -14,6 +14,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -86,6 +87,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var waitingForAnyMarkerIntentAction = false
     private var taskClearWaitingState: TimerTask? = null
 
+    private var statusBarInsetHeight : Int = 0
+    private var navigationBarInsetHeight : Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTrackmapBinding.inflate(layoutInflater)
@@ -130,6 +134,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         setControlsVisibility(isInPictureInPictureMode)
     }
 
+    override fun onBackPressed() {
+        if (isMapStyleLayersVisible() || customMarker != null ||  userMarkerMap.values.any { it.isShowingInfoWindow }) {
+            dismissAll()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
     @SuppressLint("MissingPermission")
     private fun setControlsVisibility(inPictureInPictureMode: Boolean) {
         if (inPictureInPictureMode) {
@@ -171,15 +183,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             frameAllParticipantsInMap = !frameAllParticipantsInMap
         }
 
-        getNavigationBarHeight().also { height ->
-            if (height > 0) {
-                val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
-                (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-                    setMargins(marginStart, topMargin, marginEnd, bottomMargin + height)
-                }
-            }
+        ViewCompat.setOnApplyWindowInsetsListener(binding.frameAllParticipantsInMapButton) { _, insets ->
+            statusBarInsetHeight = insets.systemWindowInsetTop
+            navigationBarInsetHeight = insets.systemWindowInsetBottom
+            insets
         }
-
         setupMapTypeSwitcher()
     }
 
@@ -241,13 +249,16 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun dismissMapStyleLayers() {
-        if (mapTypeBinging.mapTypeCaradView.visibility == View.VISIBLE) {
+        if (isMapStyleLayersVisible()) {
             mapTypeBinging.mapTypeCaradView.showTransitionTo(
                 binding.switchMapStyleButton,
                 Easing.Leave
             )
         }
     }
+
+    private fun isMapStyleLayersVisible() =
+        mapTypeBinging.mapTypeCaradView.visibility == View.VISIBLE
 
     private fun clearInfoWindows() {
         userMarkerMap.values.forEach { markerData ->
@@ -259,13 +270,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun clearCustomMarker() {
         customMarker?.remove()
         customMarker = null
-    }
-
-    private fun getNavigationBarHeight(): Int {
-        val resourceId: Int = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-        return if (resourceId > 0) {
-            resources.getDimensionPixelSize(resourceId)
-        } else 0
     }
 
     @SuppressLint("MissingPermission")
@@ -313,9 +317,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setMapPadding() {
-        val topPadding = dip(GOOGLE_MAP_TOP_PADDING_DP)
-        val bottomPadding = dip(GOOGLE_MAP_BOTTOM_PADDING_DP)
+        val topPadding = statusBarInsetHeight
+        val bottomPadding = navigationBarInsetHeight
+
         googleMap.setPadding(0, topPadding, 0, bottomPadding)
+        val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
+                (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+                    setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
+                }
     }
 
     private fun bindMapListeners() {
@@ -361,10 +370,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         googleMap.setOnMapClickListener {
-            dismissMapStyleLayers()
-            clearInfoWindows()
-            clearCustomMarker()
-            resetFrameButtonExtraSpace()
+            dismissAll()
         }
 
         googleMap.setOnMapLongClickListener { point ->
@@ -375,6 +381,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this, ::onRenderMarkerWindowInfo))
+    }
+
+    private fun dismissAll() {
+        dismissMapStyleLayers()
+        clearInfoWindows()
+        clearCustomMarker()
+        taskClearWaitingState?.run()
     }
 
     private fun animateFrameButtonToMakeSpace() {
@@ -691,8 +704,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val TRACKMAP_PARAM = "trackMapId"
         private const val GOOGLE_MAP_FRAME_MIN_PADDING_DP = 16
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
-        private const val GOOGLE_MAP_TOP_PADDING_DP = 32
-        private const val GOOGLE_MAP_BOTTOM_PADDING_DP = 36
         private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
         private const val ANY_MARKER_INTENT_ACTION_DELAY_SECS = 5L
 
@@ -704,4 +715,3 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 }
-
