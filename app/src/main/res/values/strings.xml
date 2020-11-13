@@ -57,4 +57,10 @@
     <string name="share_app_title">Try this App!</string>
     <string name="share_app_content">Download TrackMap and share your location with everybody you want.</string>
     <string name="share_app_google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.handysparksoft.trackmap</string>
+
+    <string name="sort_trackmaps_title">Sort TrackMaps by</string>
+    <string name="sort_trackmaps_by_date">Date (recent first)</string>
+    <string name="sort_trackmaps_by_name">Name (alphabetically)</string>
+    <string name="sort_trackmaps_by_participant_count">Number of participants</string>
+    <string name="sort_trackmaps_by_owner">Owner (Created by you first)</string>
 </resources>

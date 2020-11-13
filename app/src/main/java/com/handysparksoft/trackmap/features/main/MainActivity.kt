@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -16,6 +17,7 @@ import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.ShareIntentHandler
 import com.handysparksoft.trackmap.databinding.ActivityMainBinding
+import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -24,8 +26,15 @@ class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
 
+
     private val viewModel: MainViewModel by lazy {
         ViewModelProvider(this).get(MainViewModel::class.java)
+    }
+
+    private var onSortMenuItemClickListener: (() -> Unit)? = null
+
+    fun onSortMenuItemClick(listener: () -> Unit) {
+        onSortMenuItemClickListener = listener
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +72,7 @@ class MainActivity : AppCompatActivity() {
                 ShareIntentHandler.rateAppInGooglePlayIntent(this)
             }
             R.id.menuSort -> {
-
+                onSortMenuItemClickListener?.invoke()
             }
         }
         return super.onOptionsItemSelected(item)

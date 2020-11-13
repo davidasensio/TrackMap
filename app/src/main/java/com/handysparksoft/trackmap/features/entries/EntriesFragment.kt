@@ -25,6 +25,8 @@ import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentEntriesBinding
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
+import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
+import com.handysparksoft.trackmap.features.main.MainActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import javax.inject.Inject
 
@@ -49,6 +51,9 @@ class EntriesFragment : Fragment() {
 
     @Inject
     lateinit var connectionHandler: ConnectionHandler
+
+    @Inject
+    lateinit var userHandler: UserHandler
 
     // FIXME make injectable
     private lateinit var permissionChecker: PermissionChecker
@@ -94,6 +99,17 @@ class EntriesFragment : Fragment() {
             startUserTrackLocationService()
         })
 
+        (requireActivity() as MainActivity).let { mainActivity ->
+            mainActivity.onSortMenuItemClick {
+                SortEntriesBottomSheetDialogFragment().apply {
+                    this.onSortByDateClick { viewModel.sortByDate() }
+                    this.onSortByNameClick { viewModel.sortByName() }
+                    this.onSortByParticipantsClick { viewModel.sortByParticipants() }
+                    this.onSortByOwnedClick { viewModel.sortByOwned() }
+                }.show(mainActivity.supportFragmentManager, "SortEntries")
+            }
+        }
+
         checkDeepLink()
     }
 
@@ -112,6 +128,7 @@ class EntriesFragment : Fragment() {
 
     private fun setAdapter() {
         adapter = EntriesAdapter(
+            userSession = userHandler.getUserId(),
             onGoListener = {
                 viewModel.onGoTrackMapClicked(it)
             },
@@ -123,7 +140,8 @@ class EntriesFragment : Fragment() {
             }
         )
 
-        binding.recycler.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        binding.recycler.layoutManager =
+            LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         binding.recycler.adapter = adapter
     }
 
@@ -134,6 +152,7 @@ class EntriesFragment : Fragment() {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
                 binding.swipeRefreshLayout.isRefreshing = false
+                binding.recycler.scrollToPosition(0)
             }
             is Error -> {
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -196,7 +215,8 @@ class EntriesFragment : Fragment() {
     }
 
     private fun checkDeepLink() {
-        val trackMapCodeExtra = requireActivity().intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
+        val trackMapCodeExtra =
+            requireActivity().intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
             viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)

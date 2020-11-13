@@ -4,16 +4,17 @@
 
     <item
         android:id="@+id/menuSort"
-        android:icon="@drawable/ic_sort"
+        android:icon="@drawable/ic_sort_white"
         android:title="@string/menu_main_order"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/menuShare"
-        android:icon="@drawable/ic_share_black"
+        android:icon="@drawable/ic_share_white"
         android:title="@string/menu_main_share_app"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/menuRate"
+        android:icon="@drawable/ic_star_white"
         android:title="@string/menu_main_rate_this_app"
         app:showAsAction="never" />
 </menu>
