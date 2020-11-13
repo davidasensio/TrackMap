@@ -86,6 +86,7 @@ obj/
 .idea/assetWizardSettings.xml
 .idea/detekt.xml
 .idea/navEditor.xml
+.idea/gradle.xml
 
 # OS-specific files
 .DS_Store

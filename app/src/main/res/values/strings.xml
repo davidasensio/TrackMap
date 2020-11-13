@@ -27,7 +27,7 @@
     <string name="creation_template">Created <b>%1$s</b> by %2$s</string>
     <string name="sampleTrackMapCode">999-333</string>
 
-    <string name="splash_slogan">Share your location with everybody you want</string>
+    <string name="splash_slogan">Share your location with everybody you want.</string>
     <string name="splash_author">By Handysparksoft</string>
 
     <string name="leave_trackmap_question">Leave TrackMap \"%1$s\"?</string>
@@ -49,4 +49,12 @@
     <string name="altitude">Altitude</string>
     <string name="speed">Speed</string>
     <string name="distance">Distance</string>
+
+    <string name="menu_main_order">Order</string>
+    <string name="menu_main_share_app">Share app</string>
+    <string name="menu_main_rate_this_app">Rate this app</string>
+
+    <string name="share_app_title">Try this App!</string>
+    <string name="share_app_content">Download TrackMap and share your location with everybody you want.</string>
+    <string name="share_app_google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.handysparksoft.trackmap</string>
 </resources>

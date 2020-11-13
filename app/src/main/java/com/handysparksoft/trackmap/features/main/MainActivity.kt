@@ -14,6 +14,7 @@ import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.Prefs
+import com.handysparksoft.trackmap.core.platform.ShareIntentHandler
 import com.handysparksoft.trackmap.databinding.ActivityMainBinding
 import javax.inject.Inject
 
@@ -45,10 +46,24 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
                 toast("Profile icon clicked!")
+            }
+            R.id.menuShare -> {
+                ShareIntentHandler.showShareAppIntentChooser(this)
+            }
+            R.id.menuRate -> {
+                ShareIntentHandler.rateAppInGooglePlayIntent(this)
+            }
+            R.id.menuSort -> {
+
             }
         }
         return super.onOptionsItemSelected(item)
