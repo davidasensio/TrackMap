@@ -11,17 +11,18 @@ import com.handysparksoft.trackmap.core.platform.DateUtils
 import com.handysparksoft.trackmap.databinding.ItemTrackmapBinding
 
 class EntriesAdapter(
-    val onGoListener: (trackMap: TrackMap) -> Unit,
-    val onLeaveListener: (trackMap: TrackMap) -> Unit,
+    private val userSession: String,
+    private val onGoListener: (trackMap: TrackMap) -> Unit,
+    private val onLeaveListener: (trackMap: TrackMap) -> Unit,
     val onShareListener: (trackMap: TrackMap) -> Unit
 ) : RecyclerView.Adapter<EntriesAdapter.ViewHolder>() {
 
-    lateinit var binding: ItemTrackmapBinding
     var items: List<TrackMap> = emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        binding = ItemTrackmapBinding.inflate(LayoutInflater.from(parent.context), parent, false)
-        return ViewHolder(binding.root)
+        val binding =
+            ItemTrackmapBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return ViewHolder(binding)
     }
 
     override fun getItemCount(): Int = items.size
@@ -32,32 +33,39 @@ class EntriesAdapter(
         //holder.itemView.setOnClickListener { listener(trackMap) }
     }
 
-    inner class ViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
-        @Suppress("DEPRECATION")
+    inner class ViewHolder(private val itemBinding: ItemTrackmapBinding) :
+        RecyclerView.ViewHolder(itemBinding.root) {
+        //@Suppress("DEPRECATION")
         fun bind(trackMap: TrackMap) {
             if (trackMap.participantIds != null) {
-                binding.creationDateTextView.text = Html.fromHtml(
-                    getCreationText(view, trackMap.ownerId, trackMap.creationDate)
+                itemBinding.creationDateTextView.text = Html.fromHtml(
+                    getCreationText(itemBinding.root, trackMap.ownerId, trackMap.creationDate)
                 )
-                binding.nameTextView.text = trackMap.name
-                binding.descriptionTextView.text = trackMap.description
-                binding.codeTextView.text = trackMap.trackMapId
-                binding.participantsTextView.text = (trackMap.participantIds.size).toString()
-                binding.goButton.setOnClickListener {
+                itemBinding.nameTextView.text = trackMap.name
+                itemBinding.descriptionTextView.text = trackMap.description
+                itemBinding.codeTextView.text = trackMap.trackMapId
+                itemBinding.participantsTextView.text = (trackMap.participantIds.size).toString()
+                itemBinding.goButton.setOnClickListener {
                     onGoListener.invoke(trackMap)
                 }
-                binding.leaveButton.setOnClickListener {
+                itemBinding.leaveButton.setOnClickListener {
                     onLeaveListener.invoke(trackMap)
                 }
-                binding.trackMapShareImageButton.setOnClickListener {
+                itemBinding.trackMapShareImageButton.setOnClickListener {
                     onShareListener.invoke(trackMap)
                 }
             }
         }
 
-        private fun getCreationText(view: View, owner: String, creationDate: Long): String {
+        private fun getCreationText(
+            view: View,
+            owner: String,
+            creationDate: Long
+        ): String {
+            val owned = owner == userSession
+            val ownerAlias = if (owned) "You" else owner
             val dateFromTime = DateUtils.getRelativeDateFromTime(view.context, creationDate)
-            return view.context.getString(R.string.creation_template, dateFromTime, owner)
+            return view.context.getString(R.string.creation_template, dateFromTime, ownerAlias)
         }
     }
 }

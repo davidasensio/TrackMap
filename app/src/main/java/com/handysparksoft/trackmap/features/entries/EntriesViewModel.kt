@@ -1,6 +1,5 @@
 package com.handysparksoft.trackmap.features.entries
 
-import android.location.Location
 import androidx.annotation.CallSuper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -56,6 +55,8 @@ class MainViewModel(
     val joinFeedbackEvent: LiveData<Event<TrackMap>>
         get() = _joinFeedbackEvent
 
+    private var currentTrackMaps = mutableListOf<TrackMap>()
+
     init {
         initScope()
     }
@@ -73,9 +74,11 @@ class MainViewModel(
 
             val userTrackMaps = getTrackMapsUseCase.execute(userId)
             if (userTrackMaps is Result.Success) {
-                _model.value = UiModel.Content(ArrayList(userTrackMaps.data.values))
+                currentTrackMaps = ArrayList(userTrackMaps.data.values)
+                _model.value = UiModel.Content(currentTrackMaps)
             } else if (userTrackMaps is Result.Error) {
-                _model.value = UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")
+                _model.value =
+                    UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")
             }
         }
     }
@@ -122,6 +125,26 @@ class MainViewModel(
 
             refresh()
         }
+    }
+
+    fun sortByDate() {
+        _model.value = UiModel.Content(currentTrackMaps.sortedByDescending { it.creationDate })
+    }
+
+    fun sortByName() {
+        _model.value = UiModel.Content(currentTrackMaps.sortedBy { it.name.toLowerCase() })
+    }
+
+    fun sortByParticipants() {
+        _model.value =
+            UiModel.Content(currentTrackMaps.sortedByDescending { it.participantIds.size })
+    }
+
+    fun sortByOwned() {
+        _model.value = UiModel.Content(currentTrackMaps
+            .sortedByDescending { it.creationDate }
+            .sortedByDescending { it.ownerId == userHandler.getUserId() }
+        )
     }
 }
 
