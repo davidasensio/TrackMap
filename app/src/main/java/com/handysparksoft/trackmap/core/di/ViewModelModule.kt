@@ -4,6 +4,7 @@ import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
 import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
 import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
+import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
 import com.handysparksoft.usecases.*
 import dagger.Module
@@ -55,4 +56,12 @@ class ViewModelModule {
             saveUserTrackMapUseCase,
             userHandler
         )
+
+    @Provides
+    fun profileViewModelFactoryProvider(
+        getUuserProfileDataUseCase: GetUserProfileDataUseCase,
+        updateUserProfileUseCase: UpdateUserProfileUseCase,
+        userHandler: UserHandler
+    ) =
+        ProfileViewModelFactory(getUuserProfileDataUseCase, updateUserProfileUseCase, userHandler)
 }

@@ -17,4 +17,5 @@ interface RemoteDataSource {
     suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double)
     suspend fun updateUserGPSData(userId: String, userGPSData: UserGPSData)
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant)
+    suspend fun getUserProfileData(userId: String): Result<UserProfileData>
 }

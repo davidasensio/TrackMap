@@ -26,7 +26,6 @@ class CreateFragment : Fragment() {
             this,
             (activity as Context).app.component.createViewModelFactory
         ).get(CreateViewModel::class.java)
-
     }
 
     override fun onCreateView(

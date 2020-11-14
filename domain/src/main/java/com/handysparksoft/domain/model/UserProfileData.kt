@@ -1,6 +1,8 @@
 package com.handysparksoft.domain.model
 
 data class UserProfileData(
-    val name: String,
-    val nickname: String
+    val userId: String,
+    val nickname: String,
+    val fullName: String,
+    val phone: String
 )

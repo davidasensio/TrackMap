@@ -13,7 +13,7 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
         remoteDataSource.saveUser(userId)
     }
 
-    suspend fun updateUser(userId: String, userProfileData: UserProfileData) {
+    suspend fun updateUserProfile(userId: String, userProfileData: UserProfileData) {
         remoteDataSource.updateUser(userId, userProfileData)
     }
 
@@ -47,5 +47,9 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
 
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
         remoteDataSource.leaveTrackMap(userId, trackMapId, trackMapParticipant)
+    }
+
+    suspend fun getUserProfileData(userId: String): Result<UserProfileData> {
+        return remoteDataSource.getUserProfileData(userId)
     }
 }

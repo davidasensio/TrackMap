@@ -32,6 +32,7 @@
 
     <string name="leave_trackmap_question">Leave TrackMap \"%1$s\"?</string>
     <string name="no_connection_error">No internet connection available</string>
+    <string name="unknown_error">Unknown error occurred: %1$s</string>
 
     <string name="join_trackmap_code">Code</string>
     <string name="join_trackmap_code_helper">Enter TrackMap code to join</string>
@@ -63,4 +64,14 @@
     <string name="sort_trackmaps_by_name">Name (alphabetically)</string>
     <string name="sort_trackmaps_by_participant_count">Number of participants</string>
     <string name="sort_trackmaps_by_owner">Owner (Created by you first)</string>
+
+    <string name="profile_title">Profile</string>
+    <string name="profile_nickname">Nickname</string>
+    <string name="profile_nickname_helper_text">Short name</string>
+    <string name="profile_fullname">Full name</string>
+    <string name="profile_fullname_helper_text">Your full name</string>
+    <string name="profile_phone">Phone</string>
+    <string name="profile_phone_helper_text">Phone</string>
+    <string name="profile_save">Save</string>
+
 </resources>

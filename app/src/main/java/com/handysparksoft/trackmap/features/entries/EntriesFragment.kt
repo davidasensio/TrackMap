@@ -160,7 +160,7 @@ class EntriesFragment : Fragment() {
                     if (model.isNetworkError) {
                         getString(R.string.no_connection_error)
                     } else {
-                        "Unknown error occurred. ${model.message}"
+                        getString(R.string.unknown_error, model.message)
                     }
                 binding.recycler.snackbar(
                     message = message

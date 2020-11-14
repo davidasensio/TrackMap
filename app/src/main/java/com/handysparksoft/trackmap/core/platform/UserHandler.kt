@@ -15,7 +15,6 @@ class UserHandler @Inject constructor(private val context: Context) {
         } else {
             getAndroidSecureId()
         }
-
     }
 
     @SuppressLint("HardwareIds")
