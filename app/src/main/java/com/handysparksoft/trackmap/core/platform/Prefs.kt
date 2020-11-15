@@ -3,11 +3,23 @@ package com.handysparksoft.trackmap.core.platform
 import android.content.Context
 import android.content.SharedPreferences
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
+import com.handysparksoft.domain.model.UserProfileData
 import javax.inject.Inject
 
 class Prefs @Inject constructor(context: Context) {
     private val prefsFilename = "com.handysparksoft.trackmap.platform.prefs"
     private val prefs: SharedPreferences = context.getSharedPreferences(prefsFilename, 0)
+
+    var userProfileData: UserProfileData?
+        get() {
+            val serializedValue = prefs.getString(KEY_USER_PROFILE_DATA, "")
+            return Gson().fromJson(serializedValue, UserProfileData::class.java)
+        }
+        set(value) {
+            val serializedValue = Gson().toJson(value)
+            prefs.edit().putString(KEY_USER_PROFILE_DATA, serializedValue).apply()
+        }
 
     var splashScreenViewedForFirstTime: Boolean
         get() = prefs.getBoolean(KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME, false)
@@ -34,6 +46,7 @@ class Prefs @Inject constructor(context: Context) {
 
 
     companion object {
+        private const val KEY_USER_PROFILE_DATA = "key_user_profile_data"
         private const val KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME = "key_splash_screen_viewed_first"
         private const val KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY = "key_splash_screen_viewed_after"
         private const val KEY_LAST_LOCATION_LATITUDE = "key_last_location_latitude"

@@ -87,8 +87,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var waitingForAnyMarkerIntentAction = false
     private var taskClearWaitingState: TimerTask? = null
 
-    private var statusBarInsetHeight : Int = 0
-    private var navigationBarInsetHeight : Int = 0
+    private var statusBarInsetHeight: Int = 0
+    private var navigationBarInsetHeight: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,7 +135,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onBackPressed() {
-        if (isMapStyleLayersVisible() || customMarker != null ||  userMarkerMap.values.any { it.isShowingInfoWindow }) {
+        if (isMapStyleLayersVisible() || customMarker != null || userMarkerMap.values.any { it.isShowingInfoWindow }) {
             dismissAll()
         } else {
             super.onBackPressed()
@@ -322,9 +322,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         googleMap.setPadding(0, topPadding, 0, bottomPadding)
         val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
-                (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-                    setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
-                }
+        (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
+        }
     }
 
     private fun bindMapListeners() {
@@ -564,11 +564,21 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
-        val defaultLatitude =
-            if (userId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
-        val defaultLongitude =
-            if (userId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
-        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude, 0, 0, 0))
+        val userNickname = userHandler.getUserNickname()
+        val isUserSession = userId == userHandler.getUserId()
+        val defaultLatitude = if (isUserSession) prefs.lastLocationLatitude.toDouble() else 0.0
+        val defaultLongitude = if (isUserSession) prefs.lastLocationLongitude.toDouble() else 0.0
+        participants.add(
+            ParticipantLocation(
+                userId,
+                userNickname,
+                defaultLatitude,
+                defaultLongitude,
+                0,
+                0,
+                0
+            )
+        )
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
     }
