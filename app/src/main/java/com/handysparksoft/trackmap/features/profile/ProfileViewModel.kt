@@ -68,13 +68,17 @@ class ProfileViewModel(
 
         launch(Dispatchers.Main) {
             _model.value = UiModel.Loading
-            val encodedImage = profileImage?.let { bitmap ->
-                val quality = getBalancedQuality(bitmap.byteCount / 1024)
-                Base64Utils.encodeImage(bitmap, quality)
-            }
+            val encodedImage = getEncodedImage(profileImage)
             val userProfileData = UserProfileData(userId, nickname, fullName, phone, encodedImage)
             updateUserProfileUseCase.execute(userId, userProfileData)
             _saveProfileDataEvent.value = Event(true)
+        }
+    }
+
+    private fun getEncodedImage(profileImage: Bitmap?): String? {
+        return profileImage?.let { bitmap ->
+            val quality = getBalancedQuality(bitmap.byteCount / 1024)
+            Base64Utils.encodeImage(bitmap, quality)
         }
     }
 

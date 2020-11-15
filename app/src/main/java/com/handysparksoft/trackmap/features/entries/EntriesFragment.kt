@@ -85,11 +85,11 @@ class EntriesFragment : Fragment() {
 
         setAdapter()
 
-        viewModel.model.observe(this, Observer(::updateUi))
-        viewModel.goEvent.observe(this, Observer(::onGoEvent))
-        viewModel.leaveEvent.observe(this, Observer(::onLeaveEvent))
-        viewModel.shareEvent.observe(this, Observer(::onShareEvent))
-        viewModel.joinFeedbackEvent.observe(this, Observer(::onJoinFeedbackEvent))
+        viewModel.model.observe(viewLifecycleOwner, Observer(::updateUi))
+        viewModel.goEvent.observe(viewLifecycleOwner, Observer(::onGoEvent))
+        viewModel.leaveEvent.observe(viewLifecycleOwner, Observer(::onLeaveEvent))
+        viewModel.shareEvent.observe(viewLifecycleOwner, Observer(::onShareEvent))
+        viewModel.joinFeedbackEvent.observe(viewLifecycleOwner, Observer(::onJoinFeedbackEvent))
         viewModel.saveUser()
 
         setupUI()

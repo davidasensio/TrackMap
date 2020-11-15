@@ -44,6 +44,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/profileImageView"
         app:layout_constraintEnd_toEndOf="@+id/profileImageView" />
 
+    <!-- Image crop view -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/cropViewCardView"
         android:layout_width="0dp"
@@ -57,7 +58,6 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-
             android:layout_height="match_parent">
 
             <com.takusemba.cropme.CropLayout
@@ -103,6 +103,48 @@
         </androidx.constraintlayout.widget.ConstraintLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- Image zoom -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/imageZoomCardView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:cardElevation="4dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/profileZoomImageView"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scaleType="centerCrop"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/profileImageZoomCloseButton"
+                style="@style/Secondary.Medium"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="24dp"
+                android:minWidth="120dp"
+                android:text="@string/close"
+                app:icon="@drawable/ic_close"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout"
         android:layout_width="0dp"
@@ -120,7 +162,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            app:helperText="@string/profile_nickname_helper_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -130,6 +171,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/profile_nickname"
+                android:inputType="textCapSentences"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -139,7 +181,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            app:helperText="@string/profile_fullname_helper_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout2">
@@ -149,7 +190,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/profile_fullname"
-                android:imeOptions="actionDone"
+                android:inputType="textCapSentences"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
 
@@ -159,7 +200,6 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
-            app:helperText="@string/profile_phone_helper_text"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout3">
@@ -170,6 +210,7 @@
                 android:layout_height="wrap_content"
                 android:hint="@string/profile_phone"
                 android:imeOptions="actionDone"
+                android:inputType="phone"
                 android:singleLine="true" />
         </com.google.android.material.textfield.TextInputLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>

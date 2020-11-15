@@ -14,8 +14,8 @@ object Base64Utils {
             quality,
             baos
         )
-        val b = baos.toByteArray()
-        return Base64.encodeToString(b, Base64.DEFAULT)
+        val byteArrayResult = baos.toByteArray()
+        return Base64.encodeToString(byteArrayResult, Base64.DEFAULT)
     }
 
     fun getBase64Bitmap(encodedImage: String?): Bitmap? {

@@ -104,9 +104,21 @@ class ProfileFragment : Fragment() {
 
             override fun onSuccess(bitmap: Bitmap) {
                 Glide.with(requireContext()).load(bitmap).into(binding.profileImageView)
+                profileImageSelected = bitmap
                 closeCropView()
             }
         })
+
+        binding.profileImageView.setOnClickListener {
+            profileImageSelected?.let {
+                Glide.with(requireContext()).load(it).into(binding.profileZoomImageView)
+                showZoomView()
+            }
+        }
+
+        binding.profileImageZoomCloseButton.setOnClickListener {
+            closeZoomView()
+        }
 
         binding.saveButton.setOnClickListener {
             viewModel.saveUserProfile(
@@ -125,7 +137,10 @@ class ProfileFragment : Fragment() {
                 binding.nicknameEditText.setText(model.data.nickname)
                 binding.fullNameEditText.setText(model.data.fullName)
                 binding.phoneEditText.setText(model.data.phone)
-                binding.profileImageView.setImageBitmap(Base64Utils.getBase64Bitmap(model.data.image))
+                model.data.image?.let {
+                    profileImageSelected = Base64Utils.getBase64Bitmap(it)
+                    binding.profileImageView.setImageBitmap(profileImageSelected)
+                }
             }
             is Error -> {
                 val message = if (model.isNetworkError) {
@@ -155,6 +170,20 @@ class ProfileFragment : Fragment() {
 
     private fun closeCropView() {
         binding.cropViewCardView.showTransitionTo(
+            binding.profileImageView,
+            Easing.Leave
+        )
+    }
+
+    private fun showZoomView() {
+        binding.profileImageView.showTransitionTo(
+            binding.imageZoomCardView,
+            Easing.Enter
+        )
+    }
+
+    private fun closeZoomView() {
+        binding.imageZoomCardView.showTransitionTo(
             binding.profileImageView,
             Easing.Leave
         )
