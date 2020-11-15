@@ -8,6 +8,7 @@ import com.handysparksoft.trackmap.features.entries.EntriesFragment
 import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
 import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
 import com.handysparksoft.trackmap.features.main.MainActivity
+import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
 import com.handysparksoft.trackmap.features.splash.SplashActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
@@ -24,6 +25,7 @@ interface AppComponent {
     val createViewModelFactory: CreateViewModelFactory
     val trackMapViewModelFactory: TrackMapViewModelFactory
     val joinViewModelFactory: JoinViewModelFactory
+    val profileViewModelFactory: ProfileViewModelFactory
 
     // Field injections
     fun inject(mainActivity: MainActivity)

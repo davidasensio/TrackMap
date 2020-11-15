@@ -16,6 +16,9 @@
         <action
             android:id="@+id/action_entriesFragment_to_createFragment"
             app:destination="@id/createFragment" />
+        <action
+            android:id="@+id/action_entriesFragment_to_proifleFragment"
+            app:destination="@id/proifleFragment" />
     </fragment>
     <fragment
         android:id="@+id/joinFragment"
@@ -33,6 +36,15 @@
         tools:layout="@layout/fragment_create">
         <action
             android:id="@+id/action_createFragment_to_entriesFragment"
+            app:destination="@id/entriesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/proifleFragment"
+        android:name="com.handysparksoft.trackmap.features.profile.ProfileFragment"
+        android:label="Profile"
+        tools:layout="@layout/fragment_profile" >
+        <action
+            android:id="@+id/action_proifleFragment_to_entriesFragment"
             app:destination="@id/entriesFragment" />
     </fragment>
 </navigation>

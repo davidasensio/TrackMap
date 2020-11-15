@@ -5,8 +5,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
@@ -17,7 +17,6 @@ import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.ShareIntentHandler
 import com.handysparksoft.trackmap.databinding.ActivityMainBinding
-import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
 import javax.inject.Inject
 
 class MainActivity : AppCompatActivity() {
@@ -63,7 +62,7 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> {
-                toast("Profile icon clicked!")
+                findNavController(R.id.fragment).navigate(R.id.action_entriesFragment_to_proifleFragment)
             }
             R.id.menuShare -> {
                 ShareIntentHandler.showShareAppIntentChooser(this)
@@ -93,6 +92,10 @@ class MainActivity : AppCompatActivity() {
             when (destination.label) {
                 "Entries" -> supportActionBar?.show()
                 else -> supportActionBar?.hide()
+            }
+            when (destination.label) {
+                "Profile" -> binding.bottomNavigation.visibility = View.GONE
+                else -> binding.bottomNavigation.visibility = View.VISIBLE
             }
         }
     }

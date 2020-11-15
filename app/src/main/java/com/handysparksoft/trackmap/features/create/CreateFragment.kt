@@ -26,7 +26,6 @@ class CreateFragment : Fragment() {
             this,
             (activity as Context).app.component.createViewModelFactory
         ).get(CreateViewModel::class.java)
-
     }
 
     override fun onCreateView(
@@ -42,7 +41,7 @@ class CreateFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        viewModel.trackMapCreation.observe(this, Observer {
+        viewModel.trackMapCreation.observe(viewLifecycleOwner, Observer {
             it.getContentIfNotHandled()?.let { created ->
                 if (created) {
                     findNavController().navigate(R.id.action_createFragment_to_entriesFragment)
@@ -54,9 +53,9 @@ class CreateFragment : Fragment() {
     }
 
     private fun setupUI() {
-        viewModel.getTrackMapCode().observe(this, Observer(::trackMapCodeObserver))
+        viewModel.getTrackMapCode().observe(viewLifecycleOwner, Observer(::trackMapCodeObserver))
 
-        binding.createTrackmapButton?.setOnClickListener {
+        binding.createTrackmapButton.setOnClickListener {
             validateForm { success ->
                 if (success) {
                     onCreateAction()

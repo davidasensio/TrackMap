@@ -75,4 +75,8 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
             service.deleteTrackMapParticipantId(trackMapId, trackMapParticipant)
         }
     }
+
+    override suspend fun getUserProfileData(userId: String): Result<UserProfileData> {
+        return safeApiCall { service.getUserProfileData(userId) }
+    }
 }
