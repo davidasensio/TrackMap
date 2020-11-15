@@ -1,27 +1,39 @@
 package com.handysparksoft.trackmap.features.profile
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts.GetContent
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
+import com.handysparksoft.trackmap.core.extension.logError
+import com.handysparksoft.trackmap.core.extension.showTransitionTo
 import com.handysparksoft.trackmap.core.extension.snackbar
+import com.handysparksoft.trackmap.core.platform.Base64Utils
+import com.handysparksoft.trackmap.core.platform.Easing
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentProfileBinding
 import com.handysparksoft.trackmap.features.profile.ProfileViewModel.UiModel.*
+import com.takusemba.cropme.OnCropListener
 
 class ProfileFragment : Fragment() {
 
     private val bindingHolder = FragmentViewBindingHolder<FragmentProfileBinding>()
     private val binding get() = bindingHolder.binding
-
+    private var profileImageSelected: Bitmap? = null
     private val viewModel: ProfileViewModel by lazy {
         ViewModelProvider(
             this,
@@ -39,11 +51,14 @@ class ProfileFragment : Fragment() {
         return bindingHolder.binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-        viewModel.model.observe(this, Observer(::updateUi))
-        viewModel.saveProfileDataEvent.observe(this, Observer(::onSaveProfileDataEvent))
+        viewModel.model.observe(viewLifecycleOwner, Observer(::updateUi))
+        viewModel.saveProfileDataEvent.observe(
+            viewLifecycleOwner,
+            Observer(::onSaveProfileDataEvent)
+        )
 
         setupToolbar()
         setupUI()
@@ -58,11 +73,47 @@ class ProfileFragment : Fragment() {
     private fun setupUI() {
         viewModel.refresh()
 
+        binding.profileImageView.clipToOutline = true
+
+        binding.profilePickImageView.setOnClickListener {
+            // val pickPhoto = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
+            // startActivityForResult(pickPhoto, PICK_INTERNAL_IMAGE_REQUEST_CODE)
+            val launcher = requireActivity().registerForActivityResult(GetContent()) { uri: Uri? ->
+                if (uri == null) return@registerForActivityResult
+                binding.cropView.setUri(uri)
+                showCropView()
+                profileImageSelected = BitmapFactory.decodeStream(
+                    requireActivity().contentResolver.openInputStream(uri)
+                )
+            }
+            launcher.launch("image/*")
+        }
+
+        binding.profileImageCancelCropButton.setOnClickListener {
+            closeCropView()
+        }
+
+        binding.profileImageCropButton.setOnClickListener {
+            binding.cropView.crop()
+        }
+
+        binding.cropView.addOnCropListener(object : OnCropListener {
+            override fun onFailure(e: Exception) {
+                requireContext().logError(e.message ?: "Error cropping image")
+            }
+
+            override fun onSuccess(bitmap: Bitmap) {
+                Glide.with(requireContext()).load(bitmap).into(binding.profileImageView)
+                closeCropView()
+            }
+        })
+
         binding.saveButton.setOnClickListener {
             viewModel.saveUserProfile(
                 binding.nicknameEditText.text.toString(),
                 binding.fullNameEditText.text.toString(),
-                binding.phoneEditText.text.toString()
+                binding.phoneEditText.text.toString(),
+                profileImageSelected
             )
         }
     }
@@ -74,6 +125,7 @@ class ProfileFragment : Fragment() {
                 binding.nicknameEditText.setText(model.data.nickname)
                 binding.fullNameEditText.setText(model.data.fullName)
                 binding.phoneEditText.setText(model.data.phone)
+                binding.profileImageView.setImageBitmap(Base64Utils.getBase64Bitmap(model.data.image))
             }
             is Error -> {
                 val message = if (model.isNetworkError) {
@@ -94,7 +146,39 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    private fun showCropView() {
+        binding.profileImageView.showTransitionTo(
+            binding.cropViewCardView,
+            Easing.Enter
+        )
+    }
+
+    private fun closeCropView() {
+        binding.cropViewCardView.showTransitionTo(
+            binding.profileImageView,
+            Easing.Leave
+        )
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == Activity.RESULT_OK) {
+            when (requestCode) {
+                PICK_INTERNAL_IMAGE_REQUEST_CODE -> {
+                    val selectedImageUri = data?.data
+                    selectedImageUri?.let {
+                        /*val bitmap = BitmapFactory.decodeStream(
+                            requireActivity().contentResolver.openInputStream(it)
+                        )*/
+                        binding.cropView.setUri(it)
+                        showCropView()
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
+        private const val PICK_INTERNAL_IMAGE_REQUEST_CODE = 100
         fun newInstance() = ProfileFragment()
     }
 }

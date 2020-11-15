@@ -1,11 +1,13 @@
 package com.handysparksoft.trackmap.features.profile
 
+import android.graphics.Bitmap
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.UserProfileData
+import com.handysparksoft.trackmap.core.platform.Base64Utils
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
@@ -61,18 +63,35 @@ class ProfileViewModel(
         }
     }
 
-    fun saveUserProfile(nickname: String, fullName: String, phone: String) {
+    fun saveUserProfile(nickname: String, fullName: String, phone: String, profileImage: Bitmap?) {
         val userId = getUserId()
-        val userProfileData = UserProfileData(userId, nickname, fullName, phone)
 
         launch(Dispatchers.Main) {
+            _model.value = UiModel.Loading
+            val encodedImage = profileImage?.let { bitmap ->
+                val quality = getBalancedQuality(bitmap.byteCount / 1024)
+                Base64Utils.encodeImage(bitmap, quality)
+            }
+            val userProfileData = UserProfileData(userId, nickname, fullName, phone, encodedImage)
             updateUserProfileUseCase.execute(userId, userProfileData)
             _saveProfileDataEvent.value = Event(true)
         }
     }
 
-    fun getUserId(): String {
+    private fun getUserId(): String {
         return userHandler.getUserId()
+    }
+
+    private fun getBalancedQuality(kbytesCount: Int): Int {
+        return when {
+            kbytesCount > 40000 -> 1
+            kbytesCount > 30000 -> 5
+            kbytesCount > 20000 -> 10
+            kbytesCount > 15000 -> 20
+            kbytesCount > 10000 -> 30
+            kbytesCount > 7500 -> 40
+            else -> 50
+        }
     }
 }
 

@@ -55,6 +55,7 @@ dependencies {
     implementation kotlinLibs.values()
     implementation networkLibs.values()
     implementation firebaseLibs.values()
+    implementation imageLibs.values()
     implementation libs.values()
 
     kapt kaptLibs.values()
