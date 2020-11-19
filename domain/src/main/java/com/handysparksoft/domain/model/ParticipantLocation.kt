@@ -3,6 +3,7 @@ package com.handysparksoft.domain.model
 data class ParticipantLocation(
     val userId: String,
     val userNickname: String,
+    val userProfileImage: String?,
     var latitude: Double,
     var longitude: Double,
     var altitudeAMSL: Long,

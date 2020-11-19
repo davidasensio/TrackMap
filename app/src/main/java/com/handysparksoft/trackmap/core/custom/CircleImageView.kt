@@ -6,18 +6,20 @@ import android.graphics.Canvas
 import android.graphics.Path
 import android.util.AttributeSet
 import android.widget.ImageView
-import androidx.appcompat.widget.AppCompatImageView
 import kotlin.math.min
 
 
 @SuppressLint("AppCompatCustomView")
-class CircleImageView @JvmOverloads constructor(
-    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : ImageView(context, attrs, defStyleAttr) {
+class CircleImageView : ImageView {
+    constructor(context: Context) : super(context, null)
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context,
+        attrs,
+        defStyleAttr
+    )
+
     init {
-        /*outlineProvider = ViewOutlineProvider.BACKGROUND
-        clipToOutline = true
-        setBackgroundResource(R.drawable.circle_background)*/
         scaleType = ScaleType.CENTER_CROP
     }
 
@@ -29,5 +31,4 @@ class CircleImageView @JvmOverloads constructor(
         canvas.clipPath(circlePath)
         super.draw(canvas)
     }
-
 }

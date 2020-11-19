@@ -406,7 +406,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun addCustomLocatedMarker(position: LatLng) {
-        googleMapHandler.addMarker(position, "", null, null).also {
+        googleMapHandler.addMarker(position, "", null, null, null).also {
             it.tag = CustomInfoWindowAdapter.CUSTOM_LOCATED_MARKER_TAG
             customMarker = it
         }
@@ -572,6 +572,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             ParticipantLocation(
                 userId,
                 userNickname,
+                prefs.userProfileData?.image,
                 defaultLatitude,
                 defaultLongitude,
                 0,
@@ -609,7 +610,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                             " Geoid: " + participantLocation.altitudeGeoid + " m" +
                             " Speed: " + participantLocation.speed + " Km/h",
                     null,
-                    userMarkerData.icon
+                    userMarkerData.icon,
+                    participantLocation.userProfileImage
+
                 )
                 val userId = participantLocation.userId
                 marker.tag = userId
@@ -637,7 +640,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (userMakerData == null) {
             val isUserSession = userId == userHandler.getUserId()
             val icon = if (isUserSession) {
-                GoogleMapHandler.MARKER_ICON_DEFAULT_GREEN
+                googleMapHandler.getDefaultUserMarker()
             } else {
                 googleMapHandler.getRandomMarker()
             }

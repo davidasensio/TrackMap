@@ -19,15 +19,13 @@
         app:title="Profile"
         app:titleTextColor="@android:color/white" />
 
-    <ImageView
+    <com.handysparksoft.trackmap.core.custom.CircleImageView
         android:id="@+id/profileImageView"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="24dp"
-        android:background="@drawable/profile_image_round_shape_background"
-        android:backgroundTint="@color/black_overlay"
-        android:scaleType="centerCrop"
-        android:src="@drawable/ic_user_profile_white"
+        android:contentDescription="@string/user_profile_picture"
+        android:src="@drawable/ic_user_profile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/toolbar" />
@@ -36,8 +34,9 @@
         android:id="@+id/profilePickImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/profile_image_round_shape_background"
+        android:background="@drawable/round_shape_background"
         android:backgroundTint="@color/colorPrimary"
+        android:contentDescription="@string/user_profile_pick_a_picture"
         android:padding="12dp"
         android:src="@drawable/ic_photo_camera_white"
         app:icon="@drawable/ic_photo_camera_white"

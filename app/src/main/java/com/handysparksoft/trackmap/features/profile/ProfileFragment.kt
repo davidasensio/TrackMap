@@ -73,8 +73,6 @@ class ProfileFragment : Fragment() {
     private fun setupUI() {
         viewModel.refresh()
 
-        binding.profileImageView.clipToOutline = true
-
         binding.profilePickImageView.setOnClickListener {
             // val pickPhoto = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
             // startActivityForResult(pickPhoto, PICK_INTERNAL_IMAGE_REQUEST_CODE)
