@@ -55,12 +55,12 @@ fun Intent.addClearTopFlag() {
 
 fun Context.logDebug(message: String) {
     if (BuildConfig.DEBUG) {
-        Log.d(this::class.java.simpleName, message)
+        Log.d("*** " + this::class.java.simpleName, message)
     }
 }
 
 fun Context.logError(message: String) {
     if (BuildConfig.DEBUG) {
-        Log.e(this::class.java.simpleName, message)
+        Log.e("*** " + this::class.java.simpleName, message)
     }
 }

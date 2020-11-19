@@ -2,8 +2,8 @@ package com.handysparksoft.domain.model
 
 data class ParticipantLocation(
     val userId: String,
-    val userNickname: String,
-    val userProfileImage: String?,
+    val nickname: String?,
+    val image: String?,
     var latitude: Double,
     var longitude: Double,
     var altitudeAMSL: Long,
@@ -13,7 +13,7 @@ data class ParticipantLocation(
     fun isSessionUser(userSessionId: String) = userId == userSessionId
 
     fun userAlias(sessionUser: Boolean, shortIt: Boolean = false): String {
-        val userAlias = if (shortIt) userNickname.take(10) +  "..." else userNickname
+        val userAlias = if (shortIt) nickname?.take(10) +  "..." else nickname ?: userId
         return if (sessionUser) {
             "$userAlias (you)"
         } else {

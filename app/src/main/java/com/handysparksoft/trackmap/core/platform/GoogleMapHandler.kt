@@ -84,7 +84,7 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
             .snippet(snippet)
 
         if (icon != null) {
-            if (markerWithImages && encodedImage != null) {
+            if (markerWithImages) {
                 markerOption.icon(getBitmapFromEncodedImage(context, encodedImage, icon))
             } else {
                 markerOption.icon(getBitmapFromVector(context, icon))
@@ -127,7 +127,7 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
 
     private fun getBitmapFromEncodedImage(
         context: Context,
-        encodedImage: String,
+        encodedImage: String?,
         @DrawableRes vectorResourceId: Int,
     ): BitmapDescriptor {
         val bitmapImage = Base64Utils.getBase64Bitmap(encodedImage)
@@ -138,7 +138,9 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
         )
 
         markerPersonLayout.findViewById<ImageView>(R.id.markerPersonPictureImageView).apply {
-            setImageBitmap(bitmapImage)
+            if (encodedImage != null) {
+                setImageBitmap(bitmapImage)
+            }
         }
         markerPersonLayout.findViewById<ImageView>(R.id.markerPersonMarkerImageView).apply {
             setImageResource(vectorResourceId)
