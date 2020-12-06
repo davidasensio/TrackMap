@@ -7,7 +7,7 @@ import android.provider.Settings
 import com.handysparksoft.trackmap.BuildConfig
 import javax.inject.Inject
 
-class UserHandler @Inject constructor(private val context: Context) {
+class UserHandler @Inject constructor(private val context: Context, private val prefs: Prefs) {
 
     fun getUserId(): String {
         return if (BuildConfig.DEBUG) {
@@ -16,6 +16,8 @@ class UserHandler @Inject constructor(private val context: Context) {
             getAndroidSecureId()
         }
     }
+
+    fun getUserNickname() = prefs.userProfileData?.nickname ?: getUserId()
 
     @SuppressLint("HardwareIds")
     private fun getAndroidSecureId(): String {

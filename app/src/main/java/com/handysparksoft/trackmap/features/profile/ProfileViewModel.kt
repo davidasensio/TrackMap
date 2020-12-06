@@ -7,10 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.UserProfileData
-import com.handysparksoft.trackmap.core.platform.Base64Utils
-import com.handysparksoft.trackmap.core.platform.Event
-import com.handysparksoft.trackmap.core.platform.Scope
-import com.handysparksoft.trackmap.core.platform.UserHandler
+import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.usecases.GetUserProfileDataUseCase
 import com.handysparksoft.usecases.UpdateUserProfileUseCase
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +16,8 @@ import kotlinx.coroutines.launch
 class ProfileViewModel(
     private val getUserProfileDataUseCase: GetUserProfileDataUseCase,
     private val updateUserProfileUseCase: UpdateUserProfileUseCase,
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val prefs: Prefs
 ) : ViewModel(), Scope by Scope.Impl() {
 
     sealed class UiModel {
@@ -30,12 +28,7 @@ class ProfileViewModel(
 
     private val _model = MutableLiveData<UiModel>()
     val model: LiveData<UiModel>
-        get() {
-            if (_model.value == null) {
-                refresh()
-            }
-            return _model
-        }
+        get() = _model
 
     private val _saveProfileDataEvent = MutableLiveData<Event<Boolean>>()
     val saveProfileDataEvent: LiveData<Event<Boolean>> get() = _saveProfileDataEvent
@@ -50,15 +43,20 @@ class ProfileViewModel(
     }
 
     fun refresh() {
-        launch(Dispatchers.Main) {
-            val userProfileDataResult = getUserProfileDataUseCase.execute(getUserId())
-            if (userProfileDataResult is Result.Success) {
-                _model.value = UiModel.Content(userProfileDataResult.data)
-            } else if (userProfileDataResult is Result.Error) {
-                _model.value = UiModel.Error(
-                    userProfileDataResult.isNetworkError,
-                    "Code: ${userProfileDataResult.code}"
-                )
+        if (prefs.userProfileData != null) {
+            _model.value = UiModel.Content(prefs.userProfileData!!)
+        } else {
+            launch(Dispatchers.Main) {
+                val userProfileDataResult = getUserProfileDataUseCase.execute(getUserId())
+                if (userProfileDataResult is Result.Success) {
+                    _model.value = UiModel.Content(userProfileDataResult.data)
+                    prefs.userProfileData = userProfileDataResult.data
+                } else if (userProfileDataResult is Result.Error) {
+                    _model.value = UiModel.Error(
+                        userProfileDataResult.isNetworkError,
+                        "Code: ${userProfileDataResult.code}"
+                    )
+                }
             }
         }
     }
@@ -72,6 +70,8 @@ class ProfileViewModel(
             val userProfileData = UserProfileData(userId, nickname, fullName, phone, encodedImage)
             updateUserProfileUseCase.execute(userId, userProfileData)
             _saveProfileDataEvent.value = Event(true)
+
+            prefs.userProfileData = userProfileData
         }
     }
 
@@ -102,14 +102,16 @@ class ProfileViewModel(
 class ProfileViewModelFactory(
     private val getUserProfileDataUseCase: GetUserProfileDataUseCase,
     private val updateUserProfileUseCase: UpdateUserProfileUseCase,
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val prefs: Prefs
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         modelClass.getConstructor(
             getUserProfileDataUseCase::class.java,
             updateUserProfileUseCase::class.java,
-            userHandler::class.java
+            userHandler::class.java,
+            prefs::class.java,
         )
-            .newInstance(getUserProfileDataUseCase, updateUserProfileUseCase, userHandler)
+            .newInstance(getUserProfileDataUseCase, updateUserProfileUseCase, userHandler, prefs)
 }

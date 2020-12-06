@@ -27,6 +27,8 @@ import com.google.android.gms.maps.model.Marker
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
+import com.google.gson.Gson
 import com.handysparksoft.domain.model.ParticipantLocation
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.UserMarkerData
@@ -69,9 +71,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         ).get(TrackMapViewModel::class.java)
     }
 
-    private val participants = mutableSetOf<ParticipantLocation>()
-
     private lateinit var participantsLocationChildEventListener: ChildEventListener
+    private val activeParticipants = mutableSetOf<String>()
 
     private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
@@ -87,8 +88,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var waitingForAnyMarkerIntentAction = false
     private var taskClearWaitingState: TimerTask? = null
 
-    private var statusBarInsetHeight : Int = 0
-    private var navigationBarInsetHeight : Int = 0
+    private var statusBarInsetHeight: Int = 0
+    private var navigationBarInsetHeight: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -135,7 +136,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     override fun onBackPressed() {
-        if (isMapStyleLayersVisible() || customMarker != null ||  userMarkerMap.values.any { it.isShowingInfoWindow }) {
+        if (isMapStyleLayersVisible() || customMarker != null || userMarkerMap.values.any { it.isShowingInfoWindow }) {
             dismissAll()
         } else {
             super.onBackPressed()
@@ -322,9 +323,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         googleMap.setPadding(0, topPadding, 0, bottomPadding)
         val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
-                (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-                    setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
-                }
+        (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
+            setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
+        }
     }
 
     private fun bindMapListeners() {
@@ -406,7 +407,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun addCustomLocatedMarker(position: LatLng) {
-        googleMapHandler.addMarker(position, "", null, null).also {
+        googleMapHandler.addMarker(position, "", null, null, null).also {
             it.tag = CustomInfoWindowAdapter.CUSTOM_LOCATED_MARKER_TAG
             customMarker = it
         }
@@ -462,8 +463,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setTrackMapData() {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
+            loadParticipantsData(it.participantIds)
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
+
 
             // FIXME: remove after tests
             /*val taskLog = object : TimerTask() {
@@ -495,6 +498,30 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
+    private fun loadParticipantsData(participantIds: List<String>) {
+        participantIds.forEach { id ->
+            val participantData = participants.firstOrNull { it.userId == id }
+            if (participantData == null) {
+                logDebug("Loading participant data of: $participantIds")
+                firebaseHandler.getChildUserId(id)
+                    .addListenerForSingleValueEvent(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            val jsonValue = Gson().toJson(snapshot.value)
+                            val participantLocation = Gson().fromJson(
+                                jsonValue,
+                                ParticipantLocation::class.java
+                            )
+                            participants.add(participantLocation.copy(userId = id))
+                            logDebug("Loaded participant data of: $participantIds")
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+                        }
+                    })
+            }
+        }
+    }
+
     private fun setupTrackMapForParticipantUpdates(trackMap: TrackMap) {
         subscribeForParticipantUpdates(trackMap.trackMapId)
     }
@@ -503,7 +530,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         participantsLocationChildEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 subscribeForParticipantLocationUpdates(snapshot.value as String)
-                logDebug("*** Child added: ${snapshot.value}")
+                logDebug("Child added: ${snapshot.value}")
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -514,7 +541,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     participants.remove(it)
                 }
                 refreshTrackMap()
-                logDebug("*** Child removed: ${snapshot.value}")
+                logDebug("Child removed: ${snapshot.value}")
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -543,6 +570,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "altitudeGeoid" -> it.altitudeGeoid = snapshot.value as Long
                         "speed" -> it.speed = snapshot.value as Long
                     }
+                    activeParticipants.add(it.userId)
                 }
                 refreshTrackMap()
             }
@@ -563,12 +591,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onCancelled(error: DatabaseError) {
             }
         }
-
-        val defaultLatitude =
-            if (userId == userHandler.getUserId()) prefs.lastLocationLatitude.toDouble() else 0.0
-        val defaultLongitude =
-            if (userId == userHandler.getUserId()) prefs.lastLocationLongitude.toDouble() else 0.0
-        participants.add(ParticipantLocation(userId, defaultLatitude, defaultLongitude, 0, 0, 0))
+        
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
     }
@@ -585,9 +608,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             participantMarkers.clear()
             resetFrameButtonExtraSpace()
             reAddCustomLocatedMarker()
-            // clearInfoWindows() // Uncomment if auto close marker windo info desired
+            // clearInfoWindows() // Uncomment if auto close marker window info desired
 
-            participants.filter(::withAvailableLatLng).forEach { participantLocation ->
+            participants.filter(::withActivityAndAvailableLatLng).forEach { participantLocation ->
                 val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
                 val userMarkerData = getParticipantMarker(participantLocation.userId)
                 val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
@@ -599,7 +622,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                             " Geoid: " + participantLocation.altitudeGeoid + " m" +
                             " Speed: " + participantLocation.speed + " Km/h",
                     null,
-                    userMarkerData.icon
+                    userMarkerData.icon,
+                    participantLocation.image
+
                 )
                 val userId = participantLocation.userId
                 marker.tag = userId
@@ -627,7 +652,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (userMakerData == null) {
             val isUserSession = userId == userHandler.getUserId()
             val icon = if (isUserSession) {
-                GoogleMapHandler.MARKER_ICON_DEFAULT_GREEN
+                googleMapHandler.getDefaultUserMarker()
             } else {
                 googleMapHandler.getRandomMarker()
             }
@@ -641,7 +666,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun frameAllParticipants() {
         if (participantMarkers.size == 1) {
             // Move the camera to unique participant location with a zoom of 17.
-            participants.firstOrNull(::withAvailableLatLng)?.let { participant ->
+            participants.firstOrNull(::withActivityAndAvailableLatLng)?.let { participant ->
                 val latLng = LatLng(participant.latitude, participant.longitude)
                 val zoomLevel = getZoomLevelAccordingSpeed(participant.speed)
                 this.googleMap.animateCamera(
@@ -654,7 +679,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         } else {
             val boundsBuilder = LatLngBounds.Builder()
 
-            participants.filter(::withAvailableLatLng).forEach { participant ->
+            participants.filter(::withActivityAndAvailableLatLng).forEach { participant ->
                 boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
             }
 
@@ -676,13 +701,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun withAvailableLatLng(participantLocation: ParticipantLocation): Boolean {
-        return participantLocation.latitude != 0.0 && participantLocation.longitude != 0.0
+    private fun withActivityAndAvailableLatLng(participantLocation: ParticipantLocation): Boolean {
+        return activeParticipants.contains(participantLocation.userId)
+                && participantLocation.latitude != 0.0
+                && participantLocation.longitude != 0.0
     }
 
     private fun getUserSessionLocation(): Location? {
         participants
-            .filter(::withAvailableLatLng)
+            .filter(::withActivityAndAvailableLatLng)
             .firstOrNull { it.userId == userHandler.getUserId() }?.let {
                 return Location("adhoc").apply {
                     latitude = it.latitude
@@ -706,6 +733,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
         private const val ANY_MARKER_INTENT_ACTION_DELAY_SECS = 5L
+
+        private val participants = mutableSetOf<ParticipantLocation>()
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {

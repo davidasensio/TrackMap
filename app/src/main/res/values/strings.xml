@@ -75,5 +75,7 @@
     <string name="profile_phone">Phone</string>
     <string name="profile_phone_helper_text">Phone</string>
     <string name="profile_save">Save</string>
+    <string name="user_profile_picture">User picture</string>
+    <string name="user_profile_pick_a_picture">Pick a picture</string>
 
 </resources>
