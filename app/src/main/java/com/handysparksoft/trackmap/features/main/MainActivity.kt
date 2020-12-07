@@ -16,6 +16,8 @@ import com.handysparksoft.trackmap.core.extension.startActivity
 import com.handysparksoft.trackmap.core.extension.toast
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.ShareIntentHandler
+import com.handysparksoft.trackmap.core.platform.TrackEvent
+import com.handysparksoft.trackmap.core.platform.track
 import com.handysparksoft.trackmap.databinding.ActivityMainBinding
 import javax.inject.Inject
 
@@ -63,15 +65,19 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             android.R.id.home -> {
                 findNavController(R.id.fragment).navigate(R.id.action_entriesFragment_to_proifleFragment)
+                TrackEvent.HomeActionClick.track()
             }
             R.id.menuShare -> {
                 ShareIntentHandler.showShareAppIntentChooser(this)
+                TrackEvent.MenuShareActionClick.track()
             }
             R.id.menuRate -> {
                 ShareIntentHandler.rateAppInGooglePlayIntent(this)
+                TrackEvent.MenuRateActionClick.track()
             }
             R.id.menuSort -> {
                 onSortMenuItemClickListener?.invoke()
+                TrackEvent.MenuSortActionClick.track()
             }
         }
         return super.onOptionsItemSelected(item)

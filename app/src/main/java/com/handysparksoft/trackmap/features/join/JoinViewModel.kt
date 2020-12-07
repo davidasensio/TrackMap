@@ -6,9 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.domain.model.TrackMap
-import com.handysparksoft.trackmap.core.platform.Event
-import com.handysparksoft.trackmap.core.platform.Scope
-import com.handysparksoft.trackmap.core.platform.UserHandler
+import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.usecases.JoinTrackMapUseCase
 import com.handysparksoft.usecases.SaveUserTrackMapUseCase
 import kotlinx.coroutines.Dispatchers
@@ -46,6 +44,7 @@ class JoinViewModel(
                 if (showFeedback) {
                     _joinFeedbackEvent.value = Event(trackMap)
                 }
+                TrackEvent.JoinedTrackMap.track()
             }
         }
     }

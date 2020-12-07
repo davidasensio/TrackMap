@@ -101,6 +101,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        TrackEvent.EnterTrackMapActivity.track()
+
         super.onCreate(savedInstanceState)
         binding = ActivityTrackmapBinding.inflate(layoutInflater)
         mapTypeBinging = binding.dialogMapTypeLayout
