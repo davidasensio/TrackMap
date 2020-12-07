@@ -131,12 +131,15 @@ class EntriesFragment : Fragment() {
             userSession = userHandler.getUserId(),
             onGoListener = {
                 viewModel.onGoTrackMapClicked(it)
+                TrackEvent.GoActionClick.track()
             },
             onLeaveListener = {
                 viewModel.onLeaveTrackMapClicked(it)
+                TrackEvent.LeaveActionClick.track()
             },
             onShareListener = {
                 viewModel.onShareTrackMapClicked(it)
+                TrackEvent.ShareActionClick.track()
             }
         )
 

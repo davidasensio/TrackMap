@@ -18,6 +18,7 @@ class UserHandler @Inject constructor(private val context: Context, private val 
     }
 
     fun getUserNickname() = prefs.userProfileData?.nickname ?: getUserId()
+    fun getUserFullName() = prefs.userProfileData?.fullName ?: getUserId()
 
     @SuppressLint("HardwareIds")
     private fun getAndroidSecureId(): String {

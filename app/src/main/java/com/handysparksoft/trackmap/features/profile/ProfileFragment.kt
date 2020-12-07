@@ -21,9 +21,7 @@ import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.logError
 import com.handysparksoft.trackmap.core.extension.showTransitionTo
 import com.handysparksoft.trackmap.core.extension.snackbar
-import com.handysparksoft.trackmap.core.platform.Base64Utils
-import com.handysparksoft.trackmap.core.platform.Easing
-import com.handysparksoft.trackmap.core.platform.Event
+import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentProfileBinding
 import com.handysparksoft.trackmap.features.profile.ProfileViewModel.UiModel.*
@@ -67,6 +65,7 @@ class ProfileFragment : Fragment() {
     private fun setupToolbar() {
         binding.toolbar.setNavigationOnClickListener {
             findNavController().navigate(R.id.action_proifleFragment_to_entriesFragment)
+            TrackEvent.ProfileBackActionClick.track()
         }
     }
 
@@ -85,6 +84,7 @@ class ProfileFragment : Fragment() {
                 )
             }
             launcher.launch("image/*")
+            TrackEvent.ProfilePickImageActionClick.track()
         }
 
         binding.profileImageCancelCropButton.setOnClickListener {
@@ -155,6 +155,7 @@ class ProfileFragment : Fragment() {
         event.getContentIfNotHandled().let { result ->
             if (result == true) {
                 findNavController().navigate(R.id.action_proifleFragment_to_entriesFragment)
+                TrackEvent.ProfileSaveActionClick.track()
             }
         }
     }
