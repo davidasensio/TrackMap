@@ -25,7 +25,7 @@ class UserHandler @Inject constructor(private val context: Context, private val 
     }
 
     private fun getDeviceData(): String {
-        return "${Build.MANUFACTURER} ${Build.MODEL} ${getSDKName()}"
+        return "User - ${Build.MANUFACTURER} ${Build.MODEL} ${getSDKName()}"
     }
 
     private fun getSDKName(): String {

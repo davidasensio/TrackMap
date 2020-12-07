@@ -2,6 +2,7 @@ package com.handysparksoft.trackmap.core.platform
 
 import android.app.Activity
 import android.util.Base64
+import com.handysparksoft.trackmap.R
 import java.nio.charset.Charset
 
 object DeeplinkHandler {
@@ -14,7 +15,8 @@ object DeeplinkHandler {
     fun generateDeeplink(activity: Activity, code: String, name: String) {
         val encodedCode = encodeBase64(code)
         val joinTrackMapURL = "https://trackmap.firebaseapp.com?code=$encodedCode"
-        val content = "Join TrackMap \"$name\" here:\n$joinTrackMapURL"
+        val content =
+            activity.getString(R.string.share_trackmap_link_content, name, joinTrackMapURL, code)
 
         ShareIntentHandler.showTrackMapShareIntent(activity, content)
     }

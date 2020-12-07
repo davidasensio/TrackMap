@@ -43,9 +43,9 @@ class ProfileViewModel(
     }
 
     fun refresh() {
-        if (prefs.userProfileData != null) {
+        /*if (prefs.userProfileData != null) {
             _model.value = UiModel.Content(prefs.userProfileData!!)
-        } else {
+        } else {*/
             launch(Dispatchers.Main) {
                 val userProfileDataResult = getUserProfileDataUseCase.execute(getUserId())
                 if (userProfileDataResult is Result.Success) {
@@ -58,7 +58,7 @@ class ProfileViewModel(
                     )
                 }
             }
-        }
+        /*}*/
     }
 
     fun saveUserProfile(nickname: String, fullName: String, phone: String, profileImage: Bitmap?) {
@@ -72,6 +72,7 @@ class ProfileViewModel(
             _saveProfileDataEvent.value = Event(true)
 
             prefs.userProfileData = userProfileData
+            profileDataUpdated = true
         }
     }
 
@@ -96,6 +97,10 @@ class ProfileViewModel(
             kbytesCount > 7500 -> 40
             else -> 50
         }
+    }
+
+    companion object {
+        var profileDataUpdated = false
     }
 }
 

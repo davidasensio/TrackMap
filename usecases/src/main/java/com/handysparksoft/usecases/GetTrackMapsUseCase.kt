@@ -13,11 +13,13 @@ class GetTrackMapsUseCase(private val trackMapRepository: TrackMapRepository) {
                 val trackMap = trackMapRepository.getTrackMapById(userTrackMap.trackMapId)
                 if (trackMap is Result.Success) {
                     trackMap.data?.let {
-                       syncedUserTrackMaps.data[key] = it
+                        syncedUserTrackMaps.data[key] = it
                     }
                 }
             }
             return syncedUserTrackMaps
+        } else if (userTrackMaps is Result.Error && !userTrackMaps.isNetworkError) {
+            return Result.Success(HashMap<String, TrackMap>())
         }
         return userTrackMaps
     }

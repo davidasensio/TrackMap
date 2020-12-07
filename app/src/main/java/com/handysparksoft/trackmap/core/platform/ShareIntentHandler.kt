@@ -33,8 +33,10 @@ object ShareIntentHandler {
     }
 
     fun showTrackMapShareIntent(activity: Activity, content: String) {
+        val title = activity.getString(R.string.share_trackmap_link_title)
         val sendIntent: Intent = Intent().apply {
             action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_SUBJECT, title)
             putExtra(Intent.EXTRA_TEXT, content)
             type = "text/plain"
         }

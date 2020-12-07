@@ -18,16 +18,19 @@
 
     <string name="search_trackmap">Search TrackMap</string>
     <string name="your_trackmaps">Your TrackMaps</string>
+
     <string name="create_code">Code</string>
     <string name="create_name">Name</string>
     <string name="create_description">Description</string>
     <string name="create_trackmap">Create TrackMap</string>
     <string name="create_trackmap_validation">Please, fill in all the fields</string>
+    <string name="create_info_text">Once the trackmap is created it could be shared with the share action.</string>
+
     <string name="code_helper_text">Unique TrackMap code</string>
     <string name="name_helper_text">Name for the trackmap</string>
     <string name="description_helper_text">Short trackmap description</string>
     <string name="creation_template">Created <b>%1$s</b> by %2$s</string>
-    <string name="sampleTrackMapCode">999-333</string>
+    <string name="sampleTrackMapCode">999–333</string>
 
     <string name="splash_slogan">Share your location with everybody you want.</string>
     <string name="splash_author">By Handysparksoft</string>
@@ -81,4 +84,13 @@
     <string name="user_info_title">User Info</string>
     <string name="user_info_show_marker_info">Show info tooltip</string>
 
+    <string name="share_trackmap_link_title">Join this TrackMap!</string>
+    <string name="share_trackmap_link_content">Join TrackMap \"%1$s\" here in this link: %2$s\nOr just join using this code: \"%3$s\"</string>
+
+    <string name="trackmap_item_name">Name:</string>
+    <string name="trackmap_item_description">Description:</string>
+    <string name="trackmap_item_code">Code:</string>
+    <string name="trackmap_item_participants">Participants:</string>
+    <string name="trackmap_item_action_leave">Leave</string>
+    <string name="trackmap_item_action_go">Go!</string>
 </resources>

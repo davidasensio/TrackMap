@@ -42,6 +42,7 @@ import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
 import com.handysparksoft.trackmap.databinding.DialogMapTypeBinding
 import com.handysparksoft.trackmap.databinding.MarkerSelectedBottomSheetBinding
+import com.handysparksoft.trackmap.features.profile.ProfileViewModel
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -526,6 +527,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun loadParticipantsData(participantIds: List<String>) {
+        if (ProfileViewModel.profileDataUpdated) {
+            participants.clear()
+            ProfileViewModel.profileDataUpdated = false
+        }
         participantIds.forEach { id ->
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
@@ -790,7 +795,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 val distance =
                     getUserSessionLocation()?.distanceTo(participantLocation.toLocation()) ?: 0f
                 with(markerMapSelectedBottomSheetBinding) {
-                    userNickname.text = participantLocation.nickname
+                    userNickname.text = participantLocation.nickname ?: participantLocation.userId
 
                     userSpeed.value = participantLocation.speed.toString()
                     userAltitude.value = participantLocation.altitudeAMSL.toString()
@@ -799,8 +804,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     userDistanceFromYou.value = distanceFormatted
                     userDistanceFromYou.unit = unit
 
-                    userFullName.text = participantLocation.fullName
+                    userFullName.text = participantLocation.fullName ?: participantLocation.nickname
                     userPhone.text = participantLocation.phone
+                    userPhone.visibility = if (userPhone.text.isNotEmpty()) View.VISIBLE else View.INVISIBLE
                     participantLocation.image.let { userImage ->
                         userProfileImage.setImageBitmap(Base64Utils.getBase64Bitmap(userImage))
                     }
