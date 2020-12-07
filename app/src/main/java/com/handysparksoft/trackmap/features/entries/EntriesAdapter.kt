@@ -63,7 +63,7 @@ class EntriesAdapter(
             creationDate: Long
         ): String {
             val owned = owner == userSession
-            val ownerAlias = if (owned) "You" else owner
+            val ownerAlias = if (owned) view.context.getString(R.string.by_you) else owner
             val dateFromTime = DateUtils.getRelativeDateFromTime(view.context, creationDate)
             return view.context.getString(R.string.creation_template, dateFromTime, ownerAlias)
         }

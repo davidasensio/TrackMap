@@ -82,7 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/userSpeed"
         app:scalarDrawable="@drawable/ic_ruler"
-        app:scalarName="Distance from you"
+        app:scalarName="@string/distance_from_you"
         app:scalarUnit="m"
         app:scalarValue="0" />
 

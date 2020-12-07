@@ -14,10 +14,10 @@ data class ParticipantLocation(
 ) {
     fun isSessionUser(userSessionId: String) = userId == userSessionId
 
-    fun userAlias(sessionUser: Boolean, shortIt: Boolean = false): String {
+    fun userAlias(sessionUser: Boolean, extra: String, shortIt: Boolean = false): String {
         val userAlias = if (shortIt) nickname?.take(10) +  "..." else nickname ?: userId
         return if (sessionUser) {
-            "$userAlias (you)"
+            "$userAlias ($extra)"
         } else {
             userAlias
         }

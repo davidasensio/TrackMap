@@ -839,7 +839,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 ?.distanceTo(it.toLocation()) ?: 0f
             val (distanceFinal, distanceUnit) = getDistanceFormatted(distance)
 
-            R.id.markerTitle.findTextView().text = it.userAlias(isUserSession)
+            R.id.markerTitle.findTextView().text = it.userAlias(isUserSession, getString(R.string.you))
             R.id.markerAltitudeValue.findTextView().text = "$altitude $UNIT_METERS"
             R.id.markerSpeedValue.findTextView().text = "$speed $UNIT_KMH"
             R.id.markerDistanceValue.findTextView().text = "$distanceFinal $distanceUnit"
