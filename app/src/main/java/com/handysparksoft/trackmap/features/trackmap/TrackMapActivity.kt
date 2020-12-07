@@ -1,12 +1,14 @@
 package com.handysparksoft.trackmap.features.trackmap
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.app.PictureInPictureParams
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.location.Location
+import android.net.Uri
 import android.os.Bundle
 import android.util.Rational
 import android.view.View
@@ -24,6 +26,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MapStyleOptions
 import com.google.android.gms.maps.model.Marker
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -38,12 +41,17 @@ import com.handysparksoft.trackmap.core.extension.*
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
 import com.handysparksoft.trackmap.databinding.DialogMapTypeBinding
+import com.handysparksoft.trackmap.databinding.MarkerSelectedBottomSheetBinding
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
+
+    private lateinit var binding: ActivityTrackmapBinding
+    private lateinit var mapTypeBinging: DialogMapTypeBinding
+    private lateinit var markerMapSelectedBottomSheetBinding: MarkerSelectedBottomSheetBinding
 
     @Inject
     lateinit var userHandler: UserHandler
@@ -78,23 +86,24 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private var frameAllParticipantsInMap = true
 
-    private lateinit var binding: ActivityTrackmapBinding
-    private lateinit var mapTypeBinging: DialogMapTypeBinding
-
     private var pipModeEnabled = false
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
     private val participantMarkers = mutableListOf<Marker>()
     private var customMarker: Marker? = null
+    private var selectedMarkerTag: String? = null
     private var waitingForAnyMarkerIntentAction = false
     private var taskClearWaitingState: TimerTask? = null
 
     private var statusBarInsetHeight: Int = 0
     private var navigationBarInsetHeight: Int = 0
 
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityTrackmapBinding.inflate(layoutInflater)
         mapTypeBinging = binding.dialogMapTypeLayout
+        markerMapSelectedBottomSheetBinding = binding.markerMapSelectedBottomSheet
         setContentView(binding.root)
 
         injectComponents()
@@ -103,6 +112,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         setupMapUI()
         setupUI()
+        setupBottomSheet()
     }
 
     override fun onDestroy() {
@@ -137,7 +147,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onBackPressed() {
         if (isMapStyleLayersVisible() || customMarker != null || userMarkerMap.values.any { it.isShowingInfoWindow }) {
-            dismissAll()
+            dismissAll(alsoInfoWindows = true)
         } else {
             super.onBackPressed()
         }
@@ -189,6 +199,19 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             navigationBarInsetHeight = insets.systemWindowInsetBottom
             insets
         }
+        binding.markerMapSelectedBottomSheet.userShowInfoToggle.setOnCheckedChangeListener { buttonView, isChecked ->
+            selectedMarkerTag?.let { markerTag ->
+                if (isChecked) {
+                    clearInfoWindows()
+                    setMarkerInfoWindowVisible(markerTag, visible = true)
+                    participantMarkers.firstOrNull { it.tag == markerTag }?.showInfoWindow()
+                } else {
+                    setMarkerInfoWindowVisible(markerTag, visible = false)
+                    participantMarkers.firstOrNull { it.tag == markerTag }?.hideInfoWindow()
+                }
+            }
+        }
+
         setupMapTypeSwitcher()
     }
 
@@ -206,7 +229,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             imageViewToSelect.isSelected = true
             textViewToSelect.isSelected = true
         }
-
 
         binding.switchMapStyleButton.setOnClickListener {
             showMapStyleLayers()
@@ -276,6 +298,24 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     @SuppressLint("MissingPermission")
     private fun moveToLastLocation() {
         mapActionHelper.moveToPosition(prefs.lastLocation)
+    }
+
+    private fun setupBottomSheet() {
+        bottomSheetBehavior =
+            BottomSheetBehavior.from(markerMapSelectedBottomSheetBinding.markerMapSelectedContent)
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+
+        binding.markerMapSelectedBottomSheet.userPhone.apply {
+            setOnClickListener {
+                val phone = this.text.toString()
+                val dialIntent = Intent(Intent.ACTION_DIAL).apply {
+                    data= Uri.parse("tel:$phone")
+                }
+                if (dialIntent.resolveActivity(packageManager) != null) {
+                    startActivity(dialIntent)
+                }
+            }
+        }
     }
 
     /**
@@ -357,21 +397,21 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         googleMap.setOnMarkerClickListener {
-            clearInfoWindows()
-            it.showInfoWindow()
+            val markerTag = it.tag.toString()
+            val sameMarker = markerTag == selectedMarkerTag
+            selectedMarkerTag = markerTag
+            showInfoBottomSheet(markerTag, sameMarker)
             animateFrameButtonToMakeSpace()
-
-            val tagId = it.tag.toString()
-            val userMarkerData = getParticipantMarker(tagId)
-            userMarkerData.isShowingInfoWindow = true
-            userMarkerMap[tagId] = userMarkerData
-
+            keepShowingInfoWindowMarker()
             waitForAnyMarkerIntentAction()
             false
         }
 
         googleMap.setOnMapClickListener {
             dismissAll()
+
+            //Except current selected marker
+            keepShowingInfoWindowMarker()
         }
 
         googleMap.setOnMapLongClickListener { point ->
@@ -384,10 +424,26 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this, ::onRenderMarkerWindowInfo))
     }
 
-    private fun dismissAll() {
+    private fun keepShowingInfoWindowMarker() {
+        userMarkerMap.values.firstOrNull { it.isShowingInfoWindow }?.let { shownMarker ->
+            participantMarkers.firstOrNull { it.tag == shownMarker.tag }?.showInfoWindow()
+        }
+    }
+
+    private fun setMarkerInfoWindowVisible(markerTag: String, visible: Boolean) {
+        val userMarkerData = getOrInitParticipantMarker(markerTag)
+        userMarkerData.isShowingInfoWindow = visible
+        userMarkerMap[markerTag] = userMarkerData
+    }
+
+    private fun dismissAll(alsoInfoWindows: Boolean = false) {
+        if (alsoInfoWindows) {
+            clearInfoWindows()
+        }
         dismissMapStyleLayers()
-        clearInfoWindows()
         clearCustomMarker()
+        hideMarkerBottomSheet()
+        selectedMarkerTag = null
         taskClearWaitingState?.run()
     }
 
@@ -408,44 +464,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun addCustomLocatedMarker(position: LatLng) {
         googleMapHandler.addMarker(position, "", null, null, null).also {
-            it.tag = CustomInfoWindowAdapter.CUSTOM_LOCATED_MARKER_TAG
+            it.tag = CUSTOM_LOCATED_MARKER_TAG
             customMarker = it
         }
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun onRenderMarkerWindowInfo(windowInfo: View, marker: Marker) {
-        fun <T> Int.findView(): T {
-            return windowInfo.findViewById(this) as T
-        }
-
-        fun Int.findTextView(): TextView {
-            return windowInfo.findViewById(this) as TextView
-        }
-
-        fun getDistanceFormatted(distance: Float): String {
-            return when {
-                distance >= 1000 -> String.format("%.1f km", distance / 1000)
-                else -> String.format("%.0f m", distance)
-            }
-        }
-
-        val userMarkerData = userMarkerMap[marker.tag.toString()]
-        userMarkerData?.participanLocation?.let {
-            val isUserSession = userHandler.getUserId() == marker.tag.toString()
-            val altitude = it.altitudeAMSL
-            val speed = it.speed
-            val distance = getUserSessionLocation()
-                ?.distanceTo(it.toLocation()) ?: 0f
-
-            R.id.markerTitle.findTextView().text = it.userAlias(isUserSession)
-            R.id.markerAltitudeValue.findTextView().text = "$altitude m"
-            R.id.markerSpeedValue.findTextView().text = "$speed Km/h"
-            R.id.markerDistanceValue.findTextView().text = getDistanceFormatted(distance)
-
-            // Hide distance when it is oneself marker
-            R.id.markerDistance.findTextView().visibleOrGone(!isUserSession)
-            R.id.markerDistanceValue.findTextView().visibleOrGone(!isUserSession)
+    private fun getDistanceFormatted(distance: Float): Pair<String, String> {
+        return when {
+            distance >= 1000 -> Pair(String.format("%.1f", distance / 1000), UNIT_KM)
+            else -> Pair(String.format("%.0f", distance), UNIT_METERS)
         }
     }
 
@@ -591,7 +618,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             override fun onCancelled(error: DatabaseError) {
             }
         }
-        
+
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
     }
@@ -608,19 +635,19 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             participantMarkers.clear()
             resetFrameButtonExtraSpace()
             reAddCustomLocatedMarker()
-            // clearInfoWindows() // Uncomment if auto close marker window info desired
 
             participants.filter(::withActivityAndAvailableLatLng).forEach { participantLocation ->
                 val isUserSession = participantLocation.isSessionUser(userHandler.getUserId())
-                val userMarkerData = getParticipantMarker(participantLocation.userId)
+                val userMarkerData = getOrInitParticipantMarker(participantLocation.userId)
                 val latLng = LatLng(participantLocation.latitude, participantLocation.longitude)
 
                 val marker = googleMapHandler.addMarker(
                     latLng,
-                    participantLocation.userAlias(isUserSession, true) +
+                    /*participantLocation.userAlias(isUserSession, true) +
                             " AMSL: " + participantLocation.altitudeAMSL + " m" +
                             " Geoid: " + participantLocation.altitudeGeoid + " m" +
-                            " Speed: " + participantLocation.speed + " Km/h",
+                            " Speed: " + participantLocation.speed + " Km/h"*/
+                    null,
                     null,
                     userMarkerData.icon,
                     participantLocation.image
@@ -635,6 +662,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 }
                 participantMarkers.add(marker)
             }
+
+            // Refresh selected marker bottom sheet info
+            selectedMarkerTag?.let {
+                refreshBottomSheetMarkerData(it)
+            }
+
             if (frameAllParticipantsInMap) {
                 frameAllParticipants()
             }
@@ -642,12 +675,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun addUserMarkerData(participantLocation: ParticipantLocation) {
-        val userMarkerData = getParticipantMarker(participantLocation.userId)
+        val userMarkerData = getOrInitParticipantMarker(participantLocation.userId)
         userMarkerData.participanLocation = participantLocation
         userMarkerMap[participantLocation.userId] = userMarkerData
     }
 
-    private fun getParticipantMarker(userId: String): UserMarkerData {
+    private fun getOrInitParticipantMarker(userId: String): UserMarkerData {
         var userMakerData = userMarkerMap[userId]
         if (userMakerData == null) {
             val isUserSession = userId == userHandler.getUserId()
@@ -661,7 +694,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
         return userMakerData
     }
-
 
     private fun frameAllParticipants() {
         if (participantMarkers.size == 1) {
@@ -721,6 +753,118 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun getCurrentZoomLevel() = googleMap.cameraPosition.zoom
 
+    /**
+     * Bottom Sheet Selected Marker functions
+     */
+    private fun showInfoBottomSheet(markerTag: String, sameMarker: Boolean) {
+        refreshBottomSheetMarkerData(markerTag)
+        showOrHideMarkerBottomSheet(sameMarker)
+    }
+
+    private fun showOrHideMarkerBottomSheet(sameMarker: Boolean) {
+        val state =
+            if (sameMarker &&
+                (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
+                        bottomSheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED)
+            ) {
+                BottomSheetBehavior.STATE_HIDDEN
+            } else if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                BottomSheetBehavior.STATE_HALF_EXPANDED
+            } else {
+                bottomSheetBehavior.state
+            }
+
+        bottomSheetBehavior.isFitToContents = true
+        bottomSheetBehavior.halfExpandedRatio = HALF_EXPANDED_RATIO
+        bottomSheetBehavior.state = state
+    }
+
+    private fun hideMarkerBottomSheet() {
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+    }
+
+    private fun refreshBottomSheetMarkerData(markerTag: String) {
+        userMarkerMap[markerTag]?.let { userMarkerData ->
+            userMarkerData.participanLocation?.let { participantLocation ->
+
+                val distance =
+                    getUserSessionLocation()?.distanceTo(participantLocation.toLocation()) ?: 0f
+                with(markerMapSelectedBottomSheetBinding) {
+                    userNickname.text = participantLocation.nickname
+
+                    userSpeed.value = participantLocation.speed.toString()
+                    userAltitude.value = participantLocation.altitudeAMSL.toString()
+
+                    val (distanceFormatted, unit) = getDistanceFormatted(distance)
+                    userDistanceFromYou.value = distanceFormatted
+                    userDistanceFromYou.unit = unit
+
+                    userFullName.text = participantLocation.fullName
+                    userPhone.text = participantLocation.phone
+                    participantLocation.image.let { userImage ->
+                        userProfileImage.setImageBitmap(Base64Utils.getBase64Bitmap(userImage))
+                    }
+
+                    userShowInfoToggle.isChecked = userMarkerData.isShowingInfoWindow
+                }
+            }
+        }
+    }
+
+    /**
+     * CustomInfoWindowAdapter functions
+     */
+    @SuppressLint("SetTextI18n")
+    private fun onRenderMarkerWindowInfo(windowInfo: View, marker: Marker) {
+        fun <T> Int.findView(): T {
+            return windowInfo.findViewById(this) as T
+        }
+
+        fun Int.findTextView(): TextView {
+            return windowInfo.findViewById(this) as TextView
+        }
+
+        val userMarkerData = userMarkerMap[marker.tag.toString()]
+        userMarkerData?.participanLocation?.let {
+            val isUserSession = userHandler.getUserId() == marker.tag.toString()
+            val altitude = it.altitudeAMSL
+            val speed = it.speed
+            val distance = getUserSessionLocation()
+                ?.distanceTo(it.toLocation()) ?: 0f
+            val (distanceFinal, distanceUnit) = getDistanceFormatted(distance)
+
+            R.id.markerTitle.findTextView().text = it.userAlias(isUserSession)
+            R.id.markerAltitudeValue.findTextView().text = "$altitude $UNIT_METERS"
+            R.id.markerSpeedValue.findTextView().text = "$speed $UNIT_KMH"
+            R.id.markerDistanceValue.findTextView().text = "$distanceFinal $distanceUnit"
+
+            // Hide distance when it is oneself marker
+            R.id.markerDistance.findTextView().visibleOrGone(!isUserSession)
+            R.id.markerDistanceValue.findTextView().visibleOrGone(!isUserSession)
+        }
+    }
+
+    inner class CustomInfoWindowAdapter(
+        activity: Activity,
+        private val onRenderMarkerWindowInfo: (windowInfo: View, marker: Marker) -> Unit
+    ) : GoogleMap.InfoWindowAdapter {
+        private val windowInfo: View = activity.layoutInflater.inflate(
+            R.layout.custom_info_window, null
+        )
+
+        override fun getInfoWindow(marker: Marker): View? {
+            val shouldShow = userMarkerMap[marker.tag.toString()]?.isShowingInfoWindow == true
+            return if (marker.tag != CUSTOM_LOCATED_MARKER_TAG && shouldShow) {
+                onRenderMarkerWindowInfo(windowInfo, marker)
+                windowInfo
+            } else null
+        }
+
+        override fun getInfoContents(marker: Marker): View? {
+            return null
+        }
+    }
+
     sealed class MyPositionState {
         object Unallocated : MyPositionState()
         object Located : MyPositionState()
@@ -733,6 +877,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
         private const val ANY_MARKER_INTENT_ACTION_DELAY_SECS = 5L
+        private const val CUSTOM_LOCATED_MARKER_TAG = "CustomMarker"
+
+        private const val HALF_EXPANDED_RATIO = 0.3f
+        private const val UNIT_KM = "Km"
+        private const val UNIT_KMH = "Km/h"
+        private const val UNIT_METERS = "m"
 
         private val participants = mutableSetOf<ParticipantLocation>()
 

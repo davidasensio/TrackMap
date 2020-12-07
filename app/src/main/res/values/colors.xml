@@ -9,4 +9,5 @@
     <color name="black_overlay">#66000000</color>
     <color name="colorPrimaryDarkText">#1B5E20</color>
     <color name="colorTextOnDark">#FFFFFF</color>
+    <color name="colorTextCaption">#FF757575</color>
 </resources>

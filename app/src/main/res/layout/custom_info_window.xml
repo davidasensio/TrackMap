@@ -40,7 +40,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:drawableLeft="@drawable/ic_trending_up"
+        android:drawableLeft="@drawable/ic_trending_up_white"
         android:drawablePadding="8dp"
         android:text="@string/altitude"
         app:layout_constraintStart_toStartOf="parent"
