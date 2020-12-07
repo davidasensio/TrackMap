@@ -73,15 +73,18 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
 
     fun addMarker(
         latLng: LatLng,
-        title: String,
+        title: String?,
         snippet: String?,
         icon: Int? = null,
         encodedImage: String?
     ): Marker {
         val markerOption = MarkerOptions()
             .position(latLng)
-            .title(title)
             .snippet(snippet)
+
+        if (title != null) {
+            markerOption.title(title)
+        }
 
         if (icon != null) {
             if (markerWithImages) {

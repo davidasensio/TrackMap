@@ -1,122 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:map="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/trackMapContentLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".features.trackmap.TrackMapActivity">
+    android:layout_height="match_parent">
 
-    <fragment
-        android:id="@+id/trackMapFragment"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/trackMapContentLayout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        map:layout_constraintBottom_toBottomOf="parent"
-        map:layout_constraintEnd_toEndOf="parent"
-        map:layout_constraintStart_toStartOf="parent"
-        map:layout_constraintTop_toTopOf="parent"
-        tools:context="com.handysparksoft.trackmap.features.trackmap.TrackMapActivity" />
+        android:layout_height="match_parent"
+        tools:context=".features.trackmap.TrackMapActivity">
 
-    <ImageButton
-        android:id="@+id/switchMapStyleButton"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_marginTop="112dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/map_type_round_button_shape_background"
-        android:contentDescription="@string/switch_to_map_type"
-        android:elevation="4dp"
-        android:src="@drawable/ic_layers"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:tooltipText="@string/tooltip_map_style" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/frameAllParticipantsInMapButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="32dp"
-        android:backgroundTint="@color/colorAccent"
-        android:fitsSystemWindows="true"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_frame_on"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:tooltipText="@string/tooltip_frame_all_participants" />
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/trackMapBottomCardView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/colorPrimaryDarkText"
-        android:visibility="gone"
-        app:cardCornerRadius="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:padding="4dp"
-            android:text="@string/app_name"
-            android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
-            android:textColor="@color/colorTextOnDark"
-            android:textStyle="bold" />
-    </com.google.android.material.card.MaterialCardView>
-
-    <!--<RelativeLayout
-        android:id="@+id/tempLogContainer"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="96dp"
-        android:layout_marginEnd="8dp"
-        android:alpha="0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/tempLog"
+        <fragment
+            android:id="@+id/trackMapFragment"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:alpha="1"
-            android:background="@color/black_overlay"
-            android:gravity="bottom"
-            android:lines="4"
-            android:padding="4dp"
-            android:scrollbarStyle="insideInset"
-            android:scrollbars="vertical"
-            android:textColor="@android:color/white"
-            android:textSize="16sp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            tools:context="com.handysparksoft.trackmap.features.trackmap.TrackMapActivity" />
 
         <ImageButton
-            android:id="@+id/tempLogClearButton"
+            android:id="@+id/switchMapStyleButton"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginTop="112dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/map_type_round_button_shape_background"
+            android:contentDescription="@string/switch_to_map_type"
+            android:elevation="4dp"
+            android:src="@drawable/ic_layers"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:tooltipText="@string/tooltip_map_style" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/frameAllParticipantsInMapButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_margin="8dp"
-            android:background="@android:color/transparent"
-            android:importantForAccessibility="no"
-            android:padding="8dp"
-            android:src="@android:drawable/ic_menu_close_clear_cancel" />
-    </RelativeLayout>-->
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="32dp"
+            android:backgroundTint="@color/colorAccent"
+            android:fitsSystemWindows="true"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_frame_on"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:tooltipText="@string/tooltip_frame_all_participants" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/trackMapBottomCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/colorPrimaryDarkText"
+            android:visibility="gone"
+            app:cardCornerRadius="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:padding="4dp"
+                android:text="@string/app_name"
+                android:textAppearance="@style/TextAppearance.MaterialComponents.Body1"
+                android:textColor="@color/colorTextOnDark"
+                android:textStyle="bold" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!--<RelativeLayout
+            android:id="@+id/tempLogContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="96dp"
+            android:layout_marginEnd="8dp"
+            android:alpha="0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <TextView
+                android:id="@+id/tempLog"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:alpha="1"
+                android:background="@color/black_overlay"
+                android:gravity="bottom"
+                android:lines="4"
+                android:padding="4dp"
+                android:scrollbarStyle="insideInset"
+                android:scrollbars="vertical"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageButton
+                android:id="@+id/tempLogClearButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_margin="8dp"
+                android:background="@android:color/transparent"
+                android:importantForAccessibility="no"
+                android:padding="8dp"
+                android:src="@android:drawable/ic_menu_close_clear_cancel" />
+        </RelativeLayout>-->
+
+        <include
+            android:id="@+id/dialogMapTypeLayout"
+            layout="@layout/dialog_map_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:layout_constraintEnd_toEndOf="@id/switchMapStyleButton"
+            app:layout_constraintTop_toTopOf="@+id/switchMapStyleButton" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <include
-        android:id="@+id/dialogMapTypeLayout"
-        layout="@layout/dialog_map_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="@id/switchMapStyleButton"
-        app:layout_constraintTop_toTopOf="@+id/switchMapStyleButton" />
+        android:id="@+id/markerMapSelectedBottomSheet"
+        layout="@layout/marker_selected_bottom_sheet" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

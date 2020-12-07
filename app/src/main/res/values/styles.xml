@@ -89,4 +89,8 @@
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body1</item>
     </style>
 
+    <style name="ColorSwitchStyle">
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
+
 </resources>
