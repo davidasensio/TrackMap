@@ -8,7 +8,11 @@ apply plugin: 'com.google.firebase.crashlytics'
 // And load the properties
 def keystorePropertiesFile = rootProject.file("./keystore/keystore.properties")
 def keystoreProperties = new Properties()
-keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+try {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+} catch (Exception e) {
+    println("WARNING! Keystore files not found! KeystoreProperties couldn't be loaded")
+}
 
 android {
     compileSdkVersion 29
@@ -28,16 +32,20 @@ android {
 
     signingConfigs {
         config {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            try {
+                keyAlias keystoreProperties['keyAlias']
+                keyPassword keystoreProperties['keyPassword']
+                storeFile file(keystoreProperties['storeFile'])
+                storePassword keystoreProperties['storePassword']
+            } catch (Exception e) {
+                println("WARNING! KeystoreProperties are not loaded!")
+            }
         }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.config
         }
