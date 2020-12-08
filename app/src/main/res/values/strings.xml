@@ -91,8 +91,8 @@
 
     <string name="trackmap_item_name">Name:</string>
     <string name="trackmap_item_description">Description:</string>
-    <string name="trackmap_item_code">Code:</string>
-    <string name="trackmap_item_participants">Participants:</string>
+    <string name="trackmap_item_code">Code</string>
+    <string name="trackmap_item_participants">Participants</string>
     <string name="trackmap_item_action_leave">Leave</string>
     <string name="trackmap_item_action_go">Go!</string>
 </resources>

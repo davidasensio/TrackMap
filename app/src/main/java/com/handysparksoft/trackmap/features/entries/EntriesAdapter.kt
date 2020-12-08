@@ -4,6 +4,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
@@ -30,7 +31,6 @@ class EntriesAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val trackMap = items[position]
         holder.bind(trackMap)
-        //holder.itemView.setOnClickListener { listener(trackMap) }
     }
 
     inner class ViewHolder(private val itemBinding: ItemTrackmapBinding) :
@@ -43,16 +43,33 @@ class EntriesAdapter(
                 )
                 itemBinding.nameTextView.text = trackMap.name
                 itemBinding.descriptionTextView.text = trackMap.description
-                itemBinding.codeTextView.text = trackMap.trackMapId
-                itemBinding.participantsTextView.text = (trackMap.participantIds.size).toString()
-                itemBinding.goButton.setOnClickListener {
-                    onGoListener.invoke(trackMap)
-                }
-                itemBinding.leaveButton.setOnClickListener {
-                    onLeaveListener.invoke(trackMap)
-                }
+                itemBinding.codeBottomTextView.text = trackMap.trackMapId
+                itemBinding.participantsBottomTextView.text =
+                    (trackMap.participantIds.size).toString()
                 itemBinding.trackMapShareImageButton.setOnClickListener {
                     onShareListener.invoke(trackMap)
+                }
+                itemBinding.trackMapLeaveImageButton.setOnClickListener {
+                    onLeaveListener.invoke(trackMap)
+                }
+                itemBinding.trackMapFavoriteImageButton.setOnClickListener {
+                    val selected = it.tag == true
+                    if (selected) {
+                        itemBinding.trackMapFavoriteImageButton.colorFilter = null
+                        itemBinding.trackMapFavoriteImageButton.setImageResource(R.drawable.ic_star)
+                    } else {
+                        itemBinding.trackMapFavoriteImageButton.setColorFilter(
+                            ContextCompat.getColor(
+                                it.context,
+                                R.color.colorAccent
+                            )
+                        )
+                        itemBinding.trackMapFavoriteImageButton.setImageResource(R.drawable.ic_star_filled)
+                    }
+                    it.tag = !selected
+                }
+                itemBinding.trackMapItemContent.setOnClickListener {
+                    onGoListener.invoke(trackMap)
                 }
             }
         }

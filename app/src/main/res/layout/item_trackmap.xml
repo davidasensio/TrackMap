@@ -2,19 +2,35 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/trackMapItemContent"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="16dp"
     android:layout_marginTop="8dp"
     android:layout_marginEnd="16dp"
     android:layout_marginBottom="8dp"
-    android:background="@color/ThemeItemBackgroundColor"
+    android:background="@drawable/backgraound_trackmap_item"
     android:elevation="4dp"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
     android:orientation="horizontal"
     android:paddingStart="16dp"
     android:paddingTop="16dp"
     android:paddingEnd="16dp"
-    android:paddingBottom="8dp">
+    android:paddingBottom="8dp"
+    tools:ignore="UnusedAttribute"
+    tools:targetApi="m">
+
+    <ImageButton
+        android:id="@+id/trackMapFavoriteImageButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_share"
+        android:padding="8dp"
+        android:src="@drawable/ic_star"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/creationDateTextView"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/trackMapShareImageButton"
@@ -24,106 +40,124 @@
         android:contentDescription="@string/title_share"
         android:padding="8dp"
         android:src="@drawable/ic_share"
+        android:tint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/creationDateTextView" />
 
-    <TextView
-        android:id="@+id/creationDateTextView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="6dp"
-        android:ellipsize="end"
-        android:maxWidth="100dp"
-        android:maxLines="3"
-        android:textAlignment="center"
-        android:textSize="10sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/labelParticipantsTextView"
-        tools:ignore="SmallSp"
-        tools:text="Created by on 22-06-2020" />
-
-    <TextView
-        android:id="@+id/labelNameTextView"
+    <ImageButton
+        android:id="@+id/trackMapLeaveImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/trackmap_item_name"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/title_share"
+        android:padding="8dp"
+        android:src="@drawable/ic_delete"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/trackMapShareImageButton"
+        app:layout_constraintTop_toBottomOf="@+id/creationDateTextView" />
 
     <TextView
         android:id="@+id/nameTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textSize="18sp"
+        android:drawablePadding="12dp"
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="20sp"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toTopOf="@id/labelNameTextView"
-        tools:text="Valencia Bike Club" />
-
-    <TextView
-        android:id="@+id/labelDescriptionTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/trackmap_item_description"
+        app:drawableStartCompat="@drawable/ic_trackmap"
+        app:drawableTint="@color/colorPrimaryDark"
+        app:layout_constraintEnd_toStartOf="@id/trackMapFavoriteImageButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/labelNameTextView" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Valencia Bike Club" />
 
     <TextView
         android:id="@+id/descriptionTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         android:ellipsize="end"
-        android:lines="1"
-        android:maxLines="2"
-        android:textStyle="bold"
+        android:maxLines="3"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toTopOf="@id/labelDescriptionTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/nameTextView"
         tools:text="TrackMap summary" />
 
+    <View
+        android:id="@+id/horizontalSeparator1"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginEnd="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/creationDateTextView"
+        app:layout_constraintEnd_toStartOf="@id/creationDateTextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/creationDateTextView"
+        tools:layout_editor_absoluteX="16dp" />
 
     <TextView
-        android:id="@+id/labelCodeTextView"
+        android:id="@+id/creationDateTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/trackmap_item_code"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:maxWidth="220dp"
+        android:textAlignment="center"
+        android:textSize="10sp"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView" />
+        app:layout_constraintTop_toBottomOf="@+id/descriptionTextView"
+        tools:ignore="SmallSp"
+        tools:text="Created by on 22-06-2020" />
+
+    <View
+        android:id="@+id/horizontalSeparator2"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginStart="8dp"
+        android:background="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="@+id/creationDateTextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/creationDateTextView"
+        app:layout_constraintTop_toTopOf="@+id/creationDateTextView"
+        tools:layout_editor_absoluteX="16dp" />
 
     <TextView
-        android:id="@+id/codeTextView"
+        android:id="@+id/participantsBottomTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:drawablePadding="4dp"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:tooltipText="@string/trackmap_item_participants"
+        app:drawableStartCompat="@drawable/ic_participants"
+        app:drawableTint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalSeparator1"
+        tools:targetApi="o"
+        tools:text="23" />
+
+    <TextView
+        android:id="@+id/codeBottomTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:drawablePadding="4dp"
+        android:gravity="center"
         android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toTopOf="@id/labelCodeTextView"
-        tools:text="123-123" />
-
-    <TextView
-        android:id="@+id/labelParticipantsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="@string/trackmap_item_participants"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/labelCodeTextView" />
-
-    <TextView
-        android:id="@+id/participantsTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@id/guideline"
-        app:layout_constraintTop_toTopOf="@id/labelParticipantsTextView"
-        tools:text="15" />
+        android:tooltipText="@string/trackmap_item_code"
+        app:drawableStartCompat="@drawable/ic_qr_code"
+        app:drawableTint="@color/colorPrimary"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/participantsBottomTextView"
+        app:layout_constraintTop_toBottomOf="@+id/horizontalSeparator1"
+        tools:targetApi="o"
+        tools:text="233 - 123" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -142,6 +176,7 @@
             android:backgroundTint="@color/colorNotification"
             android:minWidth="110dp"
             android:text="@string/trackmap_item_action_leave"
+            android:visibility="gone"
             app:icon="@drawable/ic_delete"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -153,6 +188,7 @@
             android:layout_width="wrap_content"
             android:minWidth="110dp"
             android:text="@string/trackmap_item_action_go"
+            android:visibility="gone"
             app:icon="@drawable/ic_trackmap"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -165,6 +201,5 @@
         android:layout_height="match_parent"
         android:orientation="vertical"
         app:layout_constraintGuide_percent=".3" />
-
 
 </androidx.constraintlayout.widget.ConstraintLayout>
