@@ -26,7 +26,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders = [
-                deeplinkScheme: "trackmap.firebaseapp.com"
+                deeplinkScheme: "trackmap.page.link"
         ]
     }
 

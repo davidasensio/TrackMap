@@ -7,6 +7,7 @@ import java.nio.charset.Charset
 
 object DeeplinkHandler {
 
+    private const val BASE_URL = "https://trackmap.page.link/map"
     const val PARAM_TRACKMAP_CODE = "code"
 
     /**
@@ -14,7 +15,7 @@ object DeeplinkHandler {
      */
     fun generateDeeplink(activity: Activity, code: String, name: String) {
         val encodedCode = encodeBase64(code)
-        val joinTrackMapURL = "https://trackmap.firebaseapp.com?code=$encodedCode"
+        val joinTrackMapURL = "$BASE_URL?code=$encodedCode"
         val content =
             activity.getString(R.string.share_trackmap_link_content, name, joinTrackMapURL, code)
 
