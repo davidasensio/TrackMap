@@ -27,7 +27,7 @@ allprojects {
     }
 
     ext {
-        referenceVersionCode = 3
+        referenceVersionCode = 6
         referenceVersionName = "1.0.0"
 
         getCustomVersionCode = { referenceVersionCode ->
