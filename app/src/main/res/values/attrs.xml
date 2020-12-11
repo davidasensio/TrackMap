@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="ThemeBackgroundApp" type="drawable">@drawable/ic_tile_background</item>
+    <item name="ThemeBackgroundColor" type="color">#F9FAFA</item>
+    <item name="ThemeItemBackgroundColor" type="color">#FFFFFF</item>
+</resources>

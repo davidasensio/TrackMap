@@ -1,8 +1,98 @@
 <resources>
     <string name="app_name">TrackMap</string>
-    <string name="title_home">Create</string>
-    <string name="title_dashboard">Share</string>
+
+    <string name="cancel">Cancel</string>
+    <string name="close">Close</string>
+    <string name="leave">Leave</string>
+    <string name="settings">Settings</string>
+    <string name="action_crop">Crop</string>
+    <string name="you">you</string>
+    <string name="by_you">you</string>
+
+    <string name="title_home">Home</string>
+    <string name="title_join">Join</string>
+    <string name="title_create">Create</string>
+    <string name="title_share">Share</string>
     <string name="title_notifications">Notifications</string>
     <string name="title_activity_maps">Map</string>
     <string name="title_crash">Force crash</string>
+
+    <string name="search_trackmap">Search TrackMap</string>
+    <string name="your_trackmaps">Your TrackMaps</string>
+
+    <string name="create_code">Code</string>
+    <string name="create_name">Name</string>
+    <string name="create_description">Description</string>
+    <string name="create_trackmap">Create TrackMap</string>
+    <string name="create_trackmap_validation">Please, fill in all the fields</string>
+    <string name="create_info_text">Once the TrackMap is created it could be shared with the share action.</string>
+
+    <string name="code_helper_text">Unique TrackMap code</string>
+    <string name="name_helper_text">Name for the TrackMap</string>
+    <string name="description_helper_text">Short TrackMap description</string>
+    <string name="creation_template">Created <b>%1$s</b> by %2$s</string>
+    <string name="sampleTrackMapCode">999–333</string>
+
+    <string name="splash_slogan">Share your location with everybody you want.</string>
+    <string name="splash_author">By Handysparksoft</string>
+
+    <string name="leave_trackmap_question">Leave TrackMap \"%1$s\"?</string>
+    <string name="no_connection_error">No internet connection available</string>
+    <string name="unknown_error">Unknown error occurred: %1$s</string>
+
+    <string name="join_trackmap_code">Code</string>
+    <string name="join_trackmap_code_helper">Enter TrackMap code to join</string>
+    <string name="join_trackmap_validation">Please, provide a valid TrackMap code</string>
+    <string name="permission_need">Location permission is needed</string>
+    <string name="tooltip_frame_all_participants">Frame all participants</string>
+
+    <string name="tooltip_map_style">Change map style</string>
+    <string name="map_type_title">Map type</string>
+    <string name="map_type_default">Default</string>
+    <string name="map_type_satellite">Satellite</string>
+    <string name="map_type_terrain">Terrain</string>
+    <string name="switch_to_map_type">Switch to map type</string>
+
+    <string name="altitude">Altitude</string>
+    <string name="speed">Speed</string>
+    <string name="distance">Distance</string>
+    <string name="distance_from_you">Distance from you</string>
+
+    <string name="menu_main_order">Order</string>
+    <string name="menu_main_share_app">Share app</string>
+    <string name="menu_main_rate_this_app">Rate this app</string>
+
+    <string name="share_app_title">Try this App!</string>
+    <string name="share_app_content">Download TrackMap and share your location with everybody you want.</string>
+    <string name="share_app_google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.handysparksoft.trackmap</string>
+
+    <string name="sort_trackmaps_title">Sort TrackMaps by</string>
+    <string name="sort_trackmaps_by_date">Date (recent first)</string>
+    <string name="sort_trackmaps_by_name">Name (alphabetically)</string>
+    <string name="sort_trackmaps_by_participant_count">Number of participants</string>
+    <string name="sort_trackmaps_by_owner">Owner (Created by you first)</string>
+
+    <string name="profile_title">Profile</string>
+    <string name="profile_nickname">Nickname</string>
+    <string name="profile_nickname_helper_text">Short name</string>
+    <string name="profile_fullname">Full name</string>
+    <string name="profile_fullname_helper_text">Your full name</string>
+    <string name="profile_phone">Phone</string>
+    <string name="profile_phone_helper_text">Phone</string>
+    <string name="profile_save">Save</string>
+    <string name="user_profile_picture">User picture</string>
+    <string name="user_profile_pick_a_picture">Pick a picture</string>
+
+    <string name="user_info_title">User Info</string>
+    <string name="user_info_show_marker_info">Show info tooltip</string>
+
+    <string name="share_trackmap_link_title">Join this TrackMap!</string>
+    <string name="share_trackmap_link_content">Join TrackMap \"%1$s\" here in this link: %2$s\nOr just join using this code: \"%3$s\"</string>
+
+    <string name="trackmap_item_name">Name:</string>
+    <string name="trackmap_item_description">Description:</string>
+    <string name="trackmap_item_code">Code</string>
+    <string name="trackmap_item_participants">Participants</string>
+    <string name="trackmap_item_action_leave">Leave</string>
+    <string name="trackmap_item_action_go">Go!</string>
 </resources>

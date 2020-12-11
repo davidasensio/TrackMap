@@ -1,0 +1,36 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="43dp"
+    android:viewportWidth="24"
+    android:viewportHeight="43">
+  <path
+      android:pathData="M12.0401,42.427C8.0625,42.427 4.8382,41.1822 4.8382,39.6465C4.8382,38.2959 7.3333,37.1699 10.6411,36.9184L12.0097,39.8195L13.3818,36.9143C16.7184,37.1569 19.2422,38.2881 19.2422,39.6465C19.2422,41.1822 16.0179,42.427 12.0401,42.427"
+      android:strokeWidth="1"
+      android:fillColor="#C2C2BD"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M22.9018,16.749L22.9007,16.7496C23.4795,15.3567 23.8003,13.83 23.8003,12.2277C23.8003,5.716 18.5216,0.437 12.0097,0.437C5.498,0.437 0.219,5.716 0.219,12.2277C0.219,14.1984 0.705,16.0544 1.5597,17.6868L1.558,17.6885L1.6241,17.8126L1.6517,17.8642L12.0097,39.8195L22.8697,16.8264L22.9018,16.749"
+      android:strokeWidth="1"
+      android:fillColor="#B8C43A"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M20.1538,12.2277C20.1538,16.7255 16.5075,20.3718 12.0097,20.3718C7.5121,20.3718 3.8658,16.7255 3.8658,12.2277C3.8658,7.7298 7.5121,4.0838 12.0097,4.0838C16.5075,4.0838 20.1538,7.7298 20.1538,12.2277"
+      android:strokeWidth="1"
+      android:fillColor="#F3F4F1"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M12.0097,39.8195L12.0097,20.3718C16.5075,20.3718 20.1538,16.7255 20.1538,12.2277C20.1538,7.7298 16.5075,4.0838 12.0097,4.0838L12.0097,0.437C18.5216,0.437 23.8003,5.716 23.8003,12.2277C23.8003,13.83 23.4795,15.3567 22.9007,16.7496L22.9018,16.749L22.8697,16.8264L12.0097,39.8195"
+      android:strokeWidth="1"
+      android:fillColor="#A8B239"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M12.0097,20.3718L12.0097,4.0838C16.5075,4.0838 20.1538,7.7298 20.1538,12.2277C20.1538,16.7255 16.5075,20.3718 12.0097,20.3718"
+      android:strokeWidth="1"
+      android:fillColor="#D9D9D4"
+      android:fillType="evenOdd"
+      android:strokeColor="#00000000"/>
+</vector>

@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/markerMapSelectedContent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/ThemeBackgroundColor"
+    android:paddingTop="16dp"
+    android:paddingBottom="48dp"
+    app:behavior_hideable="true"
+    app:layout_behavior="@string/bottom_sheet_behavior">
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/draggableMark"
+        android:layout_width="32dp"
+        android:layout_height="18dp"
+        android:backgroundTint="@color/colorTextCaption"
+        android:enabled="false"
+        app:cornerRadius="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/userNickname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="8dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:lines="1"
+        android:text="@string/user_info_title"
+        android:textSize="22sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/draggableMark" />
+
+    <View
+        android:id="@+id/separator"
+        android:layout_width="0dp"
+        android:layout_height="0.5dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/colorPrimaryDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userNickname" />
+
+    <com.handysparksoft.trackmap.core.custom.ScalarView
+        android:id="@+id/userSpeed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/separator"
+        app:scalarDrawable="@drawable/ic_speed"
+        app:scalarName="@string/speed"
+        app:scalarUnit="Km/h"
+        app:scalarValue="0" />
+
+    <com.handysparksoft.trackmap.core.custom.ScalarView
+        android:id="@+id/userAltitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="@id/middle"
+        app:layout_constraintTop_toBottomOf="@+id/separator"
+        app:scalarDrawable="@drawable/ic_altitude"
+        app:scalarName="@string/altitude"
+        app:scalarUnit="m"
+        app:scalarValue="0" />
+
+    <com.handysparksoft.trackmap.core.custom.ScalarView
+        android:id="@+id/userDistanceFromYou"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userSpeed"
+        app:scalarDrawable="@drawable/ic_ruler"
+        app:scalarName="@string/distance_from_you"
+        app:scalarUnit="m"
+        app:scalarValue="0" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/userShowInfoToggle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:checked="false"
+        android:text="@string/user_info_show_marker_info"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        android:textColor="@color/colorTextCaption"
+        android:textSize="12sp"
+        android:theme="@style/ColorSwitchStyle"
+        app:layout_constraintStart_toStartOf="@+id/middle"
+        app:layout_constraintTop_toBottomOf="@+id/userAltitude" />
+
+    <com.handysparksoft.trackmap.core.custom.CircleImageView
+        android:id="@+id/userProfileImage"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/ic_person_pin_placeholder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/userDistanceFromYou" />
+
+    <TextView
+        android:id="@+id/userFullName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:lines="1"
+        app:layout_constraintStart_toEndOf="@id/userProfileImage"
+        app:layout_constraintTop_toTopOf="@id/userProfileImage"
+        tools:text="User Name" />
+
+    <TextView
+        android:id="@+id/userPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:drawablePadding="8dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@android:color/holo_blue_dark"
+        app:drawableStartCompat="@drawable/ic_phone"
+        app:layout_constraintBottom_toBottomOf="@id/userProfileImage"
+        app:layout_constraintStart_toEndOf="@id/userProfileImage"
+        tools:text="+34 654 23 87" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/middle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
