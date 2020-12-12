@@ -2,9 +2,11 @@ package com.handysparksoft.trackmap.core.extension
 
 import android.R
 import android.graphics.Color
+import android.os.Handler
 import android.transition.TransitionManager
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import androidx.annotation.StringRes
 import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.trackmap.core.platform.Easing
@@ -64,7 +66,23 @@ fun View.showTransitionTo(endView: View, easing: Easing) {
     transition.addTarget(endView)
 
     // Trigger the container transform transition
-    TransitionManager.beginDelayedTransition(this.rootView as ViewGroup?, transition as android.transition.Transition)
+    TransitionManager.beginDelayedTransition(
+        this.rootView as ViewGroup?,
+        transition as android.transition.Transition
+    )
     this.visibility = View.INVISIBLE
     endView.visibility = View.VISIBLE
+}
+
+fun View.onPreDraw(callback: () -> Unit) {
+    val treeObserver = this.viewTreeObserver
+    treeObserver.addOnPreDrawListener(object : ViewTreeObserver.OnPreDrawListener {
+        override fun onPreDraw(): Boolean {
+            Handler().postDelayed({
+                callback.invoke()
+            }, 250)
+            treeObserver.removeOnPreDrawListener(this)
+            return false
+        }
+    })
 }

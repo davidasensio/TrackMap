@@ -29,6 +29,10 @@ class Prefs @Inject constructor(context: Context) {
         get() = prefs.getBoolean(KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY, false)
         set(value) = prefs.edit().putBoolean(KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY, value).apply()
 
+    var onboardingSpotlightViewed: Boolean
+        get() = prefs.getBoolean(KEY_ONBOARDING_SPOTLIGHT_VIEWED, false)
+        set(value) = prefs.edit().putBoolean(KEY_ONBOARDING_SPOTLIGHT_VIEWED, value).apply()
+
     var lastLocationLatitude: Float
         get() = prefs.getFloat(KEY_LAST_LOCATION_LATITUDE, 0f)
         set(value) = prefs.edit().putFloat(KEY_LAST_LOCATION_LATITUDE, value).apply()
@@ -49,6 +53,7 @@ class Prefs @Inject constructor(context: Context) {
         private const val KEY_USER_PROFILE_DATA = "key_user_profile_data"
         private const val KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME = "key_splash_screen_viewed_first"
         private const val KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY = "key_splash_screen_viewed_after"
+        private const val KEY_ONBOARDING_SPOTLIGHT_VIEWED = "key_onboarding_spotlight_viewed"
         private const val KEY_LAST_LOCATION_LATITUDE = "key_last_location_latitude"
         private const val KEY_LAST_LOCATION_LONGITUDE = "key_last_location_longitude"
     }

@@ -26,7 +26,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         manifestPlaceholders = [
-                deeplinkScheme: "trackmap.firebaseapp.com"
+                deeplinkScheme: "trackmap.page.link"
         ]
     }
 
@@ -80,6 +80,7 @@ dependencies {
     implementation networkLibs.values()
     implementation firebaseLibs.values()
     implementation imageLibs.values()
+    implementation miscLibs.values()
     implementation libs.values()
 
     kapt kaptLibs.values()

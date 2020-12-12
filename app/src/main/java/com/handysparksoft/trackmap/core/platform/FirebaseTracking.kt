@@ -35,6 +35,10 @@ class FirebaseTracking(context: Context) {
 }
 
 sealed class TrackEvent {
+    object OnboardingStarted : TrackEvent()
+    object OnboardingEnded : TrackEvent()
+    object OnboardingCompleted : TrackEvent()
+
     object HomeActionClick : TrackEvent()
     object JoinActionClick : TrackEvent()
     object CreateActionClick : TrackEvent()

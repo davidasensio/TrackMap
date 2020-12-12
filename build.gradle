@@ -27,7 +27,7 @@ allprojects {
     }
 
     ext {
-        referenceVersionCode = 6
+        referenceVersionCode = 7
         referenceVersionName = "1.0.0"
 
         getCustomVersionCode = { referenceVersionCode ->
@@ -103,6 +103,10 @@ allprojects {
         imageLibs = [
                 glide   : "com.github.bumptech.glide:glide:$glide_version",
                 cropView: "com.github.takusemba:cropme:2.0.7"
+        ]
+
+        miscLibs = [
+                takusemba: "com.github.takusemba:spotlight:2.0.3"
         ]
 
         libs = [
