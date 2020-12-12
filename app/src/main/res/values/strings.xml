@@ -95,4 +95,15 @@
     <string name="trackmap_item_participants">Participants</string>
     <string name="trackmap_item_action_leave">Leave</string>
     <string name="trackmap_item_action_go">Go!</string>
+
+    <string name="spotlight_welcome">Welcome to TrackMap</string>
+    <string name="spotlight_skip">Skip</string>
+    <string name="spotlight_next">Next</string>
+
+    <string name="onboarding_profile">First, set your profile data here</string>
+    <string name="onboarding_bottom_nav_join">Then join a TrackMap with a code</string>
+    <string name="onboarding_bottom_nav_create">Or just create your own one and share it!</string>
+    <string name="onboarding_trackmaps">Here you will see all your joined or created TrackMaps</string>
+    <string name="onboarding_menu">Options to sort the data or share the app will be here</string>
+    <string name="onboarding_bottom_nav_home">Come home whenever you want :) </string>
 </resources>
