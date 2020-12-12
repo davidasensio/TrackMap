@@ -95,4 +95,15 @@
     <string name="trackmap_item_participants">Participantes</string>
     <string name="trackmap_item_action_leave">Abandonar</string>
     <string name="trackmap_item_action_go">Ir!</string>
+
+    <string name="spotlight_welcome">Bienvenido a TrackMap</string>
+    <string name="spotlight_skip">Saltar</string>
+    <string name="spotlight_next">Siguiente</string>
+
+    <string name="onboarding_profile">Primero, establece tus datos de perfil</string>
+    <string name="onboarding_bottom_nav_join">Luego únete a un TrackMap mediante el código</string>
+    <string name="onboarding_bottom_nav_create">O simplemente crea el tuyo propio y comparte!</string>
+    <string name="onboarding_trackmaps">Aquí verás todos tus TrackMaps</string>
+    <string name="onboarding_menu">Opciones como ordenar los datos o compartir la app estarán aquí</string>
+    <string name="onboarding_bottom_nav_home">Vuelve a casa cuando quieras :)</string>
 </resources>

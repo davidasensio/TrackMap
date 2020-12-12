@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:background="@color/spotlightBackground">
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/spotlight_welcome"
+        style="@style/SpotlightTextViewStyle"
+        android:textSize="32sp"
+        android:textAllCaps="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/spotlightCloseTarget"
+        style="@style/Secondary.Medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="32dp"
+        android:minWidth="130dp"
+        android:text="@string/spotlight_next"
+        android:textColor="@color/colorTextOnDark"
+        app:icon="@drawable/ic_navigate_next"
+        app:iconGravity="end"
+        app:iconTint="@color/colorTextOnDark"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/spotlightClose"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeText"
+        app:strokeColor="@color/colorTextOnDark" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/spotlightClose"
+        style="@style/Secondary.Medium"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="16dp"
+        android:minWidth="130dp"
+        android:text="@string/spotlight_skip"
+        android:textColor="@color/colorTextOnDark"
+        app:icon="@drawable/ic_close"
+        app:iconTint="@color/colorTextOnDark"
+        app:layout_constraintEnd_toStartOf="@+id/spotlightCloseTarget"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/welcomeText"
+        app:strokeColor="@color/colorTextOnDark" />
+
+    <TextView
+        android:id="@+id/spotlightTopLeftTextView"
+        style="@style/SpotlightTextViewStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="140dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="60dp"
+        app:layout_constraintBottom_toTopOf="@id/middleGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Top Left comment" />
+
+    <TextView
+        android:id="@+id/spotlightTopRightTextView"
+        style="@style/SpotlightTextViewStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="140dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toTopOf="@id/middleGuideline"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="Top Right comment" />
+
+    <TextView
+        android:id="@+id/spotlightBottomLeftTextView"
+        style="@style/SpotlightTextViewStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="140dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/middleGuideline"
+        tools:text="Bottom Left comment" />
+
+    <TextView
+        android:id="@+id/spotlightBottomRightTextView"
+        style="@style/SpotlightTextViewStyle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="140dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/middleGuideline"
+        tools:text="Bottom Right comment" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/middleGuideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".5" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

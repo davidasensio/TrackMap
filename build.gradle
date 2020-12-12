@@ -105,6 +105,10 @@ allprojects {
                 cropView: "com.github.takusemba:cropme:2.0.7"
         ]
 
+        miscLibs = [
+                takusemba: "com.github.takusemba:spotlight:2.0.3"
+        ]
+
         libs = [
                 firebaseCrashlytics: "com.google.firebase:firebase-crashlytics:17.2.1",
                 googleAnalytics    : "com.google.firebase:firebase-analytics:17.5.0",

@@ -41,7 +41,7 @@
     <style name="Primary.Small">
         <item name="android:layout_height">30dp</item>
         <item name="android:padding">0dp</item>
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">10sp</item>
         <item name="cornerRadius">15dp</item>
     </style>
 
@@ -58,7 +58,7 @@
     <style name="Secondary.Small">
         <item name="android:layout_height">30dp</item>
         <item name="android:padding">0dp</item>
-        <item name="android:textSize">10dp</item>
+        <item name="android:textSize">10sp</item>
         <item name="cornerRadius">15dp</item>
     </style>
 
@@ -91,6 +91,15 @@
 
     <style name="ColorSwitchStyle">
         <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
+
+    <!-- Spotlight -->
+    <style name="SpotlightTextViewStyle">
+        <item name="android:gravity">center</item>
+        <item name="android:textColor">@color/spotlightColorText</item>
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">@font/annie_use_your_telescope</item>
     </style>
 
 </resources>
