@@ -163,9 +163,18 @@ class MainActivity : AppCompatActivity() {
             activity = this,
             targetViews = targets,
             tooltips = tooltips,
-            onStarted = { onboardingStarted = true },
-            onEnded = { onboardingEnded = true },
-            onCompleted = { prefs.onboardingSpotlightViewed = true }
+            onStarted = {
+                onboardingStarted = true
+                TrackEvent.OnboardingStarted.track()
+            },
+            onEnded = {
+                TrackEvent.OnboardingEnded.track()
+                onboardingEnded = true
+            },
+            onCompleted = {
+                prefs.onboardingSpotlightViewed = true
+                TrackEvent.OnboardingCompleted.track()
+            }
         )
     }
 
