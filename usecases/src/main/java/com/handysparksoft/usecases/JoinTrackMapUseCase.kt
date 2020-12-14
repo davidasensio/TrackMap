@@ -2,6 +2,7 @@ package com.handysparksoft.usecases
 
 import com.handysparksoft.data.Result
 import com.handysparksoft.data.repository.TrackMapRepository
+import com.handysparksoft.domain.model.PushNotification
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.TrackMapParticipant
 
@@ -31,5 +32,9 @@ class JoinTrackMapUseCase(private val trackMapRepository: TrackMapRepository) {
             // Not found
         }
         return null
+    }
+
+    suspend fun executeSendPushNotification(authorization: String, pushNotification: PushNotification) {
+        trackMapRepository.sendPushNotification(authorization,  pushNotification)
     }
 }

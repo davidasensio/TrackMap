@@ -53,7 +53,7 @@ class JoinFragment : Fragment() {
             validateForm { success ->
                 if (success) {
                     val trackMapCode = binding.joinCodeEditText.text.toString()
-                    viewModel.joinTrackMap(trackMapCode, true)
+                    viewModel.joinTrackMap(requireContext(), trackMapCode, true)
                 } else {
                     binding.root.snackbar(
                         message = getString(R.string.join_trackmap_validation),

@@ -8,6 +8,4 @@ data class UserProfileData(
     val fullName: String,
     val phone: String,
     val image: String? // Base64 format
-) : Serializable {
-
-}
+) : Serializable

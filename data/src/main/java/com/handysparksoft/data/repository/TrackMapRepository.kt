@@ -2,15 +2,12 @@ package com.handysparksoft.data.repository
 
 import com.handysparksoft.data.Result
 import com.handysparksoft.data.source.RemoteDataSource
-import com.handysparksoft.domain.model.TrackMap
-import com.handysparksoft.domain.model.TrackMapParticipant
-import com.handysparksoft.domain.model.UserGPSData
-import com.handysparksoft.domain.model.UserProfileData
+import com.handysparksoft.domain.model.*
 
 class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
 
-    suspend fun saveUser(userId: String) {
-        remoteDataSource.saveUser(userId)
+    suspend fun saveUser(userId: String, userToken: String?) {
+        remoteDataSource.saveUser(userId, userToken)
     }
 
     suspend fun updateUserProfile(userId: String, userProfileData: UserProfileData) {
@@ -51,5 +48,13 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
 
     suspend fun getUserProfileData(userId: String): Result<UserProfileData> {
         return remoteDataSource.getUserProfileData(userId)
+    }
+
+    suspend fun getUserAccessData(userId: String): Result<UserAccessData> {
+        return remoteDataSource.getUserAccessData(userId)
+    }
+
+    suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification) {
+        return remoteDataSource.sendPushNotification(authorization, pushNotification)
     }
 }

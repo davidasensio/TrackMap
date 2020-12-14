@@ -34,8 +34,8 @@ interface AppComponent {
     fun inject(trackMapActivity: TrackMapActivity)
     fun inject(locationForegroundService: LocationForegroundService)
     fun inject(splashActivity: SplashActivity)
-    fun inject(app: App)
     fun inject(firebaseTracking: FirebaseTracking)
+    fun inject(app: App)
 
     @Component.Factory
     interface Factory {

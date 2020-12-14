@@ -106,4 +106,7 @@
     <string name="onboarding_trackmaps">Aquí verás todos tus TrackMaps</string>
     <string name="onboarding_menu">Opciones como ordenar los datos o compartir la app estarán aquí</string>
     <string name="onboarding_bottom_nav_home">Vuelve a casa cuando quieras :)</string>
+
+    <string name="push_notification_user_joined_title">Nuevo participante en TrackMap</string>
+    <string name="push_notification_user_joined_message">%1$s se ha unido a %2$s</string>
 </resources>
