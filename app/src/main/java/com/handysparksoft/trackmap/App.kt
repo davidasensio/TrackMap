@@ -29,6 +29,7 @@ class App : Application() {
         // Initialize Firebase Analytics
         firebaseAnalytics = FirebaseAnalytics.getInstance(this)
         FirebaseTracking(this)
+        firebaseAnalytics.setUserId(userHandler.getUserId())
     }
 
     companion object {
