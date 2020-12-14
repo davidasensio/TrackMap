@@ -22,7 +22,8 @@ class ViewModelModule {
         leaveTrackMapUseCase: LeaveTrackMapUseCase,
         saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
         updateUserLocationUseCase: UpdateUserLocationUseCase,
-        userHandler: UserHandler
+        userHandler: UserHandler,
+        prefs: Prefs
     ) =
         MainViewModelFactory(
             getTrackMapsUseCase,
@@ -31,7 +32,8 @@ class ViewModelModule {
             leaveTrackMapUseCase,
             saveUserTrackMapUseCase,
             updateUserLocationUseCase,
-            userHandler
+            userHandler,
+            prefs
         )
 
     @Provides
@@ -50,11 +52,13 @@ class ViewModelModule {
     fun joinViewModelFactoryProvider(
         joinTrackMapUseCase: JoinTrackMapUseCase,
         saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
+        getUserAccessDataUseCase: GetUserAccessDataUseCase,
         userHandler: UserHandler
     ) =
         JoinViewModelFactory(
             joinTrackMapUseCase,
             saveUserTrackMapUseCase,
+            getUserAccessDataUseCase,
             userHandler
         )
 

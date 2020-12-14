@@ -53,7 +53,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".features.main.MainActivity"/>
+        <activity android:name=".features.main.MainActivity" />
 
         <activity
             android:name=".features.trackmap.TrackMapActivity"
@@ -79,6 +79,25 @@
                 <action android:name="android.intent.action.ACTION_BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+
+        <!-- Push notifications -->
+        <service
+            android:name=".core.platform.MessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+
+        <!-- Set custom default icon. This is use when no icon is set for incoming notification messages. See README(https://goo.gl/l4GJaQ) for more. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_trackmap" />
+
+        <!-- Set color used with incoming notification messages. This is used when no color is set for the incoming notification message. See README(https://goo.gl/6BKBk7) for more. -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorIconPushNotification" />
     </application>
 
 </manifest>

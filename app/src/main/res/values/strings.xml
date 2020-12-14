@@ -106,4 +106,7 @@
     <string name="onboarding_trackmaps">Here you will see all your joined or created TrackMaps</string>
     <string name="onboarding_menu">Options to sort the data or share the app will be here</string>
     <string name="onboarding_bottom_nav_home">Come home whenever you want :) </string>
+
+    <string name="push_notification_user_joined_title">New TrackMap participant</string>
+    <string name="push_notification_user_joined_message">%1$s has joined %2$s</string>
 </resources>

@@ -21,6 +21,11 @@ class Prefs @Inject constructor(context: Context) {
             prefs.edit().putString(KEY_USER_PROFILE_DATA, serializedValue).apply()
         }
 
+    var userToken: String?
+        get() = prefs.getString(KEY_USER_FIREBASE_TOKEN, null)
+        set(value) = prefs.edit().putString(KEY_USER_FIREBASE_TOKEN, value).apply()
+
+
     var splashScreenViewedForFirstTime: Boolean
         get() = prefs.getBoolean(KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME, false)
         set(value) = prefs.edit().putBoolean(KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME, value).apply()
@@ -50,6 +55,7 @@ class Prefs @Inject constructor(context: Context) {
 
 
     companion object {
+        private const val KEY_USER_FIREBASE_TOKEN = "key_user_firebase_token"
         private const val KEY_USER_PROFILE_DATA = "key_user_profile_data"
         private const val KEY_SPLASH_SCREEN_VIEWED_FOR_FIRST_TIME = "key_splash_screen_viewed_first"
         private const val KEY_SPLASH_SCREEN_VIEWED_AFTER_DESTROY = "key_splash_screen_viewed_after"
