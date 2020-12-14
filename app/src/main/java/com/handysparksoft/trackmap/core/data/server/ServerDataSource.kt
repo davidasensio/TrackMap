@@ -8,8 +8,8 @@ import com.handysparksoft.trackmap.core.data.server.NetworkHelper.safeApiCall
 class ServerDataSource(private val service: TrackMapService) : RemoteDataSource {
 
 
-    override suspend fun saveUser(userId: String) {
-        val user = User(userId, System.currentTimeMillis())
+    override suspend fun saveUser(userId: String, userToken: String?) {
+        val user = UserAccessData(userId, userToken, System.currentTimeMillis())
         safeApiCall { service.saveUser(userId, user) }
     }
 
@@ -78,5 +78,13 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
 
     override suspend fun getUserProfileData(userId: String): Result<UserProfileData> {
         return safeApiCall { service.getUserProfileData(userId) }
+    }
+
+    override suspend fun getUserAccessData(userId: String): Result<UserAccessData> {
+        return safeApiCall { service.getUserAccessData(userId) }
+    }
+
+    override suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification) {
+        safeApiCall { service.sendPushNotification(authorization, pushNotification) }
     }
 }

@@ -9,6 +9,9 @@ interface TrackMapService {
     suspend fun getUsers(): Map<String, UserTrackMaps>
 
     @GET("users/{userId}.json")
+    suspend fun getUserAccessData(@Path("userId") userId: String): UserAccessData
+
+    @GET("users/{userId}.json")
     suspend fun getUserProfileData(@Path("userId") userId: String): UserProfileData
 
     @GET("trackMaps.json")
@@ -20,7 +23,7 @@ interface TrackMapService {
     @PATCH("users/{userId}.json")
     suspend fun saveUser(
         @Path("userId") userId: String,
-        @Body user: User
+        @Body userAccessData: UserAccessData
     )
 
     @PATCH("users/{userId}.json")
@@ -70,5 +73,12 @@ interface TrackMapService {
     suspend fun deleteTrackMapParticipantId(
         @Path("trackMapId") trackMapId: String,
         @Body trackMapParticipant: TrackMapParticipant
+    )
+
+    @Headers("Content-Type: application/json")
+    @POST("https://fcm.googleapis.com/fcm/send")
+    suspend fun sendPushNotification(
+        @Header("Authorization") authorization: String,
+        @Body pushNotification: PushNotification
     )
 }

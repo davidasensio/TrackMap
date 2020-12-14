@@ -1,6 +1,7 @@
 package com.handysparksoft.domain.model
 
-data class User(
+data class UserAccessData(
     val id: String,
+    val userToken: String?,
     val lastAccess: Long
 )

@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.core.platform.Event
+import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.Scope
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.usecases.*
@@ -21,7 +22,8 @@ class MainViewModel(
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val updateUserLocationUseCase: UpdateUserLocationUseCase,
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val prefs: Prefs
 ) : ViewModel(), Scope by Scope.Impl() {
 
     sealed class UiModel {
@@ -97,7 +99,7 @@ class MainViewModel(
 
     fun saveUser() {
         launch(Dispatchers.Main) {
-            saveUserUseCase.execute(userHandler.getUserId(), "default")
+            saveUserUseCase.execute(userHandler.getUserId(), prefs.userToken)
         }
     }
 
@@ -155,7 +157,8 @@ class MainViewModelFactory(
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val updateUserLocationUseCase: UpdateUserLocationUseCase,
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val prefs: Prefs
 ) :
     ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
@@ -166,7 +169,8 @@ class MainViewModelFactory(
             leaveTrackMapUseCase::class.java,
             saveUserTrackMapUseCase::class.java,
             updateUserLocationUseCase::class.java,
-            userHandler::class.java
+            userHandler::class.java,
+            prefs::class.java
         ).newInstance(
             getTrackMapsUseCase,
             saveUserUseCase,
@@ -174,7 +178,8 @@ class MainViewModelFactory(
             leaveTrackMapUseCase,
             saveUserTrackMapUseCase,
             updateUserLocationUseCase,
-            userHandler
+            userHandler,
+            prefs
         )
     }
 }

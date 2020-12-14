@@ -45,6 +45,10 @@ class UseCaseModule {
         GetUserProfileDataUseCase(trackMapRepository)
 
     @Provides
+    fun getUserAccessDataUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        GetUserAccessDataUseCase(trackMapRepository)
+
+    @Provides
     fun updateUserProfileUseCaseProvider(trackMapRepository: TrackMapRepository) =
         UpdateUserProfileUseCase(trackMapRepository)
 }
