@@ -67,7 +67,6 @@ class JoinViewModel(
         trackMap: TrackMap
     ) {
         launch(Dispatchers.IO) {
-            val joinedUser = userHandler.getUserNickname()
             val tokens = mutableListOf<String>()
             val awaitAll = trackMap.participantIds.filter { it != userId }.map {
                 async { getUserAccessDataUseCase.execute(it) }
@@ -80,11 +79,14 @@ class JoinViewModel(
             }
 
             if (tokens.isNotEmpty()) {
+                val participant = userHandler.getUserNickname()
+                    ?: context.getString(R.string.push_notification_generic_user_joined_message)
+
                 val notificationData = NotificationData(
                     title = context.getString(R.string.push_notification_user_joined_title),
                     body = context.getString(
                         R.string.push_notification_user_joined_message,
-                        joinedUser,
+                        participant,
                         trackMap.name
                     )
                 )

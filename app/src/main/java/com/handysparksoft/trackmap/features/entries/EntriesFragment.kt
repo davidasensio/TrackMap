@@ -26,6 +26,7 @@ import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBinding
 import com.handysparksoft.trackmap.databinding.FragmentEntriesBinding
 import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
 import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
+import com.handysparksoft.trackmap.features.join.JoinViewModel
 import com.handysparksoft.trackmap.features.main.MainActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import javax.inject.Inject
@@ -41,6 +42,13 @@ class EntriesFragment : Fragment() {
             this,
             requireActivity().app.component.mainViewModelFactory
         ).get(MainViewModel::class.java)
+    }
+
+    private val joinViewModel: JoinViewModel by lazy {
+        ViewModelProvider(
+            this,
+            requireActivity().app.component.joinViewModelFactory
+        ).get(JoinViewModel::class.java)
     }
 
     @Inject
@@ -75,8 +83,8 @@ class EntriesFragment : Fragment() {
         return bindingHolder.binding.root
     }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         activity?.let { fragmentActivity ->
             fragmentActivity.app.component.inject(this)
@@ -89,7 +97,7 @@ class EntriesFragment : Fragment() {
         viewModel.goEvent.observe(viewLifecycleOwner, Observer(::onGoEvent))
         viewModel.leaveEvent.observe(viewLifecycleOwner, Observer(::onLeaveEvent))
         viewModel.shareEvent.observe(viewLifecycleOwner, Observer(::onShareEvent))
-        viewModel.joinFeedbackEvent.observe(viewLifecycleOwner, Observer(::onJoinFeedbackEvent))
+        joinViewModel.joinFeedbackEvent.observe(viewLifecycleOwner, Observer(::onJoinFeedbackEvent))
         viewModel.saveUser()
 
         setupUI()
@@ -207,6 +215,7 @@ class EntriesFragment : Fragment() {
             ) {
                 // Nothing to do
             }
+            viewModel.refresh()
         }
     }
 
@@ -222,7 +231,8 @@ class EntriesFragment : Fragment() {
             requireActivity().intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
-            viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
+//            viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
+            joinViewModel.joinTrackMap(context = requireContext(), trackMapCode = decodedCode, showFeedback = true)
         }
     }
 
