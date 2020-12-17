@@ -33,9 +33,25 @@
         android:lines="1"
         android:text="@string/user_info_title"
         android:textSize="22sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/draggableMark" />
+
+    <TextView
+        android:id="@+id/userLastActivity"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="4dp"
+        android:ellipsize="end"
+        android:gravity="center"
+        android:lines="1"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/userNickname"
+        tools:text="Hace 10 min" />
 
     <View
         android:id="@+id/separator"
@@ -45,7 +61,7 @@
         android:background="@color/colorPrimaryDark"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userNickname" />
+        app:layout_constraintTop_toBottomOf="@+id/userLastActivity" />
 
     <com.handysparksoft.trackmap.core.custom.ScalarView
         android:id="@+id/userSpeed"
