@@ -94,7 +94,12 @@ class MainViewModel(
 
     fun saveUser() {
         launch(Dispatchers.Main) {
-            saveUserUseCase.execute(userHandler.getUserId(), prefs.userToken)
+            saveUserUseCase.execute(
+                userHandler.getUserId(),
+                userHandler.getUserBatteryLevel().toLong(),
+                prefs.userToken,
+                System.currentTimeMillis()
+            )
         }
     }
 

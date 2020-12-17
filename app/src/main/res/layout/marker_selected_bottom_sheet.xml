@@ -40,10 +40,11 @@
 
     <TextView
         android:id="@+id/userLastActivity"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
         android:layout_marginTop="4dp"
+        android:drawablePadding="8dp"
         android:ellipsize="end"
         android:gravity="center"
         android:lines="1"
@@ -51,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userNickname"
-        tools:text="Hace 10 min" />
+        tools:text="5 minutes ago" />
 
     <View
         android:id="@+id/separator"
@@ -116,15 +117,29 @@
         app:layout_constraintStart_toStartOf="@+id/middle"
         app:layout_constraintTop_toBottomOf="@+id/userAltitude" />
 
-    <com.handysparksoft.trackmap.core.custom.CircleImageView
-        android:id="@+id/userProfileImage"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+    <RelativeLayout
+        android:id="@+id/userProfileImageLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="48dp"
-        android:background="@drawable/ic_person_pin_placeholder"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/userDistanceFromYou" />
+        app:layout_constraintTop_toBottomOf="@+id/userDistanceFromYou">
+
+        <com.handysparksoft.trackmap.core.custom.CircleImageView
+            android:id="@+id/userProfileImage"
+            android:layout_width="50dp"
+            android:layout_centerHorizontal="true"
+            android:layout_height="50dp"
+            android:background="@drawable/ic_person_pin_placeholder" />
+
+        <com.handysparksoft.trackmap.core.custom.BatteryLevelView
+            android:id="@+id/userBatteryLevel"
+            android:layout_width="wrap_content"
+            android:layout_alignTop="@id/userProfileImage"
+            android:layout_marginTop="36dp"
+            android:layout_height="wrap_content"/>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/userFullName"
@@ -133,8 +148,8 @@
         android:layout_marginStart="16dp"
         android:ellipsize="end"
         android:lines="1"
-        app:layout_constraintStart_toEndOf="@id/userProfileImage"
-        app:layout_constraintTop_toTopOf="@id/userProfileImage"
+        app:layout_constraintStart_toEndOf="@id/userProfileImageLayout"
+        app:layout_constraintTop_toTopOf="@id/userProfileImageLayout"
         tools:text="User Name" />
 
     <TextView
@@ -147,8 +162,9 @@
         android:lines="1"
         android:textColor="@android:color/holo_blue_dark"
         app:drawableStartCompat="@drawable/ic_phone"
-        app:layout_constraintBottom_toBottomOf="@id/userProfileImage"
-        app:layout_constraintStart_toEndOf="@id/userProfileImage"
+        app:layout_constraintBottom_toBottomOf="@id/userProfileImageLayout"
+        app:layout_constraintStart_toEndOf="@id/userProfileImageLayout"
+        app:layout_constraintTop_toBottomOf="@+id/userFullName"
         tools:text="+34 654 23 87" />
 
     <androidx.constraintlayout.widget.Guideline

@@ -546,7 +546,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 jsonValue,
                                 ParticipantLocation::class.java
                             )
-                            participants.add(participantLocation.copy(userId = id))
+                            val batteryLevel = participantLocation.batteryLevel ?: 100
+                            participants.add(participantLocation.copy(userId = id, batteryLevel = batteryLevel))
                             logDebug("Loaded participant data of: $participantIds")
                         }
 
@@ -604,6 +605,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "altitudeAMSL" -> it.altitudeAMSL = snapshot.value as Long
                         "altitudeGeoid" -> it.altitudeGeoid = snapshot.value as Long
                         "speed" -> it.speed = snapshot.value as Long
+                        "batteryLevel" -> it.batteryLevel = snapshot.value as Long
                         "lastAccess" -> it.lastAccess = snapshot.value as Long
                     }
                 }
@@ -824,6 +826,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     participantLocation.image.let { userImage ->
                         userProfileImage.setImageBitmap(Base64Utils.getBase64Bitmap(userImage))
                     }
+
+                    userBatteryLevel.level = participantLocation.batteryLevel?.toInt() ?: 100
 
                     userShowInfoToggle.isChecked = userMarkerData.isShowingInfoWindow
                 }

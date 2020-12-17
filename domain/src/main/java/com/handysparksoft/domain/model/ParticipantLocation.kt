@@ -13,6 +13,7 @@ data class ParticipantLocation(
     var altitudeAMSL: Long,
     var altitudeGeoid: Long,
     var speed: Long,
+    var batteryLevel: Long?,
     var lastAccess: Long
 ) {
     fun isSessionUser(userSessionId: String) = userId == userSessionId
