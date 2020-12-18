@@ -148,6 +148,10 @@ class EntriesFragment : Fragment() {
             onShareListener = {
                 viewModel.onShareTrackMapClicked(it)
                 TrackEvent.ShareActionClick.track()
+            },
+            onFavoriteListener = { trackMap, favorite ->
+                viewModel.onFavoriteTrackMapClicked(trackMap, favorite)
+                TrackEvent.FavoriteActionClick.track()
             }
         )
 

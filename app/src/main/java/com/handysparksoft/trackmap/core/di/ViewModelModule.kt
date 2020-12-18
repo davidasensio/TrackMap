@@ -19,8 +19,7 @@ class ViewModelModule {
         getTrackMapsUseCase: GetTrackMapsUseCase,
         saveUserUseCase: SaveUserUseCase,
         leaveTrackMapUseCase: LeaveTrackMapUseCase,
-        saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-        updateUserLocationUseCase: UpdateUserLocationUseCase,
+        favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
         userHandler: UserHandler,
         prefs: Prefs
     ) =
@@ -28,8 +27,7 @@ class ViewModelModule {
             getTrackMapsUseCase,
             saveUserUseCase,
             leaveTrackMapUseCase,
-            saveUserTrackMapUseCase,
-            updateUserLocationUseCase,
+            favoriteTrackMapUseCase,
             userHandler,
             prefs
         )

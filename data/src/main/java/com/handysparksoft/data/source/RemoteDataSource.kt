@@ -16,6 +16,7 @@ interface RemoteDataSource {
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant)
     suspend fun getUserProfileData(userId: String): Result<UserProfileData>
     suspend fun getUserAccessData(userId: String): Result<UserAccessData>
+    suspend fun favoriteTrackMap(userId: String, trackMapId: String, favorite: Boolean)
 
     suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification)
 }
