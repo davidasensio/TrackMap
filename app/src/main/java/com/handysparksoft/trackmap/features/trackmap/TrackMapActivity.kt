@@ -82,7 +82,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
-    private val activeParticipants = mutableSetOf<String>()
 
     private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
@@ -100,6 +99,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var navigationBarInsetHeight: Int = 0
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private val participants = mutableSetOf<ParticipantLocation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
@@ -121,6 +121,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onDestroy() {
         unsubscribeForParticipantLocationUpdates()
+        dismissAll(true)
+        googleMap.clear()
+        participantMarkers.clear()
+        customMarker = null
+        participants.clear()
         super.onDestroy()
     }
 
@@ -530,10 +535,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun loadParticipantsData(participantIds: List<String>) {
-        if (ProfileViewModel.profileDataUpdated) {
-            participants.clear()
-            ProfileViewModel.profileDataUpdated = false
-        }
+        participants.clear()
         participantIds.forEach { id ->
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
@@ -924,8 +926,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val UNIT_METERS = "m"
 
         private const val LAST_ACTIVITY_IN_MINUTES_LIMIT = 480 // 8 hours
-
-        private val participants = mutableSetOf<ParticipantLocation>()
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {
