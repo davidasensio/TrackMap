@@ -57,4 +57,8 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
     suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification) {
         return remoteDataSource.sendPushNotification(authorization, pushNotification)
     }
+
+    suspend fun favoriteTrackMap(userId: String, trackMapId: String, favorite: Boolean) {
+        remoteDataSource.favoriteTrackMap(userId, trackMapId, favorite)
+    }
 }

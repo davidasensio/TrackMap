@@ -19,8 +19,7 @@ class MainViewModel(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
-    private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-    private val updateUserLocationUseCase: UpdateUserLocationUseCase,
+    private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
     private val userHandler: UserHandler,
     private val prefs: Prefs
 ) : ViewModel(), Scope by Scope.Impl() {
@@ -72,7 +71,7 @@ class MainViewModel(
             val userTrackMaps = getTrackMapsUseCase.execute(userId)
             if (userTrackMaps is Result.Success) {
                 currentTrackMaps = ArrayList(userTrackMaps.data.values)
-                _model.value = UiModel.Content(currentTrackMaps)
+                sortByName()
             } else if (userTrackMaps is Result.Error) {
                 _model.value =
                     UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")
@@ -90,6 +89,16 @@ class MainViewModel(
 
     fun onShareTrackMapClicked(trackMap: TrackMap) {
         _shareEvent.value = Event(trackMap)
+    }
+
+    fun onFavoriteTrackMapClicked(trackMap: TrackMap, markAsFavorite: Boolean) {
+        launch(Dispatchers.Main) {
+            favoriteTrackMapUseCase.execute(
+                userHandler.getUserId(),
+                trackMap.trackMapId,
+                markAsFavorite
+            )
+        }
     }
 
     fun saveUser() {
@@ -113,22 +122,23 @@ class MainViewModel(
     }
 
     fun sortByDate() {
-        _model.value = UiModel.Content(currentTrackMaps.sortedByDescending { it.creationDate })
+        _model.value = UiModel.Content(currentTrackMaps.sortedByDescending { it.creationDate }.sortedBy { it.favorite != true })
     }
 
     fun sortByName() {
-        _model.value = UiModel.Content(currentTrackMaps.sortedBy { it.name.toLowerCase() })
+        _model.value = UiModel.Content(currentTrackMaps.sortedBy { it.name.toLowerCase() }.sortedBy { it.favorite != true })
     }
 
     fun sortByParticipants() {
         _model.value =
-            UiModel.Content(currentTrackMaps.sortedByDescending { it.participantIds.size })
+            UiModel.Content(currentTrackMaps.sortedByDescending { it.participantIds.size }.sortedBy { it.favorite != true })
     }
 
     fun sortByOwned() {
         _model.value = UiModel.Content(currentTrackMaps
             .sortedByDescending { it.creationDate }
             .sortedByDescending { it.ownerId == userHandler.getUserId() }
+            .sortedBy { it.favorite != true }
         )
     }
 }
@@ -137,8 +147,7 @@ class MainViewModelFactory(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
-    private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-    private val updateUserLocationUseCase: UpdateUserLocationUseCase,
+    private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
     private val userHandler: UserHandler,
     private val prefs: Prefs
 ) :
@@ -148,16 +157,14 @@ class MainViewModelFactory(
             getTrackMapsUseCase::class.java,
             saveUserUseCase::class.java,
             leaveTrackMapUseCase::class.java,
-            saveUserTrackMapUseCase::class.java,
-            updateUserLocationUseCase::class.java,
+            favoriteTrackMapUseCase::class.java,
             userHandler::class.java,
             prefs::class.java
         ).newInstance(
             getTrackMapsUseCase,
             saveUserUseCase,
             leaveTrackMapUseCase,
-            saveUserTrackMapUseCase,
-            updateUserLocationUseCase,
+            favoriteTrackMapUseCase,
             userHandler,
             prefs
         )

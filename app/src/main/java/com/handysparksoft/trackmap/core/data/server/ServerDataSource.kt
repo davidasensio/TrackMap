@@ -84,6 +84,10 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
         return safeApiCall { service.getUserAccessData(userId) }
     }
 
+    override suspend fun favoriteTrackMap(userId: String, trackMapId: String, favorite: Boolean) {
+        safeApiCall { service.markAsFavoriteTrackMap(userId, trackMapId, TrackMapConfig(trackMapId, favorite)) }
+    }
+
     override suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification) {
         safeApiCall { service.sendPushNotification(authorization, pushNotification) }
     }

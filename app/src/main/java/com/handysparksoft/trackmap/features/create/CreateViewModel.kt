@@ -57,7 +57,8 @@ class CreateViewModel(
             description,
             true,
             System.currentTimeMillis(),
-            listOf(ownerId)
+            listOf(ownerId),
+            null,
         )
         launch(Dispatchers.Main) {
             saveTrackMapUseCase.execute(trackMapId, trackMap)

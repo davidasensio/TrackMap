@@ -4,6 +4,7 @@ import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.handysparksoft.domain.model.TrackMap
@@ -15,6 +16,7 @@ class EntriesAdapter(
     private val userSession: String,
     private val onGoListener: (trackMap: TrackMap) -> Unit,
     private val onLeaveListener: (trackMap: TrackMap) -> Unit,
+    private val onFavoriteListener: (trackMap: TrackMap, favorite: Boolean) -> Unit,
     val onShareListener: (trackMap: TrackMap) -> Unit
 ) : RecyclerView.Adapter<EntriesAdapter.ViewHolder>() {
 
@@ -46,6 +48,9 @@ class EntriesAdapter(
                 itemBinding.codeBottomTextView.text = trackMap.trackMapId
                 itemBinding.participantsBottomTextView.text =
                     (trackMap.participantIds.size).toString()
+                setFavoriteState(itemBinding.trackMapFavoriteImageButton, trackMap.favorite == true)
+
+                // Bind listeners
                 itemBinding.trackMapShareImageButton.setOnClickListener {
                     onShareListener.invoke(trackMap)
                 }
@@ -54,7 +59,8 @@ class EntriesAdapter(
                 }
                 itemBinding.trackMapFavoriteImageButton.setOnClickListener {
                     val selected = it.tag == true
-                    if (selected) {
+                    setFavoriteState(itemBinding.trackMapFavoriteImageButton, !selected)
+                    /*if (selected) {
                         itemBinding.trackMapFavoriteImageButton.colorFilter = null
                         itemBinding.trackMapFavoriteImageButton.setImageResource(R.drawable.ic_star)
                     } else {
@@ -65,8 +71,9 @@ class EntriesAdapter(
                             )
                         )
                         itemBinding.trackMapFavoriteImageButton.setImageResource(R.drawable.ic_star_filled)
-                    }
-                    it.tag = !selected
+                    }*/
+                    onFavoriteListener(trackMap, !selected)
+
                 }
                 itemBinding.trackMapItemContent.setOnClickListener {
                     onGoListener.invoke(trackMap)
@@ -83,6 +90,23 @@ class EntriesAdapter(
             val ownerAlias = if (owned) view.context.getString(R.string.by_you) else owner
             val dateFromTime = DateUtils.getRelativeDateFromTime(view.context, creationDate)
             return view.context.getString(R.string.creation_template, dateFromTime, ownerAlias)
+        }
+
+        private fun setFavoriteState(imageView: ImageView, selected: Boolean) {
+            if (!selected) {
+                imageView.colorFilter = null
+                imageView.setImageResource(R.drawable.ic_star)
+
+            } else {
+                imageView.setColorFilter(
+                    ContextCompat.getColor(
+                        imageView.context,
+                        R.color.colorAccent
+                    )
+                )
+                imageView.setImageResource(R.drawable.ic_star_filled)
+            }
+            imageView.tag = selected
         }
     }
 }
