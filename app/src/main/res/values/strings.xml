@@ -86,6 +86,24 @@
     <string name="user_info_title">User Info</string>
     <string name="user_info_show_marker_info">Show info tooltip</string>
 
+    <string name="user_info_last_activity">%1$s %2$s ago</string>
+    <plurals name="seconds">
+        <item quantity="one">second</item>
+        <item quantity="other">seconds</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">minute</item>
+        <item quantity="other">minutes</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">hour</item>
+        <item quantity="other">hours</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">day</item>
+        <item quantity="other">days</item>
+    </plurals>
+
     <string name="share_trackmap_link_title">Join this TrackMap!</string>
     <string name="share_trackmap_link_content">Join TrackMap \"%1$s\" here in this link: %2$s\nOr just join using this code: \"%3$s\"</string>
 

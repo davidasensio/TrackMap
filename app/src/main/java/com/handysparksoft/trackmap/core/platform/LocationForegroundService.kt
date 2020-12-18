@@ -163,7 +163,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     }
 
     private fun requestGPSLocationUpdates() {
-        // Reset altitude to 0 before start listening
+        // Reset altitude and speed to 0 before start listening
         launch {
             updateUserAltitudeUseCase.execute(userHandler.getUserId(), UserGPSData(0, 0, 0))
         }
@@ -176,7 +176,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
                     val altitudeGeoid = nmeaMessage.altitudeGeoid ?: 0
                     updateUserAltitudeUseCase.execute(
                         userHandler.getUserId(),
-                        UserGPSData(altitudeAMSL, altitudeGeoid, speedInKmh)
+                        UserGPSData(altitudeAMSL, altitudeGeoid, speedInKmh, System.currentTimeMillis())
                     )
                 }
             }
