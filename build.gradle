@@ -27,7 +27,7 @@ allprojects {
     }
 
     ext {
-        referenceVersionCode = 8
+        referenceVersionCode = 9
         referenceVersionName = "1.0.0"
 
         getCustomVersionCode = { referenceVersionCode ->
@@ -50,7 +50,7 @@ allprojects {
                 def bitriseBuildNumber = System.getenv()["BITRISE_BUILD_NUMBER"]
                 finalVersionName = finalVersionName + "." + bitriseBuildNumber
             } else {
-                finalVersionName = finalVersionName + ".LOCAL"
+                finalVersionName = finalVersionName
             }
             return finalVersionName
         }

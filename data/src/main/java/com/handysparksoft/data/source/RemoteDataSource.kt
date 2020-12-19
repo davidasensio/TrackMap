@@ -4,7 +4,7 @@ import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.*
 
 interface RemoteDataSource {
-    suspend fun saveUser(userId: String, userToken: String?)
+    suspend fun saveUser(userId: String, batteryLevel: Long, userToken: String?, lastAccess: Long)
     suspend fun updateUser(userId: String, userProfileData: UserProfileData)
     suspend fun getUserTrackMaps(userId: String): Result<Map<String, TrackMap>>
     suspend fun saveTrackMap(trackMapId: String, trackMap: TrackMap)
@@ -16,6 +16,7 @@ interface RemoteDataSource {
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant)
     suspend fun getUserProfileData(userId: String): Result<UserProfileData>
     suspend fun getUserAccessData(userId: String): Result<UserAccessData>
+    suspend fun favoriteTrackMap(userId: String, trackMapId: String, favorite: Boolean)
 
     suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification)
 }

@@ -9,8 +9,10 @@ class MessagingService : FirebaseMessagingService() {
     lateinit var prefs: Prefs
 
     override fun onNewToken(newToken: String) {
+        if (::prefs.isInitialized) {
+            prefs.userToken = newToken
+        }
         logDebug("onNewToken: $newToken")
-        prefs.userToken = newToken
         super.onNewToken(newToken)
     }
 }

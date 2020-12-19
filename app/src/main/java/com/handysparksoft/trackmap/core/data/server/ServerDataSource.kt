@@ -8,8 +8,8 @@ import com.handysparksoft.trackmap.core.data.server.NetworkHelper.safeApiCall
 class ServerDataSource(private val service: TrackMapService) : RemoteDataSource {
 
 
-    override suspend fun saveUser(userId: String, userToken: String?) {
-        val user = UserAccessData(userId, userToken, System.currentTimeMillis())
+    override suspend fun saveUser(userId: String, batteryLevel: Long, userToken: String?, lastAccess: Long) {
+        val user = UserAccessData(userId, batteryLevel, userToken, lastAccess)
         safeApiCall { service.saveUser(userId, user) }
     }
 
@@ -58,7 +58,7 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
     }
 
     override suspend fun updateUserLocation(userId: String, latitude: Double, longitude: Double) {
-        safeApiCall { service.updateUserLocation(userId, UserLocationData(latitude, longitude)) }
+        safeApiCall { service.updateUserLocation(userId, UserLocationData(latitude, longitude, System.currentTimeMillis())) }
     }
 
     override suspend fun updateUserGPSData(userId: String, userGPSData: UserGPSData) {
@@ -82,6 +82,10 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
 
     override suspend fun getUserAccessData(userId: String): Result<UserAccessData> {
         return safeApiCall { service.getUserAccessData(userId) }
+    }
+
+    override suspend fun favoriteTrackMap(userId: String, trackMapId: String, favorite: Boolean) {
+        safeApiCall { service.markAsFavoriteTrackMap(userId, trackMapId, TrackMapConfig(trackMapId, favorite)) }
     }
 
     override suspend fun sendPushNotification(authorization: String, pushNotification: PushNotification) {

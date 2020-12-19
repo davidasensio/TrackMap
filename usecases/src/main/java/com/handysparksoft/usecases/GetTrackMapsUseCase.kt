@@ -13,6 +13,7 @@ class GetTrackMapsUseCase(private val trackMapRepository: TrackMapRepository) {
                 val trackMap = trackMapRepository.getTrackMapById(userTrackMap.trackMapId)
                 if (trackMap is Result.Success) {
                     trackMap.data?.let {
+                        it.favorite = userTrackMap.favorite
                         syncedUserTrackMaps.data[key] = it
                     }
                 }

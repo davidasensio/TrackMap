@@ -86,6 +86,24 @@
     <string name="user_info_title">Info de usuario</string>
     <string name="user_info_show_marker_info">Mostrar info tooltip</string>
 
+    <string name="user_info_last_activity">Hace %1$s %2$s</string>
+    <plurals name="seconds">
+        <item quantity="one">segundo</item>
+        <item quantity="other">segundos</item>
+    </plurals>
+    <plurals name="minutes">
+        <item quantity="one">minuto</item>
+        <item quantity="other">minutos</item>
+    </plurals>
+    <plurals name="hours">
+        <item quantity="one">hora</item>
+        <item quantity="other">horas</item>
+    </plurals>
+    <plurals name="days">
+        <item quantity="one">día</item>
+        <item quantity="other">días</item>
+    </plurals>
+
     <string name="share_trackmap_link_title">Únete a este TrackMap!</string>
     <string name="share_trackmap_link_content">Únete al TrackMap \"%1$s\" con este link: %2$s\nO simplemente usando este código: \"%3$s\"</string>
 
@@ -109,4 +127,5 @@
 
     <string name="push_notification_user_joined_title">Nuevo participante en TrackMap</string>
     <string name="push_notification_user_joined_message">%1$s se ha unido a %2$s</string>
+    <string name="push_notification_generic_user_joined_message">Un nuevo participante</string>
 </resources>

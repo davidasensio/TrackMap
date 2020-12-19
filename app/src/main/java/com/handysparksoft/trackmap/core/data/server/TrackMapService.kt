@@ -75,6 +75,13 @@ interface TrackMapService {
         @Body trackMapParticipant: TrackMapParticipant
     )
 
+    @PATCH("users/{userId}/trackMaps/{trackMapId}.json")
+    suspend fun markAsFavoriteTrackMap(
+        @Path("userId") userId: String,
+        @Path("trackMapId") trackMapId: String,
+        @Body trackMapConfig: TrackMapConfig
+    )
+
     @Headers("Content-Type: application/json")
     @POST("https://fcm.googleapis.com/fcm/send")
     suspend fun sendPushNotification(

@@ -90,12 +90,12 @@ class ProfileViewModel(
     private fun getBalancedQuality(kbytesCount: Int): Int {
         return when {
             kbytesCount > 40000 -> 1
-            kbytesCount > 30000 -> 5
-            kbytesCount > 20000 -> 10
-            kbytesCount > 15000 -> 20
-            kbytesCount > 10000 -> 30
-            kbytesCount > 7500 -> 40
-            else -> 50
+            kbytesCount > 30000 -> 2
+            kbytesCount > 20000 -> 5
+            kbytesCount > 15000 -> 10
+            kbytesCount > 10000 -> 20
+            kbytesCount > 7500 -> 30
+            else -> 40
         }
     }
 

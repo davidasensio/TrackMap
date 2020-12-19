@@ -51,4 +51,8 @@ class UseCaseModule {
     @Provides
     fun updateUserProfileUseCaseProvider(trackMapRepository: TrackMapRepository) =
         UpdateUserProfileUseCase(trackMapRepository)
+
+    @Provides
+    fun favoriteTrackMapUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        FavoriteTrackMapUseCase(trackMapRepository)
 }

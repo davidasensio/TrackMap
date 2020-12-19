@@ -35,6 +35,7 @@ import com.google.gson.Gson
 import com.handysparksoft.domain.model.ParticipantLocation
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.UserMarkerData
+import com.handysparksoft.trackmap.BuildConfig
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.data.server.FirebaseHandler
 import com.handysparksoft.trackmap.core.extension.*
@@ -81,7 +82,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
-    private val activeParticipants = mutableSetOf<String>()
 
     private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
@@ -99,6 +99,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var navigationBarInsetHeight: Int = 0
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+    private val participants = mutableSetOf<ParticipantLocation>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
@@ -120,6 +121,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onDestroy() {
         unsubscribeForParticipantLocationUpdates()
+        dismissAll(true)
+        googleMap.clear()
+        participantMarkers.clear()
+        customMarker = null
+        participants.clear()
         super.onDestroy()
     }
 
@@ -312,7 +318,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             setOnClickListener {
                 val phone = this.text.toString()
                 val dialIntent = Intent(Intent.ACTION_DIAL).apply {
-                    data= Uri.parse("tel:$phone")
+                    data = Uri.parse("tel:$phone")
                 }
                 if (dialIntent.resolveActivity(packageManager) != null) {
                     startActivity(dialIntent)
@@ -529,10 +535,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun loadParticipantsData(participantIds: List<String>) {
-        if (ProfileViewModel.profileDataUpdated) {
-            participants.clear()
-            ProfileViewModel.profileDataUpdated = false
-        }
+        participants.clear()
         participantIds.forEach { id ->
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
@@ -545,7 +548,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 jsonValue,
                                 ParticipantLocation::class.java
                             )
-                            participants.add(participantLocation.copy(userId = id))
+                            val batteryLevel = participantLocation.batteryLevel ?: 100
+                            participants.add(participantLocation.copy(userId = id, batteryLevel = batteryLevel))
                             logDebug("Loaded participant data of: $participantIds")
                         }
 
@@ -603,8 +607,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "altitudeAMSL" -> it.altitudeAMSL = snapshot.value as Long
                         "altitudeGeoid" -> it.altitudeGeoid = snapshot.value as Long
                         "speed" -> it.speed = snapshot.value as Long
+                        "batteryLevel" -> it.batteryLevel = snapshot.value as Long
+                        "lastAccess" -> it.lastAccess = snapshot.value as Long
                     }
-                    activeParticipants.add(it.userId)
                 }
                 refreshTrackMap()
             }
@@ -722,10 +727,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 boundsBuilder.include(LatLng(participant.latitude, participant.longitude))
             }
 
-            val framePadding = dip(googleMapFramePadding)
-            val build = boundsBuilder.build()
-            val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
-            this.googleMap.animateCamera(cameraUpdateAction)
+            try {
+                val framePadding = dip(googleMapFramePadding)
+                val build = boundsBuilder.build()
+                val cameraUpdateAction = CameraUpdateFactory.newLatLngBounds(build, framePadding)
+                this.googleMap.animateCamera(cameraUpdateAction)
+            } catch (e: IllegalStateException) {
+                // No included points
+            }
         }
     }
 
@@ -741,7 +750,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun withActivityAndAvailableLatLng(participantLocation: ParticipantLocation): Boolean {
-        return activeParticipants.contains(participantLocation.userId)
+        val activityTimeFactor = if (BuildConfig.DEBUG) 4 else 1
+        val activityTimeLimit = LAST_ACTIVITY_IN_MINUTES_LIMIT * activityTimeFactor
+        return participantLocation.getLastActivityInMinutes() < activityTimeLimit
                 && participantLocation.latitude != 0.0
                 && participantLocation.longitude != 0.0
     }
@@ -798,6 +809,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     getUserSessionLocation()?.distanceTo(participantLocation.toLocation()) ?: 0f
                 with(markerMapSelectedBottomSheetBinding) {
                     userNickname.text = participantLocation.nickname ?: participantLocation.userId
+                    val (time, timeUnit) = participantLocation.getLastActivity()
+                    val timeUnitPlural = getTimeUnitPlural(time, timeUnit)
+                    userLastActivity.text =
+                        getString(R.string.user_info_last_activity, time.toString(), timeUnitPlural)
 
                     userSpeed.value = participantLocation.speed.toString()
                     userAltitude.value = participantLocation.altitudeAMSL.toString()
@@ -808,14 +823,31 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                     userFullName.text = participantLocation.fullName ?: participantLocation.nickname
                     userPhone.text = participantLocation.phone
-                    userPhone.visibility = if (userPhone.text.isNotEmpty()) View.VISIBLE else View.INVISIBLE
+                    userPhone.visibility =
+                        if (userPhone.text.isNotEmpty()) View.VISIBLE else View.INVISIBLE
                     participantLocation.image.let { userImage ->
                         userProfileImage.setImageBitmap(Base64Utils.getBase64Bitmap(userImage))
                     }
 
+                    userBatteryLevel.level = participantLocation.batteryLevel?.toInt() ?: 100
+
                     userShowInfoToggle.isChecked = userMarkerData.isShowingInfoWindow
                 }
             }
+        }
+    }
+
+    private val cacheTimeUnitPlurals = hashMapOf<String, String>()
+    private fun getTimeUnitPlural(time: Long, timeUnit: TimeUnit): String {
+        val isAUnit = time == 1L
+        val key = "$timeUnit$isAUnit"
+        return cacheTimeUnitPlurals[key] ?: when (timeUnit) {
+            TimeUnit.DAYS -> resources.getQuantityString(R.plurals.days, time.toInt())
+            TimeUnit.HOURS -> resources.getQuantityString(R.plurals.hours, time.toInt())
+            TimeUnit.MINUTES -> resources.getQuantityString(R.plurals.minutes, time.toInt())
+            else -> resources.getQuantityString(R.plurals.seconds, time.toInt())
+        }.apply {
+            cacheTimeUnitPlurals[key] = this
         }
     }
 
@@ -841,7 +873,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 ?.distanceTo(it.toLocation()) ?: 0f
             val (distanceFinal, distanceUnit) = getDistanceFormatted(distance)
 
-            R.id.markerTitle.findTextView().text = it.userAlias(isUserSession, getString(R.string.you))
+            R.id.markerTitle.findTextView().text =
+                it.userAlias(isUserSession, getString(R.string.you))
             R.id.markerAltitudeValue.findTextView().text = "$altitude $UNIT_METERS"
             R.id.markerSpeedValue.findTextView().text = "$speed $UNIT_KMH"
             R.id.markerDistanceValue.findTextView().text = "$distanceFinal $distanceUnit"
@@ -892,7 +925,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val UNIT_KMH = "Km/h"
         private const val UNIT_METERS = "m"
 
-        private val participants = mutableSetOf<ParticipantLocation>()
+        private const val LAST_ACTIVITY_IN_MINUTES_LIMIT = 480 // 8 hours
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {
