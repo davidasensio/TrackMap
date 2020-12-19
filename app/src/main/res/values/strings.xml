@@ -85,6 +85,7 @@
 
     <string name="user_info_title">User Info</string>
     <string name="user_info_show_marker_info">Show info tooltip</string>
+    <string name="user_info_follow">Follow</string>
 
     <string name="user_info_last_activity">%1$s %2$s ago</string>
     <plurals name="seconds">
