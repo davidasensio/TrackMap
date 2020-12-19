@@ -18,11 +18,8 @@ object Base64Utils {
         return Base64.encodeToString(byteArrayResult, Base64.DEFAULT)
     }
 
-    fun getBase64Bitmap(encodedImage: String?): Bitmap? {
-        encodedImage?.let {
-            val decodedString: ByteArray = Base64.decode(encodedImage, Base64.DEFAULT)
-            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        }
-        return null
+    fun getBase64Bitmap(encodedImage: String): Bitmap {
+        val decodedString: ByteArray = Base64.decode(encodedImage, Base64.DEFAULT)
+        return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
     }
 }

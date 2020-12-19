@@ -128,12 +128,19 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
     }
 
 
+    private val bitmapCache = hashMapOf<String, Bitmap>()
     private fun getBitmapFromEncodedImage(
         context: Context,
         encodedImage: String?,
         @DrawableRes vectorResourceId: Int,
     ): BitmapDescriptor {
-        val bitmapImage = Base64Utils.getBase64Bitmap(encodedImage)
+        val bitmapImage = if (encodedImage != null) {
+            bitmapCache[encodedImage] ?: Base64Utils.getBase64Bitmap(encodedImage).apply {
+                bitmapCache[encodedImage] = this
+            }
+        } else {
+            null
+        }
 
         val markerPersonLayout = LayoutInflater.from(context).inflate(
             R.layout.marker_person_layout,
@@ -141,7 +148,7 @@ class GoogleMapHandler @Inject constructor(private val context: Context) {
         )
 
         markerPersonLayout.findViewById<ImageView>(R.id.markerPersonPictureImageView).apply {
-            if (encodedImage != null) {
+            if (bitmapImage != null) {
                 setImageBitmap(bitmapImage)
             }
         }
