@@ -85,6 +85,7 @@
 
     <string name="user_info_title">Info de usuario</string>
     <string name="user_info_show_marker_info">Mostrar info tooltip</string>
+    <string name="user_info_follow">Seguir</string>
 
     <string name="user_info_last_activity">Hace %1$s %2$s</string>
     <plurals name="seconds">
