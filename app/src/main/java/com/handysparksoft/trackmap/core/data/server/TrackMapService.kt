@@ -63,6 +63,12 @@ interface TrackMapService {
         @Body user: UserGPSData
     )
 
+    @PATCH("users/{userId}.json")
+    suspend fun updateUserBatteryLevel(
+        @Path("userId") userId: String,
+        @Body userData: UserBatteryLevel
+    )
+
     @DELETE("users/{userId}/trackMaps/{trackMapId}.json")
     suspend fun deleteUserTrackMap(
         @Path("userId") userId: String,
