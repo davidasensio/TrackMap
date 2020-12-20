@@ -105,7 +105,6 @@ class MainViewModel(
         launch(Dispatchers.Main) {
             saveUserUseCase.execute(
                 userHandler.getUserId(),
-                userHandler.getUserBatteryLevel().toLong(),
                 prefs.userToken,
                 System.currentTimeMillis()
             )

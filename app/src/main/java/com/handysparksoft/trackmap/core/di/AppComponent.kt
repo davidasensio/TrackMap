@@ -11,6 +11,7 @@ import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
 import com.handysparksoft.trackmap.features.main.MainActivity
 import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
 import com.handysparksoft.trackmap.features.splash.SplashActivity
+import com.handysparksoft.trackmap.features.task.UpdateBatteryLevelWorker
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
 import dagger.BindsInstance
@@ -35,6 +36,7 @@ interface AppComponent {
     fun inject(locationForegroundService: LocationForegroundService)
     fun inject(splashActivity: SplashActivity)
     fun inject(firebaseTracking: FirebaseTracking)
+    fun inject(updateBatteryLevelWorker: UpdateBatteryLevelWorker)
     fun inject(app: App)
 
     @Component.Factory

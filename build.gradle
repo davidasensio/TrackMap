@@ -63,6 +63,7 @@ allprojects {
         final def lifecycle_version = "2.2.0"
         final def navComponent_version = "2.1.0"
         final def glide_version = "4.11.0"
+        final def work_manager = "2.4.0"
 
         androidLibs = [
                 appcompat             : "androidx.appcompat:appcompat:1.2.0",
@@ -77,6 +78,7 @@ allprojects {
                 swipeRefreshLayout    : "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0",
                 navigationCompFragment: "androidx.navigation:navigation-fragment-ktx:$navComponent_version",
                 navigationCompUi      : "androidx.navigation:navigation-ui-ktx:$navComponent_version",
+                workManager           : "androidx.work:work-runtime-ktx:$work_manager",
 
                 // For Image Intent chooser extension functions
                 activityKtx           : "androidx.activity:activity-ktx:1.2.0-alpha06",
@@ -96,8 +98,8 @@ allprojects {
         ]
 
         firebaseLibs = [
-                firebaseCore    : "com.google.firebase:firebase-core:17.5.0",
-                firebaseDatabase: "com.google.firebase:firebase-database:19.4.0",
+                firebaseCore     : "com.google.firebase:firebase-core:17.5.0",
+                firebaseDatabase : "com.google.firebase:firebase-database:19.4.0",
                 firebaseMessaging: "com.google.firebase:firebase-messaging:21.0.0"
         ]
 

@@ -8,10 +8,12 @@ import com.handysparksoft.trackmap.core.di.AppComponent
 import com.handysparksoft.trackmap.core.di.DaggerAppComponent
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.logError
+import com.handysparksoft.trackmap.core.platform.BatteryLevelHelper
 import com.handysparksoft.trackmap.core.platform.FirebaseTracking
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
+import com.handysparksoft.trackmap.features.task.UpdateBatteryLevelWorker
 import javax.inject.Inject
 
 class App : Application() {
@@ -53,6 +55,8 @@ class App : Application() {
             prefs.userToken = token
             logDebug("User token is $token")
         }
+
+        UpdateBatteryLevelWorker.initBatteryLevelPeriodicWork(this)
     }
 
     companion object {

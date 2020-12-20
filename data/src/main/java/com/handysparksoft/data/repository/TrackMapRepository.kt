@@ -6,8 +6,8 @@ import com.handysparksoft.domain.model.*
 
 class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
 
-    suspend fun saveUser(userId: String, batteryLevel: Long, userToken: String?, lastAccess: Long) {
-        remoteDataSource.saveUser(userId, batteryLevel, userToken, lastAccess)
+    suspend fun saveUser(userId: String, userToken: String?, lastAccess: Long) {
+        remoteDataSource.saveUser(userId, userToken, lastAccess)
     }
 
     suspend fun updateUserProfile(userId: String, userProfileData: UserProfileData) {
@@ -40,6 +40,10 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
 
     suspend fun updateUserGPSData(userId: String, userGPSData: UserGPSData) {
         return remoteDataSource.updateUserGPSData(userId, userGPSData)
+    }
+
+    suspend fun updateUserBatteryLevel(userId: String, userBatteryLevel: UserBatteryLevel) {
+        remoteDataSource.updateUserBatteryLevel(userId, userBatteryLevel)
     }
 
     suspend fun leaveTrackMap(userId: String, trackMapId: String, trackMapParticipant: TrackMapParticipant) {
