@@ -56,7 +56,7 @@ class UpdateBatteryLevelWorker(appContext: Context, workerParams: WorkerParamete
 
             workManager.enqueueUniquePeriodicWork(
                 UNIQUE_ID,
-                ExistingPeriodicWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.KEEP,
                 updateBatteryLevelWork
             )
             workManager.getWorkInfoByIdLiveData(updateBatteryLevelWork.id).observeForever {
