@@ -43,7 +43,6 @@ import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.databinding.ActivityTrackmapBinding
 import com.handysparksoft.trackmap.databinding.DialogMapTypeBinding
 import com.handysparksoft.trackmap.databinding.MarkerSelectedBottomSheetBinding
-import com.handysparksoft.trackmap.features.profile.ProfileViewModel
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPositionState.*
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -85,7 +84,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
-    private var frameAllParticipantsInMap = true
+    private var frameOrFollowParticipantsInMap = true
 
     private var pipModeEnabled = false
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
@@ -100,6 +99,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private val participants = mutableSetOf<ParticipantLocation>()
+    private var participantToFollow: ParticipantLocation? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
@@ -168,13 +168,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             dismissMapStyleLayers()
             clearInfoWindows()
             binding.switchMapStyleButton.gone()
-            binding.frameAllParticipantsInMapButton.gone()
+            binding.frameOrFollowParticipantsInMapButton.gone()
             binding.trackMapBottomCardView.visible()
             googleMap.isMyLocationEnabled = false
             googleMapFramePadding = GOOGLE_MAP_FRAME_MIN_PADDING_DP
         } else {
             binding.switchMapStyleButton.visible()
-            binding.frameAllParticipantsInMapButton.visible()
+            binding.frameOrFollowParticipantsInMapButton.visible()
             binding.trackMapBottomCardView.gone()
             googleMap.isMyLocationEnabled = true
             googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
@@ -198,27 +198,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupUI() {
         title = getString(R.string.app_name)
 
-        binding.frameAllParticipantsInMapButton.setOnClickListener {
-            binding.frameAllParticipantsInMapButton.setImageResource(if (frameAllParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
-            frameAllParticipantsInMap = !frameAllParticipantsInMap
+        binding.frameOrFollowParticipantsInMapButton.setOnClickListener {
+            binding.frameOrFollowParticipantsInMapButton.setImageResource(if (frameOrFollowParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+            frameOrFollowParticipantsInMap = !frameOrFollowParticipantsInMap
         }
 
-        ViewCompat.setOnApplyWindowInsetsListener(binding.frameAllParticipantsInMapButton) { _, insets ->
+        ViewCompat.setOnApplyWindowInsetsListener(binding.frameOrFollowParticipantsInMapButton) { _, insets ->
             statusBarInsetHeight = insets.systemWindowInsetTop
             navigationBarInsetHeight = insets.systemWindowInsetBottom
             insets
-        }
-        binding.markerMapSelectedBottomSheet.userShowInfoToggle.setOnCheckedChangeListener { buttonView, isChecked ->
-            selectedMarkerTag?.let { markerTag ->
-                if (isChecked) {
-                    clearInfoWindows()
-                    setMarkerInfoWindowVisible(markerTag, visible = true)
-                    participantMarkers.firstOrNull { it.tag == markerTag }?.showInfoWindow()
-                } else {
-                    setMarkerInfoWindowVisible(markerTag, visible = false)
-                    participantMarkers.firstOrNull { it.tag == markerTag }?.hideInfoWindow()
-                }
-            }
         }
 
         setupMapTypeSwitcher()
@@ -314,6 +302,32 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             BottomSheetBehavior.from(markerMapSelectedBottomSheetBinding.markerMapSelectedContent)
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
+        binding.markerMapSelectedBottomSheet.userShowInfoToggle.setOnCheckedChangeListener { _, isChecked ->
+            selectedMarkerTag?.let { markerTag ->
+                if (isChecked) {
+                    clearInfoWindows()
+                    setMarkerInfoWindowVisible(markerTag, visible = true)
+                    participantMarkers.firstOrNull { it.tag == markerTag }?.showInfoWindow()
+                } else {
+                    setMarkerInfoWindowVisible(markerTag, visible = false)
+                    participantMarkers.firstOrNull { it.tag == markerTag }?.hideInfoWindow()
+                }
+            }
+        }
+
+        binding.markerMapSelectedBottomSheet.userFollowToggle.setOnCheckedChangeListener { _, isChecked ->
+            selectedMarkerTag?.let { markerTag ->
+                if (isChecked) {
+                    participantToFollow = participants.firstOrNull { it.userId == markerTag }
+                    activateFraming()
+                } else {
+                    if (markerTag == participantToFollow?.userId) {
+                        participantToFollow = null
+                    }
+                }
+            }
+        }
+
         binding.markerMapSelectedBottomSheet.userPhone.apply {
             setOnClickListener {
                 val phone = this.text.toString()
@@ -371,7 +385,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val bottomPadding = navigationBarInsetHeight
 
         googleMap.setPadding(0, topPadding, 0, bottomPadding)
-        val layoutParams = binding.frameAllParticipantsInMapButton.layoutParams
+        val layoutParams = binding.frameOrFollowParticipantsInMapButton.layoutParams
         (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
             setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
         }
@@ -399,9 +413,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (reason == GoogleMap.OnCameraMoveStartedListener.REASON_GESTURE) {
                 myPositionState = Unallocated
 
-                if (frameAllParticipantsInMap) {
-                    binding.frameAllParticipantsInMapButton.performClick()
-                }
+                deactivateFraming()
             }
         }
 
@@ -433,6 +445,18 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         googleMap.setInfoWindowAdapter(CustomInfoWindowAdapter(this, ::onRenderMarkerWindowInfo))
     }
 
+    private fun deactivateFraming() {
+        if (frameOrFollowParticipantsInMap) {
+            binding.frameOrFollowParticipantsInMapButton.performClick()
+        }
+    }
+
+    private fun activateFraming() {
+        if (!frameOrFollowParticipantsInMap) {
+            binding.frameOrFollowParticipantsInMapButton.performClick()
+        }
+    }
+
     private fun keepShowingInfoWindowMarker() {
         userMarkerMap.values.firstOrNull { it.isShowingInfoWindow }?.let { shownMarker ->
             participantMarkers.firstOrNull { it.tag == shownMarker.tag }?.showInfoWindow()
@@ -458,11 +482,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun animateFrameButtonToMakeSpace() {
         val value = this.dip(GOOGLE_MAP_MARKER_INTENT_SPACE) * -1f
-        binding.frameAllParticipantsInMapButton.animate().translationY(value).start()
+        binding.frameOrFollowParticipantsInMapButton.animate().translationY(value).start()
     }
 
     private fun resetFrameButtonExtraSpace() {
-        binding.frameAllParticipantsInMapButton.animate().translationY(0f).start()
+        binding.frameOrFollowParticipantsInMapButton.animate().translationY(0f).start()
     }
 
     private fun reAddCustomLocatedMarker() {
@@ -680,8 +704,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 refreshBottomSheetMarkerData(it)
             }
 
-            if (frameAllParticipantsInMap) {
-                frameAllParticipants()
+            if (frameOrFollowParticipantsInMap) {
+                frameOrFollowParticipants()
             }
         }
     }
@@ -707,19 +731,18 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         return userMakerData
     }
 
-    private fun frameAllParticipants() {
-        if (participantMarkers.size == 1) {
-            // Move the camera to unique participant location with a zoom of 17.
-            participants.firstOrNull(::withActivityAndAvailableLatLng)?.let { participant ->
-                val latLng = LatLng(participant.latitude, participant.longitude)
-                val zoomLevel = getZoomLevelAccordingSpeed(participant.speed)
-                this.googleMap.animateCamera(
-                    CameraUpdateFactory.newLatLngZoom(
-                        latLng,
-                        zoomLevel
-                    )
-                )
-            }
+    /**
+     * Move the camera to participant to follow
+     * or to unique participant location
+     * or to all participants  with a zoom of 17.
+     */
+    private fun frameOrFollowParticipants() {
+        val followedParticipant = participantToFollow
+
+        if (followedParticipant != null) {
+            moveCameraToParticipant(followedParticipant)
+        } else if (participantMarkers.size == 1) {
+            participants.firstOrNull(::withActivityAndAvailableLatLng)?.let { moveCameraToParticipant(it) }
         } else {
             val boundsBuilder = LatLngBounds.Builder()
 
@@ -736,6 +759,17 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 // No included points
             }
         }
+    }
+
+    private fun moveCameraToParticipant(participant: ParticipantLocation) {
+        val latLng = LatLng(participant.latitude, participant.longitude)
+        val zoomLevel = getZoomLevelAccordingSpeed(participant.speed)
+        this.googleMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                latLng,
+                zoomLevel
+            )
+        )
     }
 
     private fun getZoomLevelAccordingSpeed(speed: Long): Float {
@@ -825,13 +859,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     userPhone.text = participantLocation.phone
                     userPhone.visibility =
                         if (userPhone.text.isNotEmpty()) View.VISIBLE else View.INVISIBLE
-                    participantLocation.image.let { userImage ->
+                    participantLocation.image?.let { userImage ->
                         userProfileImage.setImageBitmap(Base64Utils.getBase64Bitmap(userImage))
                     }
 
                     userBatteryLevel.level = participantLocation.batteryLevel?.toInt() ?: 100
 
                     userShowInfoToggle.isChecked = userMarkerData.isShowingInfoWindow
+                    userFollowToggle.isChecked = markerTag == participantToFollow?.userId
                 }
             }
         }
