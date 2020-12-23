@@ -136,8 +136,9 @@ fabric.properties
 # Api Keys
 **/*/res/values/api_keys.xml
 
-# Firebase
+# Firebase and Google Play Publisher
 google-services.json
+trackmap-googleplay-service-account.json
 
 ### AndroidStudio Patch ###
 
