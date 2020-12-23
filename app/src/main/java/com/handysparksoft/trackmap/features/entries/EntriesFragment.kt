@@ -99,6 +99,7 @@ class EntriesFragment : Fragment() {
         viewModel.shareEvent.observe(viewLifecycleOwner, Observer(::onShareEvent))
         joinViewModel.joinFeedbackEvent.observe(viewLifecycleOwner, Observer(::onJoinFeedbackEvent))
         viewModel.saveUser()
+        viewModel.updateUserBatteryLevel()
 
         setupUI()
 

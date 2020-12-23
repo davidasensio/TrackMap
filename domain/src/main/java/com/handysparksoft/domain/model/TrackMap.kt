@@ -7,7 +7,6 @@ data class TrackMap(
     val ownerId: String,
     val name: String,
     val description: String,
-    val active: Boolean,
     val creationDate: Long = System.currentTimeMillis(),
     val participantIds: List<String>,
     var favorite: Boolean?

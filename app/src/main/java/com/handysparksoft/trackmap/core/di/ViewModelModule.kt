@@ -20,6 +20,7 @@ class ViewModelModule {
         saveUserUseCase: SaveUserUseCase,
         leaveTrackMapUseCase: LeaveTrackMapUseCase,
         favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
+        updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
         userHandler: UserHandler,
         prefs: Prefs
     ) =
@@ -28,6 +29,7 @@ class ViewModelModule {
             saveUserUseCase,
             leaveTrackMapUseCase,
             favoriteTrackMapUseCase,
+            updateUserBatteryLevelUseCase,
             userHandler,
             prefs
         )

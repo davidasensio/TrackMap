@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.TrackMap
+import com.handysparksoft.domain.model.UserBatteryLevel
 import com.handysparksoft.trackmap.core.platform.Event
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.Scope
@@ -20,6 +21,7 @@ class MainViewModel(
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
+    private val updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
     private val userHandler: UserHandler,
     private val prefs: Prefs
 ) : ViewModel(), Scope by Scope.Impl() {
@@ -111,6 +113,18 @@ class MainViewModel(
         }
     }
 
+    fun updateUserBatteryLevel() {
+        val userId = userHandler.getUserId()
+        val batteryLevel = userHandler.getUserBatteryLevel()
+
+        launch(Dispatchers.Main) {
+            updateUserBatteryLevelUseCase.execute(
+                userId,
+                UserBatteryLevel(userId, batteryLevel.toLong())
+            )
+        }
+    }
+
     fun leave(trackMap: TrackMap) {
         val userId = userHandler.getUserId()
         launch(Dispatchers.Main) {
@@ -147,6 +161,7 @@ class MainViewModelFactory(
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
     private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
+    private val updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
     private val userHandler: UserHandler,
     private val prefs: Prefs
 ) :
@@ -157,6 +172,7 @@ class MainViewModelFactory(
             saveUserUseCase::class.java,
             leaveTrackMapUseCase::class.java,
             favoriteTrackMapUseCase::class.java,
+            updateUserBatteryLevelUseCase::class.java,
             userHandler::class.java,
             prefs::class.java
         ).newInstance(
@@ -164,6 +180,7 @@ class MainViewModelFactory(
             saveUserUseCase,
             leaveTrackMapUseCase,
             favoriteTrackMapUseCase,
+            updateUserBatteryLevelUseCase,
             userHandler,
             prefs
         )

@@ -419,9 +419,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         googleMap.setOnMarkerClickListener {
             val markerTag = it.tag.toString()
-            val sameMarker = markerTag == selectedMarkerTag
-            selectedMarkerTag = markerTag
-            showInfoBottomSheet(markerTag, sameMarker)
+            if (markerTag != customMarker?.tag) {
+                val sameMarker = markerTag == selectedMarkerTag
+                selectedMarkerTag = markerTag
+                showInfoBottomSheet(markerTag, sameMarker)
+                customMarker?.remove()
+            } else {
+                hideMarkerBottomSheet()
+            }
             animateFrameButtonToMakeSpace()
             keepShowingInfoWindowMarker()
             waitForAnyMarkerIntentAction()
@@ -439,6 +444,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             customMarker?.remove()
             addCustomLocatedMarker(point)
             clearInfoWindows()
+            hideMarkerBottomSheet()
             waitForAnyMarkerIntentAction()
         }
 
@@ -572,9 +578,16 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                                 jsonValue,
                                 ParticipantLocation::class.java
                             )
-                            val batteryLevel = participantLocation.batteryLevel ?: 100
-                            participants.add(participantLocation.copy(userId = id, batteryLevel = batteryLevel))
-                            logDebug("Loaded participant data of: $participantIds")
+                            participantLocation?.let {
+                                val batteryLevel = it.batteryLevel ?: 100
+                                participants.add(
+                                    it.copy(
+                                        userId = id,
+                                        batteryLevel = batteryLevel
+                                    )
+                                )
+                                logDebug("Loaded participant data of: $participantIds")
+                            }
                         }
 
                         override fun onCancelled(error: DatabaseError) {
@@ -742,7 +755,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         if (followedParticipant != null) {
             moveCameraToParticipant(followedParticipant)
         } else if (participantMarkers.size == 1) {
-            participants.firstOrNull(::withActivityAndAvailableLatLng)?.let { moveCameraToParticipant(it) }
+            participants.firstOrNull(::withActivityAndAvailableLatLng)
+                ?.let { moveCameraToParticipant(it) }
         } else {
             val boundsBuilder = LatLngBounds.Builder()
 

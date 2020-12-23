@@ -55,7 +55,6 @@ class CreateViewModel(
             ownerId,
             name,
             description,
-            true,
             System.currentTimeMillis(),
             listOf(ownerId),
             null,
