@@ -28,7 +28,8 @@ data class ParticipantLocation(
     }
 
     fun getLastActivity(): Pair<Long, TimeUnit> {
-        val diff = System.currentTimeMillis() - lastAccess
+        val difference = System.currentTimeMillis() - lastAccess
+        val diff = if (difference < 0) 0 else difference
         val seconds = diff / 1000
         val minutes = seconds / 60
         val hours = minutes / 60
