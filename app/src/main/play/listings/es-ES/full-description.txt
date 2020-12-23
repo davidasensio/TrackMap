@@ -1,0 +1,4 @@
+TrackMap es una aplicación de compartir la localización para unirse o crear TrackMaps (grupos) dónde compartir tu localización en tiempo real.
+Disfruta del "live tracking" con tus amigos mientras realizas tu deporte o actividad favorita o cualquier evento al aire libre.
+
+Ideal para actividades deportivas: Parapente, Bicicleta, Correr, Senderismo, Navegar, Kayak, Paddle Surf... o simplemente para compartir tú ubicación en tiempo real con tus amigos.
