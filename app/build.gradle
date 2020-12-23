@@ -1,8 +1,10 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'com.github.triplet.play'
+
+import com.github.triplet.gradle.androidpublisher.ReleaseStatus
 
 // Create a variable called keystorePropertiesFile, and initialize it to your keystore.properties file, in the rootProject folder.
 // And load the properties
@@ -96,6 +98,28 @@ dependencies {
 
     testImplementation testLibs.values()
     androidTestImplementation androidTestLibs.values()
+}
+
+/**
+ * Google Play Publisher plugin config
+ *  - To check GPP config is fine or sync play data execute ./gradlew bootstrap
+ *  - To publish release APK execute ./gradlew publishReleaseApk
+ *  - To see a list of tasks execute ./gradlew tasks --group publishing
+ */
+play {
+    serviceAccountCredentials.set(file("trackmap-googleplay-service-account.json"))
+
+    // Overrides defaults
+    track.set("production")                         // internal/alpha/beta/production
+    updatePriority.set(5)                           // 1 to 5 -> 1 for lower and 5 for highest - https://developer.android.com/guide/playcore/in-app-updates
+
+    // Complete release
+    userFraction.set(Double.valueOf(1))             // Is the percentage of users who will receive a staged release default 0.1 (10%) and only applicable where releaseStatus=[IN_PROGRESS/HALTED]
+    releaseStatus.set(ReleaseStatus.COMPLETED)      // Is the type of release, i.e. ReleaseStatus.[COMPLETED/DRAFT/HALTED/IN_PROGRESS]
+
+    // Roll out release
+    // userFraction.set(Double.valueOf(0.9))
+    // releaseStatus.set(ReleaseStatus.IN_PROGRESS)
 }
 
 apply plugin: 'com.google.gms.google-services'

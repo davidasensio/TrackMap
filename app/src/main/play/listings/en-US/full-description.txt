@@ -1,0 +1,4 @@
+TrackMap is a location sharing application to create and join TrackMaps (groups) where you can share your location in real-time. 
+Enjoy tracking your friends while doing any sports activity or any outdoor event.
+
+Great for sports activities: Paragliding, Cycling, Running, Trekking,  Sailing, Kayak, Paddle Surf... or just for sharing your live tracking with your friends.
