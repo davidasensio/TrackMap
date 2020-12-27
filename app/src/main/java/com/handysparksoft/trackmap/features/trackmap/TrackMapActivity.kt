@@ -7,6 +7,9 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.drawable.AnimatedVectorDrawable
+import android.graphics.drawable.LayerDrawable
+import android.graphics.drawable.StateListDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -199,7 +202,17 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.app_name)
 
         binding.frameOrFollowParticipantsInMapButton.setOnClickListener {
-            binding.frameOrFollowParticipantsInMapButton.setImageResource(if (frameOrFollowParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+            val frameOnResource = R.drawable.ic_frame_on
+            val frameOffResource = R.drawable.ic_frame_off_anim
+
+            if (frameOrFollowParticipantsInMap) {
+                binding.frameOrFollowParticipantsInMapButton.setImageResource(frameOffResource)
+                (binding.frameOrFollowParticipantsInMapButton.drawable as AnimatedVectorDrawable)
+                    .start()
+            } else {
+                binding.frameOrFollowParticipantsInMapButton.setImageResource(frameOnResource)
+            }
+
             frameOrFollowParticipantsInMap = !frameOrFollowParticipantsInMap
         }
 
