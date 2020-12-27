@@ -417,6 +417,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
         }
 
+        googleMap.setOnMyLocationButtonClickListener {
+            deactivateFraming()
+            false
+        }
+
         googleMap.setOnMarkerClickListener {
             val markerTag = it.tag.toString()
             if (markerTag != customMarker?.tag) {
