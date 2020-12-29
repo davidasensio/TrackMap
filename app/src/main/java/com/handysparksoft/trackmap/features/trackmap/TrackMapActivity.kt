@@ -72,6 +72,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     @Inject
     lateinit var googleMapHandler: GoogleMapHandler
 
+    @Inject
+    lateinit var locationForegroundServiceHandler: LocationForegroundServiceHandler
+
     private lateinit var googleMap: GoogleMap
 
     private lateinit var mapActionHelper: MapActionHelper
@@ -124,7 +127,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         setupMapUI()
         setupUI()
         setupBottomSheet()
-        setupTrackingAlert()
     }
 
     override fun onDestroy() {
@@ -365,6 +367,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupTrackingAlert() {
         binding.liveTrackingAlertDialog.scaleX = 0f
         binding.liveTrackingAlertDialog.scaleY = 0f
+        binding.liveTrackingAlertDialog.visibility = View.VISIBLE
         binding.liveTrackingAlertDialog.animate()
             .scaleX(1f)
             .scaleY(1f)
@@ -375,17 +378,17 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             }
             .start()
 
-        countDownTimer = object : CountDownTimer(2100, 1000) {
+        countDownTimer = object : CountDownTimer(3500, 1000) {
             override fun onTick(millisUntilFinished: Long) {
-                val secondsRemaining = (millisUntilFinished / 1000) + 1
-                binding.liveTrackingInfoNumber.scaleX = 3f
-                binding.liveTrackingInfoNumber.scaleY = 3f
+                val secondsRemaining = (millisUntilFinished / 1000)
+                binding.liveTrackingInfoNumber.scaleX = 2.5f
+                binding.liveTrackingInfoNumber.scaleY = 2.5f
                 binding.liveTrackingInfoNumber.visibility = View.VISIBLE
                 binding.liveTrackingInfoNumber.text = secondsRemaining.toString()
                 binding.liveTrackingInfoNumber.animate()
                     .scaleX(1f)
                     .scaleY(1f)
-                    .setDuration(1000)
+                    .setDuration(900)
                     .start()
             }
 
@@ -396,15 +399,25 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     .setDuration(250)
                     .withEndAction {
                         binding.liveTrackingAlertDialog.visibility = View.GONE
+                        startUserTrackLocationService(trackMapId = trackMapId, startTracking = true)
+                        TrackEvent.LiveTrackingAutoActionClick.track()
                     }
                     .start()
             }
         }
 
         binding.liveTrackingAlertCancelButton.setOnClickListener {
-            binding.liveTrackingAlertDialog.visibility = View.GONE
             countDownTimer.cancel()
+            binding.liveTrackingAlertDialog.visibility = View.GONE
         }
+    }
+
+    private fun startUserTrackLocationService(trackMapId: String, startTracking: Boolean) {
+        locationForegroundServiceHandler.startUserLocationService(
+            this,
+            trackMapId,
+            startTracking
+        )
     }
 
     /**
@@ -605,6 +618,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
 
+            if (!locationForegroundServiceHandler.hasLiveTrackingAlreadyStarted(trackMapId)) {
+                setupTrackingAlert()
+            }
 
             // FIXME: remove after tests
             /*val taskLog = object : TimerTask() {

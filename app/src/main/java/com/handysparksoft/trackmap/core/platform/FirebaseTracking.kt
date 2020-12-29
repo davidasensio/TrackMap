@@ -55,6 +55,8 @@ sealed class TrackEvent {
     object LeaveActionClick : TrackEvent()
     object ShareActionClick : TrackEvent()
     object FavoriteActionClick : TrackEvent()
+    object LiveTrackingActionClick : TrackEvent()
+    object LiveTrackingAutoActionClick : TrackEvent()
 
     object CreatedTrackMap : TrackEvent()
     object JoinedTrackMap : TrackEvent()

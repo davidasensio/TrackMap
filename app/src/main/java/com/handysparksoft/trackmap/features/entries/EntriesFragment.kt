@@ -1,10 +1,7 @@
 package com.handysparksoft.trackmap.features.entries
 
 import android.app.Activity
-import android.app.ActivityManager
-import android.content.Context
 import android.content.Intent
-import android.location.LocationManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
-import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
@@ -63,10 +59,11 @@ class EntriesFragment : Fragment() {
     @Inject
     lateinit var userHandler: UserHandler
 
+    @Inject
+    lateinit var locationForegroundServiceHandler: LocationForegroundServiceHandler
+
     // FIXME make injectable
     private lateinit var permissionChecker: PermissionChecker
-
-    private lateinit var locationForegroundService: LocationForegroundService
 
     override fun onStart() {
         connectionHandler.registerNetworkCallback()
@@ -103,11 +100,6 @@ class EntriesFragment : Fragment() {
 
         setupUI()
 
-        permissionChecker.requestLocationPermission(onGrantedPermission = {
-            updateLastLocation()
-            startUserTrackLocationService()
-        })
-
         (requireActivity() as MainActivity).let { mainActivity ->
             mainActivity.onSortMenuItemClick {
                 SortEntriesBottomSheetDialogFragment().apply {
@@ -139,8 +131,11 @@ class EntriesFragment : Fragment() {
         adapter = EntriesAdapter(
             userSession = userHandler.getUserId(),
             onGoListener = {
-                viewModel.onGoTrackMapClicked(it)
-                TrackEvent.GoActionClick.track()
+                permissionChecker.requestLocationPermission(onGrantedPermission = {
+                    updateLastLocation()
+                    viewModel.onGoTrackMapClicked(it)
+                    TrackEvent.GoActionClick.track()
+                })
             },
             onLeaveListener = {
                 viewModel.onLeaveTrackMapClicked(it)
@@ -153,6 +148,13 @@ class EntriesFragment : Fragment() {
             onFavoriteListener = { trackMap, favorite ->
                 viewModel.onFavoriteTrackMapClicked(trackMap, favorite)
                 TrackEvent.FavoriteActionClick.track()
+            },
+            onLiveTrackingListener = { trackMap, startTracking ->
+                permissionChecker.requestLocationPermission(onGrantedPermission = {
+                    updateLastLocation()
+                    startUserTrackLocationService(trackMap, startTracking)
+                })
+                TrackEvent.LiveTrackingActionClick.track()
             }
         )
 
@@ -237,47 +239,22 @@ class EntriesFragment : Fragment() {
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
 //            viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
-            joinViewModel.joinTrackMap(context = requireContext(), trackMapCode = decodedCode, showFeedback = true)
+            joinViewModel.joinTrackMap(
+                context = requireContext(),
+                trackMapCode = decodedCode,
+                showFeedback = true
+            )
         }
     }
 
-    private fun startUserTrackLocationService() {
+    private fun startUserTrackLocationService(trackMap: TrackMap, startTracking: Boolean) {
         requireActivity().apply {
-            locationForegroundService = LocationForegroundService()
-            val serviceIntent = Intent(requireContext(), locationForegroundService::class.java)
-            if (!isMyServiceRunning(locationForegroundService::class.java, this)) {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                    startForegroundService(serviceIntent)
-                } else {
-                    startService(serviceIntent)
-                }
-                logDebug("Service initialized")
-            } else {
-                logDebug("Service already initialized!")
-            }
+            locationForegroundServiceHandler.startUserLocationService(
+                this,
+                trackMap.trackMapId,
+                startTracking
+            )
         }
-    }
-
-    private fun isMyServiceRunning(serviceClass: Class<*>, mActivity: Activity): Boolean {
-        val manager: ActivityManager =
-            mActivity.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
-        for (service in manager.getRunningServices(Int.MAX_VALUE)) {
-            if (serviceClass.name == service.service.getClassName()) {
-                requireContext().logDebug("Service status - Running")
-                return true
-            }
-        }
-        requireContext().logDebug("Service status - Not Running")
-        return false
-    }
-
-    fun isLocationEnabledOrNot(context: Context): Boolean {
-        var locationManager: LocationManager? = null
-        locationManager =
-            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager?
-        return locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager!!.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
-        )
     }
 
     companion object {

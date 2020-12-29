@@ -52,6 +52,7 @@
     <string name="map_type_satellite">Satellite</string>
     <string name="map_type_terrain">Terrain</string>
     <string name="switch_to_map_type">Cambiar estilo de mapa</string>
+    <string name="live_tracking_autostart_info">Tracking en tiempo real empezará en</string>
 
     <string name="altitude">Altitud</string>
     <string name="speed">Velocidad</string>

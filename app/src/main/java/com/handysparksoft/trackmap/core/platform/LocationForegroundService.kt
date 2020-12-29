@@ -68,6 +68,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
             when (it) {
                 ACTION_STOP -> {
                     manuallyStopped = true
+                    stopForeground(true)
                     stopSelf()
                 }
             }
