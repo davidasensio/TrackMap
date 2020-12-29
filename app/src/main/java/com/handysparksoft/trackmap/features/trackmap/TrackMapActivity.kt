@@ -11,6 +11,7 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Rational
 import android.view.View
 import android.widget.ImageView
@@ -105,6 +106,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val participants = mutableSetOf<ParticipantLocation>()
     private var participantToFollow: ParticipantLocation? = null
 
+    lateinit var countDownTimer: CountDownTimer
+
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
 
@@ -121,6 +124,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         setupMapUI()
         setupUI()
         setupBottomSheet()
+        setupTrackingAlert()
     }
 
     override fun onDestroy() {
@@ -352,6 +356,54 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     startActivity(dialIntent)
                 }
             }
+        }
+    }
+
+    /**
+     * Start Live Tracking animated alert functions
+     */
+    private fun setupTrackingAlert() {
+        binding.liveTrackingAlertDialog.scaleX = 0f
+        binding.liveTrackingAlertDialog.scaleY = 0f
+        binding.liveTrackingAlertDialog.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setStartDelay(2000)
+            .setDuration(750)
+            .withStartAction {
+                countDownTimer.start()
+            }
+            .start()
+
+        countDownTimer = object : CountDownTimer(2100, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = (millisUntilFinished / 1000) + 1
+                binding.liveTrackingInfoNumber.scaleX = 3f
+                binding.liveTrackingInfoNumber.scaleY = 3f
+                binding.liveTrackingInfoNumber.visibility = View.VISIBLE
+                binding.liveTrackingInfoNumber.text = secondsRemaining.toString()
+                binding.liveTrackingInfoNumber.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(1000)
+                    .start()
+            }
+
+            override fun onFinish() {
+                binding.liveTrackingAlertDialog.animate()
+                    .scaleX(0f)
+                    .scaleY(0f)
+                    .setDuration(250)
+                    .withEndAction {
+                        binding.liveTrackingAlertDialog.visibility = View.GONE
+                    }
+                    .start()
+            }
+        }
+
+        binding.liveTrackingAlertCancelButton.setOnClickListener {
+            binding.liveTrackingAlertDialog.visibility = View.GONE
+            countDownTimer.cancel()
         }
     }
 
