@@ -8,8 +8,6 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.drawable.AnimatedVectorDrawable
-import android.graphics.drawable.LayerDrawable
-import android.graphics.drawable.StateListDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
@@ -36,6 +34,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
 import com.handysparksoft.domain.model.ParticipantLocation
+import com.handysparksoft.domain.model.ParticipantLocationSnapshot
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.UserMarkerData
 import com.handysparksoft.trackmap.BuildConfig
@@ -82,6 +81,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             app.component.trackMapViewModelFactory
         ).get(TrackMapViewModel::class.java)
     }
+
+    lateinit var trackMapId: String
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
@@ -547,6 +548,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setTrackMapData() {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
+            trackMapId = it.trackMapId
             loadParticipantsData(it.participantIds)
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
@@ -665,6 +667,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "batteryLevel" -> it.batteryLevel = snapshot.value as Long
                         "lastAccess" -> it.lastAccess = snapshot.value as Long
                     }
+                    locationHandler.addParticipantSnapshot(
+                        trackMapId,
+                        ParticipantLocationSnapshot.fromParticipantLocation(it)
+                    )
                 }
                 refreshTrackMap()
             }
@@ -870,24 +876,31 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun refreshBottomSheetMarkerData(markerTag: String) {
         userMarkerMap[markerTag]?.let { userMarkerData ->
             userMarkerData.participanLocation?.let { participantLocation ->
+                val userId = participantLocation.userId
+                val userNickname = participantLocation.nickname
 
                 val distance =
                     getUserSessionLocation()?.distanceTo(participantLocation.toLocation()) ?: 0f
                 with(markerMapSelectedBottomSheetBinding) {
-                    userNickname.text = participantLocation.nickname ?: participantLocation.userId
+                    markerMapSelectedBottomSheetBinding.userNickname.text = userNickname ?: userId
+
                     val (time, timeUnit) = participantLocation.getLastActivity()
                     val timeUnitPlural = getTimeUnitPlural(time, timeUnit)
                     userLastActivity.text =
                         getString(R.string.user_info_last_activity, time.toString(), timeUnitPlural)
 
                     userSpeed.value = participantLocation.speed.toString()
+                    userSpeed.maxValue = locationHandler.getMaxSpeed(trackMapId, userId).toString()
+
                     userAltitude.value = participantLocation.altitudeAMSL.toString()
+                    userAltitude.maxValue =
+                        locationHandler.getMaxAltitudeAMSL(trackMapId, userId).toString()
 
                     val (distanceFormatted, unit) = getDistanceFormatted(distance)
                     userDistanceFromYou.value = distanceFormatted
                     userDistanceFromYou.unit = unit
 
-                    userFullName.text = participantLocation.fullName ?: participantLocation.nickname
+                    userFullName.text = participantLocation.fullName ?: userNickname
                     userPhone.text = participantLocation.phone
                     userPhone.visibility =
                         if (userPhone.text.isNotEmpty()) View.VISIBLE else View.INVISIBLE

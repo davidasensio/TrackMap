@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.LayoutInflater
+import android.view.View
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.databinding.CustomScalarViewBinding
@@ -24,6 +25,22 @@ class ScalarView : ConstraintLayout {
         set(value) {
             field = value
             binding.customScalarViewValue.text = value
+        }
+
+    var maxValue: String? = null
+        set(value) {
+            field = value
+            if (field != null && unit != null) {
+                val maxValue = "(Max)\n$value $unit"
+                binding.customScalarViewMaxValue.text = maxValue
+            }
+        }
+
+    var maxValueHidden: Boolean = false
+        set(value) {
+            field = value
+            val visibility = if (value) View.GONE else View.VISIBLE
+            binding.customScalarViewMaxValue.visibility = visibility
         }
 
     var unit: String? = null
@@ -58,8 +75,10 @@ class ScalarView : ConstraintLayout {
     private fun init(attrs: AttributeSet?, defStyle: Int) {
         context.obtainStyledAttributes(attrs, R.styleable.ScalarView, defStyle, 0).apply {
             name = this.getString(R.styleable.ScalarView_scalarName)
-            value = this.getString(R.styleable.ScalarView_scalarValue)
             unit = this.getString(R.styleable.ScalarView_scalarUnit)
+            value = this.getString(R.styleable.ScalarView_scalarValue)
+            maxValue = this.getString(R.styleable.ScalarView_scalarMaxValue)
+            maxValueHidden = this.getBoolean(R.styleable.ScalarView_scalarMaxValueHidden, false)
             drawable = this.getDrawable(R.styleable.ScalarView_scalarDrawable)
 
             binding.customScalarViewValue.compoundDrawablePadding = this.getDimensionPixelSize(R.styleable.ScalarView_android_drawablePadding, 16)
