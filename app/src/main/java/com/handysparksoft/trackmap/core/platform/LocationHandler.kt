@@ -44,7 +44,6 @@ class LocationHandler @Inject constructor(private val context: Context) {
             period = SNAPSHOT_UPDATE_RATE_MILLIS,
             action = {
                 canUpdateSnapshots = true
-                println("******** Heeeelllos")
             }
         )
     }
