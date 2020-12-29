@@ -19,6 +19,7 @@
         tools:text="Speed" />
 
     <LinearLayout
+        android:id="@+id/customScalarViewLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -49,6 +50,26 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/customScalarViewName"
             tools:ignore="SmallSp"
-            tools:text="m/s" />
+            tools:text="Km/h" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/customScalarViewMaxValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center_horizontal"
+        android:padding="4dp"
+        android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+        android:textColor="@color/colorPrimary"
+        android:textSize="10sp"
+        android:visibility="gone"
+        tools:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/customScalarViewLayout"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:ignore="SmallSp"
+        tools:text="(Max)\n120 Km/h" />
 </merge>

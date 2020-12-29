@@ -2,6 +2,8 @@
     <declare-styleable name="ScalarView">
         <attr name="scalarName" format="string" />
         <attr name="scalarValue" format="string" />
+        <attr name="scalarMaxValue" format="string" />
+        <attr name="scalarMaxValueHidden" format="boolean" />
         <attr name="scalarUnit" format="string" />
         <attr name="scalarDrawable" format="reference" />
         <attr name="android:drawablePadding" format="dimension" />
