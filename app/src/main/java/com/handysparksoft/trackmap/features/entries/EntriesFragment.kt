@@ -107,6 +107,7 @@ class EntriesFragment : Fragment() {
                     this.onSortByNameClick { viewModel.sortByName() }
                     this.onSortByParticipantsClick { viewModel.sortByParticipants() }
                     this.onSortByOwnedClick { viewModel.sortByOwned() }
+                    this.onSortByLiveTrackingClick { viewModel.sortByLiveTracking() }
                 }.show(mainActivity.supportFragmentManager, "SortEntries")
             }
         }

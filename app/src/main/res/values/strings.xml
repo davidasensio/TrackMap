@@ -72,6 +72,7 @@
     <string name="sort_trackmaps_by_name">Name (alphabetically)</string>
     <string name="sort_trackmaps_by_participant_count">Number of participants</string>
     <string name="sort_trackmaps_by_owner">Owner (Created by you first)</string>
+    <string name="sort_trackmaps_by_live_tracking">Live Tracking state</string>
 
     <string name="profile_title">Profile</string>
     <string name="profile_nickname">Nickname</string>
