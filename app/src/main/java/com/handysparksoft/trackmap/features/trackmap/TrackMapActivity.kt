@@ -136,6 +136,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         participantMarkers.clear()
         customMarker = null
         participants.clear()
+        cancelCountDownTimer()
         super.onDestroy()
     }
 
@@ -401,12 +402,19 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         binding.liveTrackingAlertDialog.visibility = View.GONE
                         startUserTrackLocationService(trackMapId = trackMapId, startTracking = true)
                         TrackEvent.LiveTrackingAutoActionClick.track()
+                        setResult(RESULT_OK)
                     }
                     .start()
             }
         }
 
         binding.liveTrackingAlertCancelButton.setOnClickListener {
+            cancelCountDownTimer()
+        }
+    }
+
+    private fun cancelCountDownTimer() {
+        if (::countDownTimer.isInitialized) {
             countDownTimer.cancel()
             binding.liveTrackingAlertDialog.visibility = View.GONE
         }
@@ -1048,7 +1056,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     companion object {
-        private const val TRACKMAP_PARAM = "trackMapId"
+        const val TRACKMAP_PARAM = "trackMapId"
         private const val GOOGLE_MAP_FRAME_MIN_PADDING_DP = 16
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
