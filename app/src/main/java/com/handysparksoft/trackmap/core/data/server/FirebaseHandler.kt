@@ -40,7 +40,7 @@ class FirebaseHandler @Inject constructor() {
     private val trackMapSubscriptors = mutableListOf<OnTrackMapListener>()
 
     fun getChildTrackMapId(trackMapId: String): DatabaseReference {
-        return rootRef.child("trackMaps/$trackMapId/participantIds")
+        return rootRef.child("trackMaps/$trackMapId/liveParticipantIds")
     }
 
     fun getChildUserId(userId: String): DatabaseReference {

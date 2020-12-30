@@ -614,7 +614,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setTrackMapData() {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
             trackMapId = it.trackMapId
-            loadParticipantsData(it.participantIds)
+
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
 
@@ -652,9 +652,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun loadParticipantsData(participantIds: List<String>) {
+    private fun loadParticipantsData(participantIds: List<String>?) {
         participants.clear()
-        participantIds.forEach { id ->
+        participantIds?.forEach { id ->
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
                 logDebug("Loading participant data of: $participantIds")
@@ -692,19 +692,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun subscribeForParticipantUpdates(trackMapId: String) {
         participantsLocationChildEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                subscribeForParticipantLocationUpdates(snapshot.value as String)
-                logDebug("Child added: ${snapshot.value}")
+                reloadParticipantData()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                val removedParticipantId = snapshot.value as String
-                participants.firstOrNull { it.userId == removedParticipantId }?.let {
-                    participants.remove(it)
-                }
-                refreshTrackMap()
-                logDebug("Child removed: ${snapshot.value}")
+                reloadParticipantData()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -716,8 +710,22 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             .addChildEventListener(participantsLocationChildEventListener)
     }
 
+    private fun reloadParticipantData() {
+        firebaseHandler.getChildTrackMapId(trackMapId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    (snapshot.value as? List<String>)?.let { liveParticipants ->
+                        loadParticipantsData(liveParticipants)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+    }
+
     private fun setupTrackMapForParticipantLocations(trackMap: TrackMap) {
-        trackMap.participantIds.forEach { userId ->
+        trackMap.liveParticipantIds?.forEach { userId ->
             subscribeForParticipantLocationUpdates(userId)
         }
     }
