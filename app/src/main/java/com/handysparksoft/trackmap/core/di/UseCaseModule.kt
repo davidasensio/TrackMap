@@ -59,4 +59,12 @@ class UseCaseModule {
     @Provides
     fun favoriteTrackMapUseCaseProvider(trackMapRepository: TrackMapRepository) =
         FavoriteTrackMapUseCase(trackMapRepository)
+
+    @Provides
+    fun startLiveTrackingUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        StartLiveTrackingUseCase(trackMapRepository)
+
+    @Provides
+    fun stopLiveTrackingUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        StopLiveTrackingUseCase(trackMapRepository)
 }

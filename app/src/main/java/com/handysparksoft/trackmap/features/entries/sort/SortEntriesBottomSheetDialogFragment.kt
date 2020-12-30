@@ -16,6 +16,7 @@ class SortEntriesBottomSheetDialogFragment : BottomSheetDialogFragment() {
     private var onSortByNameClickListener: (() -> Unit)? = null
     private var onSortByParticipantsClickListener: (() -> Unit)? = null
     private var onSortByOwnedClickListener: (() -> Unit)? = null
+    private var onSortByLiveTrackingClickListener: (() -> Unit)? = null
 
     fun onSortByDateClick(listener: () -> Unit) {
         onSortByDateClickListener = listener
@@ -31,6 +32,10 @@ class SortEntriesBottomSheetDialogFragment : BottomSheetDialogFragment() {
 
     fun onSortByOwnedClick(listener: () -> Unit) {
         onSortByOwnedClickListener = listener
+    }
+
+    fun onSortByLiveTrackingClick(listener: () -> Unit) {
+        onSortByLiveTrackingClickListener = listener
     }
 
     override fun onCreateView(
@@ -60,6 +65,10 @@ class SortEntriesBottomSheetDialogFragment : BottomSheetDialogFragment() {
         }
         binding.sortByOwned.setOnClickListener {
             onSortByOwnedClickListener?.invoke()
+            dismiss()
+        }
+        binding.sortByLiveTracking.setOnClickListener {
+            onSortByLiveTrackingClickListener?.invoke()
             dismiss()
         }
     }

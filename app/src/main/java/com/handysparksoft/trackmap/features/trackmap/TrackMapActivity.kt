@@ -11,6 +11,7 @@ import android.graphics.drawable.AnimatedVectorDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Rational
 import android.view.View
 import android.widget.ImageView
@@ -71,6 +72,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     @Inject
     lateinit var googleMapHandler: GoogleMapHandler
 
+    @Inject
+    lateinit var locationForegroundServiceHandler: LocationForegroundServiceHandler
+
     private lateinit var googleMap: GoogleMap
 
     private lateinit var mapActionHelper: MapActionHelper
@@ -104,6 +108,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private val participants = mutableSetOf<ParticipantLocation>()
     private var participantToFollow: ParticipantLocation? = null
+
+    lateinit var countDownTimer: CountDownTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
@@ -356,6 +362,65 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
+     * Start Live Tracking animated alert functions
+     */
+    private fun setupTrackingAlert() {
+        binding.liveTrackingAlertDialog.scaleX = 0f
+        binding.liveTrackingAlertDialog.scaleY = 0f
+        binding.liveTrackingAlertDialog.visibility = View.VISIBLE
+        binding.liveTrackingAlertDialog.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setStartDelay(2000)
+            .setDuration(750)
+            .withStartAction {
+                countDownTimer.start()
+            }
+            .start()
+
+        countDownTimer = object : CountDownTimer(3500, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = (millisUntilFinished / 1000)
+                binding.liveTrackingInfoNumber.scaleX = 2.5f
+                binding.liveTrackingInfoNumber.scaleY = 2.5f
+                binding.liveTrackingInfoNumber.visibility = View.VISIBLE
+                binding.liveTrackingInfoNumber.text = secondsRemaining.toString()
+                binding.liveTrackingInfoNumber.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(900)
+                    .start()
+            }
+
+            override fun onFinish() {
+                binding.liveTrackingAlertDialog.animate()
+                    .scaleX(0f)
+                    .scaleY(0f)
+                    .setDuration(250)
+                    .withEndAction {
+                        binding.liveTrackingAlertDialog.visibility = View.GONE
+                        startUserTrackLocationService(trackMapId = trackMapId, startTracking = true)
+                        TrackEvent.LiveTrackingAutoActionClick.track()
+                    }
+                    .start()
+            }
+        }
+
+        binding.liveTrackingAlertCancelButton.setOnClickListener {
+            countDownTimer.cancel()
+            binding.liveTrackingAlertDialog.visibility = View.GONE
+        }
+    }
+
+    private fun startUserTrackLocationService(trackMapId: String, startTracking: Boolean) {
+        locationForegroundServiceHandler.startUserLocationService(
+            this,
+            trackMapId,
+            startTracking
+        )
+    }
+
+    /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
@@ -549,10 +614,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setTrackMapData() {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
             trackMapId = it.trackMapId
-            loadParticipantsData(it.participantIds)
+
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
 
+            if (!locationForegroundServiceHandler.hasLiveTrackingAlreadyStarted(trackMapId)) {
+                setupTrackingAlert()
+            }
 
             // FIXME: remove after tests
             /*val taskLog = object : TimerTask() {
@@ -584,9 +652,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun loadParticipantsData(participantIds: List<String>) {
+    private fun loadParticipantsData(participantIds: List<String>?) {
         participants.clear()
-        participantIds.forEach { id ->
+        participantIds?.forEach { id ->
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
                 logDebug("Loading participant data of: $participantIds")
@@ -624,19 +692,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun subscribeForParticipantUpdates(trackMapId: String) {
         participantsLocationChildEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                subscribeForParticipantLocationUpdates(snapshot.value as String)
-                logDebug("Child added: ${snapshot.value}")
+                reloadParticipantData()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                val removedParticipantId = snapshot.value as String
-                participants.firstOrNull { it.userId == removedParticipantId }?.let {
-                    participants.remove(it)
-                }
-                refreshTrackMap()
-                logDebug("Child removed: ${snapshot.value}")
+                reloadParticipantData()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -648,8 +710,22 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             .addChildEventListener(participantsLocationChildEventListener)
     }
 
+    private fun reloadParticipantData() {
+        firebaseHandler.getChildTrackMapId(trackMapId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    (snapshot.value as? List<String>)?.let { liveParticipants ->
+                        loadParticipantsData(liveParticipants)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+    }
+
     private fun setupTrackMapForParticipantLocations(trackMap: TrackMap) {
-        trackMap.participantIds.forEach { userId ->
+        trackMap.liveParticipantIds?.forEach { userId ->
             subscribeForParticipantLocationUpdates(userId)
         }
     }

@@ -154,6 +154,14 @@ class MainViewModel(
             .sortedBy { it.favorite != true }
         )
     }
+
+    fun sortByLiveTracking() {
+        _model.value = UiModel.Content(currentTrackMaps
+            .sortedByDescending { it.creationDate }
+            .sortedBy { it.favorite != true }
+            .sortedByDescending { it.liveParticipantIds?.contains(userHandler.getUserId()) }
+        )
+    }
 }
 
 class MainViewModelFactory(

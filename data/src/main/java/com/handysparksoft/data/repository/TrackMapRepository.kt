@@ -65,4 +65,12 @@ class TrackMapRepository(private val remoteDataSource: RemoteDataSource) {
     suspend fun favoriteTrackMap(userId: String, trackMapId: String, favorite: Boolean) {
         remoteDataSource.favoriteTrackMap(userId, trackMapId, favorite)
     }
+
+    suspend fun startLiveTracking(trackMapId: String, liveTrackingParticipant: TrackMapLiveTrackingParticipant) {
+        remoteDataSource.startLiveTracking(trackMapId, liveTrackingParticipant)
+    }
+
+    suspend fun stopLiveTracking(trackMapId: String, liveTrackingParticipant: TrackMapLiveTrackingParticipant) {
+        remoteDataSource.stopLiveTracking(trackMapId, liveTrackingParticipant)
+    }
 }

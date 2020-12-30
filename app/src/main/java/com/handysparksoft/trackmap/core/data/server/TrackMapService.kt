@@ -94,4 +94,16 @@ interface TrackMapService {
         @Header("Authorization") authorization: String,
         @Body pushNotification: PushNotification
     )
+
+    @PATCH("trackMaps/{trackMapId}.json")
+    suspend fun startLiveTracking(
+        @Path("trackMapId") trackMapId: String,
+        @Body liveTrackingParticipant: TrackMapLiveTrackingParticipant
+    )
+
+    @PATCH("trackMaps/{trackMapId}.json")
+    suspend fun stopLiveTracking(
+        @Path("trackMapId") trackMapId: String,
+        @Body liveTrackingParticipant: TrackMapLiveTrackingParticipant
+    )
 }

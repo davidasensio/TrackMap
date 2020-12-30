@@ -57,6 +57,7 @@ class CreateViewModel(
             description,
             System.currentTimeMillis(),
             listOf(ownerId),
+            emptyList(),
             null,
         )
         launch(Dispatchers.Main) {

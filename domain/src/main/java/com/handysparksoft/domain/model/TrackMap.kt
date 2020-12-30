@@ -9,5 +9,6 @@ data class TrackMap(
     val description: String,
     val creationDate: Long = System.currentTimeMillis(),
     val participantIds: List<String>,
+    val liveParticipantIds: List<String>?,
     var favorite: Boolean?
 ) : Serializable
