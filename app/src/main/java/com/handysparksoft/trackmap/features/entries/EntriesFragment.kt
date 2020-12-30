@@ -169,6 +169,7 @@ class EntriesFragment : Fragment() {
             is Content -> {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
+                locationForegroundServiceHandler.setUserTrackMapIds(model.data.map { it.trackMapId })
                 binding.swipeRefreshLayout.isRefreshing = false
                 binding.recycler.scrollToPosition(0)
             }

@@ -36,6 +36,9 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     @Inject
     lateinit var updateUserAltitudeUseCase: UpdateUserGPSDataUseCase
 
+    @Inject
+    lateinit var locationForegroundServiceHandler: LocationForegroundServiceHandler
+
     private var manuallyStopped: Boolean = false
 
     init {
@@ -82,7 +85,9 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     override fun onDestroy() {
         stopRequestLocationUpdates()
         stopRequestGPSLocationUpdates()
+        locationForegroundServiceHandler.clearAllLiveTracking()
         destroyScope()
+
         super.onDestroy()
 
         if (!manuallyStopped) {

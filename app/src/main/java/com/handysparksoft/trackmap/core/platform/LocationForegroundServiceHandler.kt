@@ -8,30 +8,66 @@ import android.location.LocationManager
 import android.os.Build
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.platform.LocationForegroundService.Companion.ACTION_STOP
+import com.handysparksoft.usecases.StartLiveTrackingUseCase
+import com.handysparksoft.usecases.StopLiveTrackingUseCase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LocationForegroundServiceHandler @Inject constructor() {
+class LocationForegroundServiceHandler @Inject constructor(
+    private val userHandler: UserHandler,
+    private val startLiveTrackingUseCase: StartLiveTrackingUseCase,
+    private val stopLiveTrackingUseCase: StopLiveTrackingUseCase
+) : Scope by Scope.Impl() {
 
     private lateinit var locationForegroundService: LocationForegroundService
 
+    private var userTrackMapIds = mutableSetOf<String>()
+
     private val liveTrackingMapIds = mutableSetOf<String>()
+
+    init {
+        initScope()
+    }
+
+    fun setUserTrackMapIds(trackMapIds: List<String>) {
+        userTrackMapIds = trackMapIds.toMutableSet()
+    }
 
     fun startUserLocationService(activity: Activity, trackMapId: String, startTracking: Boolean) {
         if (startTracking) {
             startService(activity)
             liveTrackingMapIds.add(trackMapId)
+
+            launch(Dispatchers.IO) {
+                startLiveTrackingUseCase.execute(userHandler.getUserId(), trackMapId)
+            }
         } else {
             liveTrackingMapIds.remove(trackMapId)
             if (liveTrackingMapIds.size == 0) {
                 stopService(activity)
+            }
+
+            launch(Dispatchers.IO) {
+                stopLiveTrackingUseCase.execute(userHandler.getUserId(), trackMapId)
             }
         }
     }
 
     fun hasLiveTrackingAlreadyStarted(trackMapId: String): Boolean =
         liveTrackingMapIds.contains(trackMapId)
+
+    fun clearAllLiveTracking() {
+        userTrackMapIds.forEach { trackMapId ->
+            launch(Dispatchers.IO) {
+                stopLiveTrackingUseCase.execute(userHandler.getUserId(), trackMapId)
+            }
+        }
+        userTrackMapIds.clear()
+        liveTrackingMapIds.clear()
+    }
 
     private fun startService(activity: Activity) {
         locationForegroundService = LocationForegroundService()
