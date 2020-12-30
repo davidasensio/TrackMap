@@ -732,11 +732,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "batteryLevel" -> it.batteryLevel = snapshot.value as Long
                         "lastAccess" -> it.lastAccess = snapshot.value as Long
                     }
-                    locationHandler.addParticipantSnapshot(
-                        trackMapId,
-                        ParticipantLocationSnapshot.fromParticipantLocation(it)
-                    )
-                    println("***updated + ${snapshot.key}")
                 }
                 refreshTrackMap()
             }

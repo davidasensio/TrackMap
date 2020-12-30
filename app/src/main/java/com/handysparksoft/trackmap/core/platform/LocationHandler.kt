@@ -160,13 +160,22 @@ class LocationHandler @Inject constructor(private val context: Context) {
         }
     }
 
-    fun addParticipantSnapshot(trackMapId: String, snapshot: ParticipantLocationSnapshot) {
+    fun addSnapshots(
+        liveTrackingMapIds: MutableSet<String>,
+        snapshot: ParticipantLocationSnapshot
+    ) {
         if (canUpdateSnapshots) {
             canUpdateSnapshots = false
-            val trackMapSnapshots = participantSnapshots[trackMapId] ?: mutableListOf()
-            trackMapSnapshots.add(snapshot)
-            participantSnapshots[trackMapId] = trackMapSnapshots
+            liveTrackingMapIds.forEach {
+                addParticipantSnapshot(it, snapshot)
+            }
         }
+    }
+
+    fun addParticipantSnapshot(trackMapId: String, snapshot: ParticipantLocationSnapshot) {
+        val trackMapSnapshots = participantSnapshots[trackMapId] ?: mutableListOf()
+        trackMapSnapshots.add(snapshot)
+        participantSnapshots[trackMapId] = trackMapSnapshots
     }
 
     fun getMaxSpeed(trackMapId: String, userId: String): Long {

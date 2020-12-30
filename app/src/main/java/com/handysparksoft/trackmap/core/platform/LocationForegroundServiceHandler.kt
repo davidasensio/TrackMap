@@ -26,7 +26,7 @@ class LocationForegroundServiceHandler @Inject constructor(
 
     private var userTrackMapIds = mutableSetOf<String>()
 
-    private val liveTrackingMapIds = mutableSetOf<String>()
+    val liveTrackingMapIds = mutableSetOf<String>()
 
     init {
         initScope()
