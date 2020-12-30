@@ -56,6 +56,7 @@ class App : Application() {
             logDebug("User token is $token")
         }
 
+        // Periodic task for battery updates
         UpdateBatteryLevelWorker.initBatteryLevelPeriodicWork(this)
     }
 

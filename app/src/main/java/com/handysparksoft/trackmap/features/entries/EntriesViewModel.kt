@@ -74,7 +74,7 @@ class MainViewModel(
             val userTrackMaps = getTrackMapsUseCase.execute(userId)
             if (userTrackMaps is Result.Success) {
                 currentTrackMaps = ArrayList(userTrackMaps.data.values)
-                sortByName()
+                sortByLiveTracking()
             } else if (userTrackMaps is Result.Error) {
                 _model.value =
                     UiModel.Error(userTrackMaps.isNetworkError, "Code: ${userTrackMaps.code}")

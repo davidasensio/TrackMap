@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.IBinder
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
+import com.handysparksoft.domain.model.ParticipantLocationSnapshot
 import com.handysparksoft.domain.model.UserGPSData
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.app
@@ -159,6 +160,9 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
                         it.latitude,
                         it.longitude
                     )
+
+                    // Add Snapshot to TrackMaps in Live Tracking state
+                    addSnapshots(it.latitude, it.longitude, 0, 0, 0)
                 }
             }
         }
@@ -182,11 +186,38 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
                     val altitudeGeoid = nmeaMessage.altitudeGeoid ?: 0
                     updateUserAltitudeUseCase.execute(
                         userHandler.getUserId(),
-                        UserGPSData(altitudeAMSL, altitudeGeoid, speedInKmh, System.currentTimeMillis())
+                        UserGPSData(
+                            altitudeAMSL,
+                            altitudeGeoid,
+                            speedInKmh,
+                            System.currentTimeMillis()
+                        )
                     )
+
+                    // Add Snapshot to TrackMaps in Live Tracking state
+                    addSnapshots(0.0, 0.0, altitudeAMSL, altitudeGeoid, speedInKmh)
                 }
             }
         }
+    }
+
+    private fun addSnapshots(
+        latitude: Double,
+        longitude: Double,
+        altitudeAMSL: Long,
+        altitudeGeoid: Long,
+        speedInKmh: Long
+    ) {
+        val snapshot = ParticipantLocationSnapshot(
+            userHandler.getUserId(),
+            latitude,
+            longitude,
+            altitudeAMSL,
+            altitudeGeoid,
+            speedInKmh,
+            System.currentTimeMillis()
+        )
+        locationHandler.addSnapshots(locationForegroundServiceHandler.liveTrackingMapIds, snapshot)
     }
 
     private fun stopRequestGPSLocationUpdates() {

@@ -26,14 +26,17 @@ class LocationForegroundServiceHandler @Inject constructor(
 
     private var userTrackMapIds = mutableSetOf<String>()
 
-    private val liveTrackingMapIds = mutableSetOf<String>()
+    val liveTrackingMapIds = mutableSetOf<String>()
 
     init {
         initScope()
     }
 
-    fun setUserTrackMapIds(trackMapIds: List<String>) {
+    fun setUserTrackMapIds(activity: Activity, trackMapIds: List<String>) {
         userTrackMapIds = trackMapIds.toMutableSet()
+        if (!isServiceRunning(activity)) {
+            clearAllLiveTracking()
+        }
     }
 
     fun startUserLocationService(activity: Activity, trackMapId: String, startTracking: Boolean) {
@@ -69,6 +72,9 @@ class LocationForegroundServiceHandler @Inject constructor(
         userTrackMapIds.clear()
         liveTrackingMapIds.clear()
     }
+
+    fun isServiceRunning(activity: Activity) = ::locationForegroundService.isInitialized &&
+            isMyServiceRunning(locationForegroundService::class.java, activity)
 
     private fun startService(activity: Activity) {
         locationForegroundService = LocationForegroundService()

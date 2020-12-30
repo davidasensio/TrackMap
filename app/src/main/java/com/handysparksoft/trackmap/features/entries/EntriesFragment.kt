@@ -170,7 +170,15 @@ class EntriesFragment : Fragment() {
             is Content -> {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
-                locationForegroundServiceHandler.setUserTrackMapIds(model.data.map { it.trackMapId })
+
+                locationForegroundServiceHandler.setUserTrackMapIds(requireActivity(), model.data.map { it.trackMapId })
+                if (!locationForegroundServiceHandler.isServiceRunning(requireActivity())) {
+                    // Reset possible remaining TrackMap states in Live Tracking when service is not running
+                    if (model.data.any { it.liveParticipantIds?.contains(userHandler.getUserId()) == true }) {
+                        viewModel.refresh()
+                    }
+                }
+
                 binding.swipeRefreshLayout.isRefreshing = false
                 binding.recycler.scrollToPosition(0)
             }
@@ -191,7 +199,11 @@ class EntriesFragment : Fragment() {
 
     private fun onGoEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
-            TrackMapActivity.start(requireContext(), it)
+            // TrackMapActivity.start(requireContext(), it)
+            val intent = Intent(requireContext(), TrackMapActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            intent.putExtra(TrackMapActivity.TRACKMAP_PARAM, it)
+            startActivityForResult(intent, START_TRACKMAP_ACTIVITY_REQUEST_CODE)
         }
     }
 
@@ -261,6 +273,9 @@ class EntriesFragment : Fragment() {
 
     companion object {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
+        private const val START_TRACKMAP_ACTIVITY_REQUEST_CODE = 200
+
+        private var isFirstLoading: Boolean = true
 
         fun newInstance() = EntriesFragment()
     }
