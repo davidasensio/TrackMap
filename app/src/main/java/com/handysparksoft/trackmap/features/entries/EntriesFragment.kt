@@ -170,7 +170,16 @@ class EntriesFragment : Fragment() {
             is Content -> {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
-                locationForegroundServiceHandler.setUserTrackMapIds(model.data.map { it.trackMapId })
+
+                locationForegroundServiceHandler.setUserTrackMapIds(model.data.map { it.trackMapId }, isFirstLoading)
+                if (isFirstLoading) {
+                    isFirstLoading = false
+                    // Reset possible remaining TrackMap states in Live Tracking for the first loading
+                    if (model.data.any { it.liveParticipantIds?.contains(userHandler.getUserId()) == true }) {
+                        viewModel.refresh()
+                    }
+                }
+
                 binding.swipeRefreshLayout.isRefreshing = false
                 binding.recycler.scrollToPosition(0)
             }
@@ -261,6 +270,8 @@ class EntriesFragment : Fragment() {
 
     companion object {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
+
+        private var isFirstLoading: Boolean = true
 
         fun newInstance() = EntriesFragment()
     }

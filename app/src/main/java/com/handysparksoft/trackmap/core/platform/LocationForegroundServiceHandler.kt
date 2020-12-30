@@ -32,8 +32,11 @@ class LocationForegroundServiceHandler @Inject constructor(
         initScope()
     }
 
-    fun setUserTrackMapIds(trackMapIds: List<String>) {
+    fun setUserTrackMapIds(trackMapIds: List<String>, isInitialization: Boolean = false) {
         userTrackMapIds = trackMapIds.toMutableSet()
+        if (isInitialization) {
+            clearAllLiveTracking()
+        }
     }
 
     fun startUserLocationService(activity: Activity, trackMapId: String, startTracking: Boolean) {
