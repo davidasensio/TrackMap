@@ -76,7 +76,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/selectableItemBackground"
-        android:drawablePadding="16dp"
+        android:drawablePadding="12dp"
         android:gravity="center_vertical"
         android:minHeight="?android:attr/listPreferredItemHeightSmall"
         android:paddingStart="16dp"

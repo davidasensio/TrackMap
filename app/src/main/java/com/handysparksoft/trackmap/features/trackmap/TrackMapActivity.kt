@@ -621,27 +621,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             if (!locationForegroundServiceHandler.hasLiveTrackingAlreadyStarted(trackMapId)) {
                 setupTrackingAlert()
             }
-
-            // FIXME: remove after tests
-            /*val taskLog = object : TimerTask() {
-                override fun run() {
-                    runOnUiThread {
-                        binding.tempLog.text = LocationHandler.nmeaLog.toString()
-                    }
-                }
-            }
-            Timer().scheduleAtFixedRate(taskLog, 0, 1500)
-            binding.tempLog.movementMethod = ScrollingMovementMethod()
-            binding.tempLog.setOnLongClickListener {
-                binding.tempLogContainer.alpha =
-                    if (binding.tempLogContainer.alpha == 1f) 0f else 1f
-                true
-            }
-            binding.tempLogClearButton.setOnClickListener {
-                LocationHandler.nmeaLog.clear()
-                binding.tempLog.text = ""
-            }*/
-            // END FIXME
         }
     }
 
