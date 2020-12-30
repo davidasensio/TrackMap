@@ -20,6 +20,7 @@ class MainViewModel(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
+    private val stopLiveTrackingUseCase: StopLiveTrackingUseCase,
     private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
     private val updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
     private val userHandler: UserHandler,
@@ -130,6 +131,9 @@ class MainViewModel(
         launch(Dispatchers.Main) {
             leaveTrackMapUseCase.execute(userId, trackMap.trackMapId)
 
+            // Besides leave TrackMap also stop tracking if necessary
+            stopLiveTrackingUseCase.execute(userId, trackMap.trackMapId)
+
             refresh()
         }
     }
@@ -154,12 +158,21 @@ class MainViewModel(
             .sortedBy { it.favorite != true }
         )
     }
+
+    fun sortByLiveTracking() {
+        _model.value = UiModel.Content(currentTrackMaps
+            .sortedByDescending { it.creationDate }
+            .sortedBy { it.favorite != true }
+            .sortedByDescending { it.liveParticipantIds?.contains(userHandler.getUserId()) }
+        )
+    }
 }
 
 class MainViewModelFactory(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
+    private val stopLiveTrackingUseCase: StopLiveTrackingUseCase,
     private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
     private val updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
     private val userHandler: UserHandler,
@@ -171,6 +184,7 @@ class MainViewModelFactory(
             getTrackMapsUseCase::class.java,
             saveUserUseCase::class.java,
             leaveTrackMapUseCase::class.java,
+            stopLiveTrackingUseCase::class.java,
             favoriteTrackMapUseCase::class.java,
             updateUserBatteryLevelUseCase::class.java,
             userHandler::class.java,
@@ -179,6 +193,7 @@ class MainViewModelFactory(
             getTrackMapsUseCase,
             saveUserUseCase,
             leaveTrackMapUseCase,
+            stopLiveTrackingUseCase,
             favoriteTrackMapUseCase,
             updateUserBatteryLevelUseCase,
             userHandler,

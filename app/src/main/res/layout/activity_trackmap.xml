@@ -72,46 +72,67 @@
                 android:textStyle="bold" />
         </com.google.android.material.card.MaterialCardView>
 
-        <!--<RelativeLayout
-            android:id="@+id/tempLogContainer"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/liveTrackingAlertDialog"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="96dp"
-            android:layout_marginEnd="8dp"
-            android:alpha="0"
+            android:layout_margin="48dp"
+            android:background="@drawable/overlay_round_shape_background"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@+id/trackMapFragment"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.2"
+            tools:visibility="visible">
 
             <TextView
-                android:id="@+id/tempLog"
-                android:layout_width="match_parent"
+                android:id="@+id/liveTrackingInfo"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:alpha="1"
-                android:background="@color/black_overlay"
-                android:gravity="bottom"
-                android:lines="4"
-                android:padding="4dp"
-                android:scrollbarStyle="insideInset"
-                android:scrollbars="vertical"
-                android:textColor="@android:color/white"
-                android:textSize="16sp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:gravity="center_horizontal"
+                android:text="@string/live_tracking_autostart_info"
+                android:textColor="@color/colorTextOnDark"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.3"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <ImageButton
-                android:id="@+id/tempLogClearButton"
+            <TextView
+                android:id="@+id/liveTrackingInfoNumber"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentEnd="true"
-                android:layout_margin="8dp"
-                android:background="@android:color/transparent"
-                android:importantForAccessibility="no"
-                android:padding="8dp"
-                android:src="@android:drawable/ic_menu_close_clear_cancel" />
-        </RelativeLayout>-->
+                android:layout_marginTop="8dp"
+                android:textColor="@color/colorTextOnDark"
+                android:textSize="28sp"
+                android:visibility="invisible"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/liveTrackingInfo"
+                tools:text="3"
+                tools:visibility="visible" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/liveTrackingAlertCancelButton"
+                style="@style/Secondary.Medium"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:text="@string/cancel"
+                android:textColor="@color/colorTextOnDark"
+                app:icon="@drawable/ic_close"
+                app:iconTint="@color/colorTextOnDark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/liveTrackingInfoNumber"
+                app:strokeColor="@color/colorTextOnDark" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <include
             android:id="@+id/dialogMapTypeLayout"

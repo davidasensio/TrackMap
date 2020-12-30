@@ -54,7 +54,7 @@ class BatteryLevelView : FrameLayout {
             else -> R.drawable.ic_battery_0
         }
         val iconTintResource = when {
-            level <= 10 -> R.color.colorNotification
+            level <= 10 -> R.color.colorAlert
             else -> TypedValue().let { typedValue ->
                 context.theme.resolveAttribute(R.attr.colorControlNormal, typedValue, true)
                 typedValue.resourceId

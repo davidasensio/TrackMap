@@ -70,4 +70,18 @@
         android:text="@string/sort_trackmaps_by_owner"
         android:textAppearance="?android:attr/textAppearanceListItemSmall"
         app:drawableStartCompat="@drawable/ic_person" />
+
+    <TextView
+        android:id="@+id/sortByLiveTracking"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/selectableItemBackground"
+        android:drawablePadding="12dp"
+        android:gravity="center_vertical"
+        android:minHeight="?android:attr/listPreferredItemHeightSmall"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:text="@string/sort_trackmaps_by_live_tracking"
+        android:textAppearance="?android:attr/textAppearanceListItemSmall"
+        app:drawableStartCompat="@drawable/ic_live_tracking" />
 </LinearLayout>

@@ -5,7 +5,7 @@
     <color name="colorAccent">#FDD835</color>
 
     <color name="colorIconPushNotification">#FFFFFF</color>
-    <color name="colorNotification">#F44336</color>
+    <color name="colorAlert">#F44336</color>
 
     <color name="black_overlay">#66000000</color>
     <color name="colorPrimaryDarkText">#1B5E20</color>

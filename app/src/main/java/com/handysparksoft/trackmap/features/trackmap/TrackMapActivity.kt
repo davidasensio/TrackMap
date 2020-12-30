@@ -7,9 +7,11 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.drawable.AnimatedVectorDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Rational
 import android.view.View
 import android.widget.ImageView
@@ -33,6 +35,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.gson.Gson
 import com.handysparksoft.domain.model.ParticipantLocation
+import com.handysparksoft.domain.model.ParticipantLocationSnapshot
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.UserMarkerData
 import com.handysparksoft.trackmap.BuildConfig
@@ -69,6 +72,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     @Inject
     lateinit var googleMapHandler: GoogleMapHandler
 
+    @Inject
+    lateinit var locationForegroundServiceHandler: LocationForegroundServiceHandler
+
     private lateinit var googleMap: GoogleMap
 
     private lateinit var mapActionHelper: MapActionHelper
@@ -79,6 +85,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             app.component.trackMapViewModelFactory
         ).get(TrackMapViewModel::class.java)
     }
+
+    lateinit var trackMapId: String
 
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
@@ -100,6 +108,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
     private val participants = mutableSetOf<ParticipantLocation>()
     private var participantToFollow: ParticipantLocation? = null
+
+    lateinit var countDownTimer: CountDownTimer
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
@@ -199,7 +209,17 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         title = getString(R.string.app_name)
 
         binding.frameOrFollowParticipantsInMapButton.setOnClickListener {
-            binding.frameOrFollowParticipantsInMapButton.setImageResource(if (frameOrFollowParticipantsInMap) R.drawable.ic_frame_off else R.drawable.ic_frame_on)
+            val frameOnResource = R.drawable.ic_frame_on
+            val frameOffResource = R.drawable.ic_frame_off_anim
+
+            if (frameOrFollowParticipantsInMap) {
+                binding.frameOrFollowParticipantsInMapButton.setImageResource(frameOffResource)
+                (binding.frameOrFollowParticipantsInMapButton.drawable as AnimatedVectorDrawable)
+                    .start()
+            } else {
+                binding.frameOrFollowParticipantsInMapButton.setImageResource(frameOnResource)
+            }
+
             frameOrFollowParticipantsInMap = !frameOrFollowParticipantsInMap
         }
 
@@ -342,6 +362,65 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     /**
+     * Start Live Tracking animated alert functions
+     */
+    private fun setupTrackingAlert() {
+        binding.liveTrackingAlertDialog.scaleX = 0f
+        binding.liveTrackingAlertDialog.scaleY = 0f
+        binding.liveTrackingAlertDialog.visibility = View.VISIBLE
+        binding.liveTrackingAlertDialog.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setStartDelay(2000)
+            .setDuration(750)
+            .withStartAction {
+                countDownTimer.start()
+            }
+            .start()
+
+        countDownTimer = object : CountDownTimer(3500, 1000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsRemaining = (millisUntilFinished / 1000)
+                binding.liveTrackingInfoNumber.scaleX = 2.5f
+                binding.liveTrackingInfoNumber.scaleY = 2.5f
+                binding.liveTrackingInfoNumber.visibility = View.VISIBLE
+                binding.liveTrackingInfoNumber.text = secondsRemaining.toString()
+                binding.liveTrackingInfoNumber.animate()
+                    .scaleX(1f)
+                    .scaleY(1f)
+                    .setDuration(900)
+                    .start()
+            }
+
+            override fun onFinish() {
+                binding.liveTrackingAlertDialog.animate()
+                    .scaleX(0f)
+                    .scaleY(0f)
+                    .setDuration(250)
+                    .withEndAction {
+                        binding.liveTrackingAlertDialog.visibility = View.GONE
+                        startUserTrackLocationService(trackMapId = trackMapId, startTracking = true)
+                        TrackEvent.LiveTrackingAutoActionClick.track()
+                    }
+                    .start()
+            }
+        }
+
+        binding.liveTrackingAlertCancelButton.setOnClickListener {
+            countDownTimer.cancel()
+            binding.liveTrackingAlertDialog.visibility = View.GONE
+        }
+    }
+
+    private fun startUserTrackLocationService(trackMapId: String, startTracking: Boolean) {
+        locationForegroundServiceHandler.startUserLocationService(
+            this,
+            trackMapId,
+            startTracking
+        )
+    }
+
+    /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
      * This is where we can add markers or lines, add listeners or move the camera. In this case,
@@ -415,6 +494,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
                 deactivateFraming()
             }
+        }
+
+        googleMap.setOnMyLocationButtonClickListener {
+            deactivateFraming()
+            false
         }
 
         googleMap.setOnMarkerClickListener {
@@ -529,31 +613,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun setTrackMapData() {
         (intent.getSerializableExtra(TRACKMAP_PARAM) as? TrackMap)?.let {
-            loadParticipantsData(it.participantIds)
+            trackMapId = it.trackMapId
+
             setupTrackMapForParticipantUpdates(it)
             setupTrackMapForParticipantLocations(it)
 
-
-            // FIXME: remove after tests
-            /*val taskLog = object : TimerTask() {
-                override fun run() {
-                    runOnUiThread {
-                        binding.tempLog.text = LocationHandler.nmeaLog.toString()
-                    }
-                }
+            if (!locationForegroundServiceHandler.hasLiveTrackingAlreadyStarted(trackMapId)) {
+                setupTrackingAlert()
             }
-            Timer().scheduleAtFixedRate(taskLog, 0, 1500)
-            binding.tempLog.movementMethod = ScrollingMovementMethod()
-            binding.tempLog.setOnLongClickListener {
-                binding.tempLogContainer.alpha =
-                    if (binding.tempLogContainer.alpha == 1f) 0f else 1f
-                true
-            }
-            binding.tempLogClearButton.setOnClickListener {
-                LocationHandler.nmeaLog.clear()
-                binding.tempLog.text = ""
-            }*/
-            // END FIXME
         }
     }
 
@@ -564,9 +631,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun loadParticipantsData(participantIds: List<String>) {
+    private fun loadParticipantsData(participantIds: List<String>?) {
         participants.clear()
-        participantIds.forEach { id ->
+        participantIds?.forEach { id ->
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
                 logDebug("Loading participant data of: $participantIds")
@@ -604,19 +671,13 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun subscribeForParticipantUpdates(trackMapId: String) {
         participantsLocationChildEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                subscribeForParticipantLocationUpdates(snapshot.value as String)
-                logDebug("Child added: ${snapshot.value}")
+                reloadParticipantData()
             }
 
             override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {}
 
             override fun onChildRemoved(snapshot: DataSnapshot) {
-                val removedParticipantId = snapshot.value as String
-                participants.firstOrNull { it.userId == removedParticipantId }?.let {
-                    participants.remove(it)
-                }
-                refreshTrackMap()
-                logDebug("Child removed: ${snapshot.value}")
+                reloadParticipantData()
             }
 
             override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {}
@@ -628,8 +689,22 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             .addChildEventListener(participantsLocationChildEventListener)
     }
 
+    private fun reloadParticipantData() {
+        firebaseHandler.getChildTrackMapId(trackMapId)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    (snapshot.value as? List<String>)?.let { liveParticipants ->
+                        loadParticipantsData(liveParticipants)
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                }
+            })
+    }
+
     private fun setupTrackMapForParticipantLocations(trackMap: TrackMap) {
-        trackMap.participantIds.forEach { userId ->
+        trackMap.liveParticipantIds?.forEach { userId ->
             subscribeForParticipantLocationUpdates(userId)
         }
     }
@@ -647,6 +722,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         "batteryLevel" -> it.batteryLevel = snapshot.value as Long
                         "lastAccess" -> it.lastAccess = snapshot.value as Long
                     }
+                    locationHandler.addParticipantSnapshot(
+                        trackMapId,
+                        ParticipantLocationSnapshot.fromParticipantLocation(it)
+                    )
                 }
                 refreshTrackMap()
             }
@@ -852,24 +931,31 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun refreshBottomSheetMarkerData(markerTag: String) {
         userMarkerMap[markerTag]?.let { userMarkerData ->
             userMarkerData.participanLocation?.let { participantLocation ->
+                val userId = participantLocation.userId
+                val userNickname = participantLocation.nickname
 
                 val distance =
                     getUserSessionLocation()?.distanceTo(participantLocation.toLocation()) ?: 0f
                 with(markerMapSelectedBottomSheetBinding) {
-                    userNickname.text = participantLocation.nickname ?: participantLocation.userId
+                    markerMapSelectedBottomSheetBinding.userNickname.text = userNickname ?: userId
+
                     val (time, timeUnit) = participantLocation.getLastActivity()
                     val timeUnitPlural = getTimeUnitPlural(time, timeUnit)
                     userLastActivity.text =
                         getString(R.string.user_info_last_activity, time.toString(), timeUnitPlural)
 
                     userSpeed.value = participantLocation.speed.toString()
+                    userSpeed.maxValue = locationHandler.getMaxSpeed(trackMapId, userId).toString()
+
                     userAltitude.value = participantLocation.altitudeAMSL.toString()
+                    userAltitude.maxValue =
+                        locationHandler.getMaxAltitudeAMSL(trackMapId, userId).toString()
 
                     val (distanceFormatted, unit) = getDistanceFormatted(distance)
                     userDistanceFromYou.value = distanceFormatted
                     userDistanceFromYou.unit = unit
 
-                    userFullName.text = participantLocation.fullName ?: participantLocation.nickname
+                    userFullName.text = participantLocation.fullName ?: userNickname
                     userPhone.text = participantLocation.phone
                     userPhone.visibility =
                         if (userPhone.text.isNotEmpty()) View.VISIBLE else View.INVISIBLE

@@ -11,11 +11,13 @@ import android.os.Looper
 import com.google.android.gms.location.*
 import com.google.android.gms.maps.model.LatLng
 import com.handysparksoft.domain.model.NMEAMessage
+import com.handysparksoft.domain.model.ParticipantLocationSnapshot
 import com.handysparksoft.trackmap.BuildConfig
 import com.handysparksoft.trackmap.core.extension.toLatLng
 import java.lang.reflect.Method
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.concurrent.fixedRateTimer
 
 @Singleton
 class LocationHandler @Inject constructor(private val context: Context) {
@@ -31,6 +33,20 @@ class LocationHandler @Inject constructor(private val context: Context) {
     private lateinit var locationListenerGPS: LocationListener
 
     private var lastLocation: LatLng? = null
+
+    // For max / min / avg purposes when tracking
+    private val participantSnapshots = HashMap<String, MutableList<ParticipantLocationSnapshot>>()
+    private var canUpdateSnapshots = false
+
+    init {
+        fixedRateTimer(
+            name = "SnapshotUpdateRate",
+            period = SNAPSHOT_UPDATE_RATE_MILLIS,
+            action = {
+                canUpdateSnapshots = true
+            }
+        )
+    }
 
     @SuppressLint("MissingPermission")
     fun getLastLocation(callback: (lastLocationParam: LatLng) -> Unit) {
@@ -89,6 +105,7 @@ class LocationHandler @Inject constructor(private val context: Context) {
                     currentSpeed = (location.speed * MS_TO_KMH_FACTOR).toLong()
                 }
             }
+
             override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {}
             override fun onProviderEnabled(provider: String) {}
             override fun onProviderDisabled(provider: String) {}
@@ -143,6 +160,33 @@ class LocationHandler @Inject constructor(private val context: Context) {
         }
     }
 
+    fun addParticipantSnapshot(trackMapId: String, snapshot: ParticipantLocationSnapshot) {
+        if (canUpdateSnapshots) {
+            canUpdateSnapshots = false
+            val trackMapSnapshots = participantSnapshots[trackMapId] ?: mutableListOf()
+            trackMapSnapshots.add(snapshot)
+            participantSnapshots[trackMapId] = trackMapSnapshots
+        }
+    }
+
+    fun getMaxSpeed(trackMapId: String, userId: String): Long {
+        return try {
+            participantSnapshots[trackMapId]?.filter { it.userId == userId }?.maxOf { it.speed }
+                ?: 0
+        } catch (e: NoSuchElementException) {
+            0
+        }
+    }
+
+    fun getMaxAltitudeAMSL(trackMapId: String, userId: String): Long {
+        return try {
+            participantSnapshots[trackMapId]?.filter { it.userId == userId }
+                ?.maxOf { it.altitudeAMSL } ?: 0
+        } catch (e: NoSuchElementException) {
+            0
+        }
+    }
+
     companion object {
         val nmeaLog = StringBuilder()
 
@@ -160,5 +204,8 @@ class LocationHandler @Inject constructor(private val context: Context) {
         private val LOCATION_GPS_MIN_DISTANCE_METERS = if (BuildConfig.DEBUG) 0f else 2f
         private const val REGEX_GGA_MESSAGE = "\\\$G[PLN]GGA.*"
         private const val MS_TO_KMH_FACTOR = 3.6
+
+        // Snapshots Update Rate
+        private const val SNAPSHOT_UPDATE_RATE_MILLIS = 5000L
     }
 }
