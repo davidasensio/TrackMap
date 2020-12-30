@@ -88,6 +88,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     lateinit var trackMapId: String
 
+    private lateinit var participantDataChildEventListener: ChildEventListener
     private lateinit var participantsLocationChildEventListener: ChildEventListener
 
     private val userMarkerMap = hashMapOf<String, UserMarkerData>()
@@ -131,6 +132,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onDestroy() {
         unsubscribeForParticipantLocationUpdates()
+        unsubscribeForParticipantDataUpdates()
         dismissAll(true)
         googleMap.clear()
         participantMarkers.clear()
@@ -624,7 +626,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             trackMapId = it.trackMapId
 
             setupTrackMapForParticipantUpdates(it)
-            setupTrackMapForParticipantLocations(it)
 
             if (!locationForegroundServiceHandler.hasLiveTrackingAlreadyStarted(trackMapId)) {
                 setupTrackingAlert()
@@ -641,7 +642,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun loadParticipantsData(participantIds: List<String>?) {
         participants.clear()
+
         participantIds?.forEach { id ->
+            // Load participant data (Once)
             val participantData = participants.firstOrNull { it.userId == id }
             if (participantData == null) {
                 logDebug("Loading participant data of: $participantIds")
@@ -669,6 +672,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         }
                     })
             }
+
+            // Subscribe for participant location updates
+            subscribeForParticipantLocationUpdates(id)
         }
     }
 
@@ -677,7 +683,9 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun subscribeForParticipantUpdates(trackMapId: String) {
-        participantsLocationChildEventListener = object : ChildEventListener {
+        unsubscribeForParticipantDataUpdates()
+
+        participantDataChildEventListener = object : ChildEventListener {
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
                 reloadParticipantData()
             }
@@ -694,7 +702,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         firebaseHandler.getChildTrackMapId(trackMapId)
-            .addChildEventListener(participantsLocationChildEventListener)
+            .addChildEventListener(participantDataChildEventListener)
     }
 
     private fun reloadParticipantData() {
@@ -709,12 +717,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 override fun onCancelled(error: DatabaseError) {
                 }
             })
-    }
-
-    private fun setupTrackMapForParticipantLocations(trackMap: TrackMap) {
-        trackMap.liveParticipantIds?.forEach { userId ->
-            subscribeForParticipantLocationUpdates(userId)
-        }
     }
 
     private fun subscribeForParticipantLocationUpdates(userId: String) {
@@ -734,6 +736,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         trackMapId,
                         ParticipantLocationSnapshot.fromParticipantLocation(it)
                     )
+                    println("***updated + ${snapshot.key}")
                 }
                 refreshTrackMap()
             }
@@ -757,6 +760,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
         firebaseHandler.getChildUserId(userId)
             .addChildEventListener(participantsLocationChildEventListener)
+    }
+
+    private fun unsubscribeForParticipantDataUpdates() {
+        if (::participantDataChildEventListener.isInitialized) {
+            firebaseHandler.rootRef.removeEventListener(participantDataChildEventListener)
+        }
     }
 
     private fun unsubscribeForParticipantLocationUpdates() {
