@@ -46,12 +46,13 @@ class LocationForegroundServiceHandler @Inject constructor(
             }
         } else {
             liveTrackingMapIds.remove(trackMapId)
-            if (liveTrackingMapIds.size == 0) {
-                stopService(activity)
-            }
 
             launch(Dispatchers.IO) {
                 stopLiveTrackingUseCase.execute(userHandler.getUserId(), trackMapId)
+            }
+            if (liveTrackingMapIds.size == 0) {
+                clearAllLiveTracking()
+                stopService(activity)
             }
         }
     }
