@@ -19,6 +19,8 @@ class UserHandler @Inject constructor(private val context: Context, private val 
 
     fun getUserNickname() = prefs.userProfileData?.nickname
 
+    fun getUserNicknameOrFullName() = prefs.userProfileData?.nickname ?: getUserFullName()
+
     fun getUserFullName() = prefs.userProfileData?.fullName ?: getUserId()
 
     fun getUserBatteryLevel(): Int = BatteryLevelHelper.getBatteryLevel(context)
