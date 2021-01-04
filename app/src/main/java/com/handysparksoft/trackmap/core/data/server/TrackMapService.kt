@@ -17,6 +17,9 @@ interface TrackMapService {
     @GET("trackMaps.json")
     suspend fun getTrackMaps(): Map<String, TrackMap>
 
+    @GET("trackMaps/{trackMapId}.json")
+    suspend fun getTrackMapById(@Path("trackMapId") trackMapId: String): TrackMap
+
     @GET("users/{userId}/trackMaps.json")
     suspend fun getUserTrackMaps(@Path("userId") userId: String): Map<String, TrackMap>
 
