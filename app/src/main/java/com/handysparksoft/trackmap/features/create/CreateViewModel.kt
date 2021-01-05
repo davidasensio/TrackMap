@@ -49,10 +49,12 @@ class CreateViewModel(
 
     fun createTrackMap(trackMapId: String, name: String, description: String) {
         val ownerId = userHandler.getUserId()
+        val ownerName = userHandler.getUserNicknameOrFullName()
 
         val trackMap = TrackMap(
             trackMapId,
             ownerId,
+            ownerName,
             name,
             description,
             System.currentTimeMillis(),

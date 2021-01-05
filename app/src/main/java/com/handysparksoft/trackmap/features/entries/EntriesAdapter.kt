@@ -42,8 +42,9 @@ class EntriesAdapter(
         //@Suppress("DEPRECATION")
         fun bind(trackMap: TrackMap) {
             if (trackMap.participantIds != null) {
+                val ownerName = trackMap.ownerName ?: trackMap.ownerId
                 itemBinding.creationDateTextView.text = Html.fromHtml(
-                    getCreationText(itemBinding.root, trackMap.ownerId, trackMap.creationDate)
+                    getCreationText(itemBinding.root, ownerName, trackMap.creationDate)
                 )
                 itemBinding.nameTextView.text = trackMap.name
                 itemBinding.descriptionTextView.text = trackMap.description
@@ -58,7 +59,7 @@ class EntriesAdapter(
                 )
 
                 // Bind listeners
-                itemBinding.trackMapShareImageButton.setOnClickListener {
+                itemBinding.codeBottomTextView.setOnClickListener {
                     onShareListener.invoke(trackMap)
                 }
                 itemBinding.trackMapLeaveImageButton.setOnClickListener {

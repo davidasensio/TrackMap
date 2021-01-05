@@ -43,9 +43,9 @@ class ProfileViewModel(
     }
 
     fun refresh() {
-        /*if (prefs.userProfileData != null) {
+        if (prefs.userProfileData != null) {
             _model.value = UiModel.Content(prefs.userProfileData!!)
-        } else {*/
+        } else {
             launch(Dispatchers.Main) {
                 val userProfileDataResult = getUserProfileDataUseCase.execute(getUserId())
                 if (userProfileDataResult is Result.Success) {
@@ -58,7 +58,7 @@ class ProfileViewModel(
                     )
                 }
             }
-        /*}*/
+        }
     }
 
     fun saveUserProfile(nickname: String, fullName: String, phone: String, profileImage: Bitmap?) {
@@ -93,9 +93,9 @@ class ProfileViewModel(
             kbytesCount > 30000 -> 2
             kbytesCount > 20000 -> 5
             kbytesCount > 15000 -> 10
-            kbytesCount > 10000 -> 20
-            kbytesCount > 7500 -> 30
-            else -> 40
+            kbytesCount > 10000 -> 15
+            kbytesCount > 7500 -> 20
+            else -> 25
         }
     }
 

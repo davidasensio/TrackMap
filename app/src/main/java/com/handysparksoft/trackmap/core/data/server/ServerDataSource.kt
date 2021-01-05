@@ -38,15 +38,10 @@ class ServerDataSource(private val service: TrackMapService) : RemoteDataSource 
     }
 
     override suspend fun getTrackMapById(trackMapId: String): Result<TrackMap?> {
-        val result = safeApiCall { service.getTrackMaps() }
+        val result = safeApiCall { service.getTrackMapById(trackMapId) }
         return when (result) {
             is Result.Success -> {
-                val data = result.data.values.firstOrNull { it.trackMapId == trackMapId }
-                if (data != null) {
-                    Result.Success(data)
-                } else {
-                    Result.Error(false, null, null)
-                }
+                Result.Success(result.data)
             }
             is Result.Error -> Result.Error(
                 result.isNetworkError,
