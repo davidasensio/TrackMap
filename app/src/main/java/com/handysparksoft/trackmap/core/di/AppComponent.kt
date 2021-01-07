@@ -6,7 +6,7 @@ import com.handysparksoft.trackmap.core.platform.FirebaseTracking
 import com.handysparksoft.trackmap.core.platform.LocationForegroundService
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
 import com.handysparksoft.trackmap.features.entries.EntriesFragment
-import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
+import com.handysparksoft.trackmap.features.entries.EntriesViewModelFactory
 import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
 import com.handysparksoft.trackmap.features.main.MainActivity
 import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
@@ -23,7 +23,7 @@ import javax.inject.Singleton
 interface AppComponent {
 
     // Exposed Graph components
-    val mainViewModelFactory: MainViewModelFactory
+    val entriesViewModelFactory: EntriesViewModelFactory
     val createViewModelFactory: CreateViewModelFactory
     val trackMapViewModelFactory: TrackMapViewModelFactory
     val joinViewModelFactory: JoinViewModelFactory

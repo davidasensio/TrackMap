@@ -20,7 +20,7 @@ import com.handysparksoft.trackmap.core.platform.*
 import com.handysparksoft.trackmap.core.platform.network.ConnectionHandler
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentEntriesBinding
-import com.handysparksoft.trackmap.features.entries.MainViewModel.UiModel.*
+import com.handysparksoft.trackmap.features.entries.EntriesViewModel.UiModel.*
 import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
 import com.handysparksoft.trackmap.features.join.JoinViewModel
 import com.handysparksoft.trackmap.features.main.MainActivity
@@ -33,11 +33,11 @@ class EntriesFragment : Fragment() {
 
     private lateinit var adapter: EntriesAdapter
 
-    private val viewModel: MainViewModel by lazy {
+    private val viewModel: EntriesViewModel by lazy {
         ViewModelProvider(
             this,
-            requireActivity().app.component.mainViewModelFactory
-        ).get(MainViewModel::class.java)
+            requireActivity().app.component.entriesViewModelFactory
+        ).get(EntriesViewModel::class.java)
     }
 
     private val joinViewModel: JoinViewModel by lazy {
@@ -164,7 +164,7 @@ class EntriesFragment : Fragment() {
         binding.recycler.adapter = adapter
     }
 
-    private fun updateUi(model: MainViewModel.UiModel) {
+    private fun updateUi(model: EntriesViewModel.UiModel) {
         binding.progress.visibility = if (model == Loading) View.VISIBLE else View.GONE
         when (model) {
             is Content -> {
