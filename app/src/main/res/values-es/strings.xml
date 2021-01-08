@@ -131,4 +131,11 @@
     <string name="push_notification_user_joined_title">Nuevo participante en TrackMap</string>
     <string name="push_notification_user_joined_message">%1$s se ha unido a %2$s</string>
     <string name="push_notification_generic_user_joined_message">Un nuevo participante</string>
+
+    <string name="participants_title">Participantes</string>
+    <string name="participants_subtitle">Creado por %1$s, %2$s</string>
+    <string name="participants_count_title">%1$d Participants</string>
+    <string name="participants_content_description">Lista de participantes</string>
+    <string name="participants_image_description">Imagen del participant</string>
+    <string name="participants_owner_tag">Creador del grupo</string>
 </resources>

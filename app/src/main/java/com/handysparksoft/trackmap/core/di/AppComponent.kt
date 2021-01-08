@@ -9,6 +9,8 @@ import com.handysparksoft.trackmap.features.entries.EntriesFragment
 import com.handysparksoft.trackmap.features.entries.EntriesViewModelFactory
 import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
 import com.handysparksoft.trackmap.features.main.MainActivity
+import com.handysparksoft.trackmap.features.participants.ParticipantsFragment
+import com.handysparksoft.trackmap.features.participants.ParticipantsViewModelFactory
 import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
 import com.handysparksoft.trackmap.features.splash.SplashActivity
 import com.handysparksoft.trackmap.features.task.UpdateBatteryLevelWorker
@@ -28,6 +30,7 @@ interface AppComponent {
     val trackMapViewModelFactory: TrackMapViewModelFactory
     val joinViewModelFactory: JoinViewModelFactory
     val profileViewModelFactory: ProfileViewModelFactory
+    val participantsViewModelFactory: ParticipantsViewModelFactory
 
     // Field injections
     fun inject(mainActivity: MainActivity)
@@ -37,6 +40,7 @@ interface AppComponent {
     fun inject(splashActivity: SplashActivity)
     fun inject(firebaseTracking: FirebaseTracking)
     fun inject(updateBatteryLevelWorker: UpdateBatteryLevelWorker)
+    fun inject(participantsFragment: ParticipantsFragment)
     fun inject(app: App)
 
     @Component.Factory

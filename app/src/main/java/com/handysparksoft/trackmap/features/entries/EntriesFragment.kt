@@ -7,9 +7,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
 import com.handysparksoft.domain.model.TrackMap
@@ -24,6 +27,8 @@ import com.handysparksoft.trackmap.features.entries.EntriesViewModel.UiModel.*
 import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
 import com.handysparksoft.trackmap.features.join.JoinViewModel
 import com.handysparksoft.trackmap.features.main.MainActivity
+import com.handysparksoft.trackmap.features.participants.ParticipantsFragment
+import com.handysparksoft.trackmap.features.participants.ParticipantsFragment.Companion.TRACKMAP_ARGUMENT
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import javax.inject.Inject
 
@@ -145,6 +150,11 @@ class EntriesFragment : Fragment() {
             onShareListener = {
                 viewModel.onShareTrackMapClicked(it)
                 TrackEvent.ShareActionClick.track()
+            },
+            onShowParticipantsListener = {
+                val bundle = bundleOf(TRACKMAP_ARGUMENT to it)
+                findNavController().navigate(R.id.action_entriesFragment_to_participantsFragment, bundle)
+                TrackEvent.ShowParticipantsActionClick.track()
             },
             onFavoriteListener = { trackMap, favorite ->
                 viewModel.onFavoriteTrackMapClicked(trackMap, favorite)
