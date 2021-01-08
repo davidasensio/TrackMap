@@ -72,6 +72,11 @@ class ParticipantsFragment : Fragment() {
         setupUI()
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        findNavController().popBackStack(R.id.participantsFragment, true)
+    }
+
     private fun setupToolbar() {
         val trackMapName = trackMap.name
         val trackMapOwner = trackMap.ownerName.let {
