@@ -21,8 +21,9 @@
         android:id="@+id/userProfileImage"
         android:layout_width="45dp"
         android:layout_height="45dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/ic_person_pin_placeholder" />
+        android:background="@drawable/ic_person_pin_placeholder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/userNickname"
