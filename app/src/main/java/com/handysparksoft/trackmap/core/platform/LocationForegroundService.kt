@@ -124,15 +124,15 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         val notification = notificationBuilder
             .setOngoing(true)
             .setContentTitle(getString(R.string.app_name))
-            .setContentText("Tracking location is active")
+            .setContentText(getString(R.string.foreground_notification_content_text))
             .setSmallIcon(R.drawable.ic_map_black_24dp)
             .setPriority(NotificationManager.IMPORTANCE_MIN)
             .setCategory(NotificationCompat.CATEGORY_SERVICE)
             .setContentIntent(pendingIntent)
             .setStyle(
                 NotificationCompat.BigTextStyle()
-                    .bigText("While tracking is active user location is being monitored. Stop tracking action is available below")
-                    .setSummaryText("Tracking is active")
+                    .bigText(getString(R.string.foreground_notification_big_text))
+                    .setSummaryText(getString(R.string.foreground_notification_summary))
             )
             .addAction(getStopAction())
             .build()
@@ -146,7 +146,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
         val pendingIntent = PendingIntent.getService(this, 0, intent, 0)
         return NotificationCompat.Action(
             R.drawable.ic_stop,
-            "Stop tracking",
+            getString(R.string.foreground_notification_stop_tracking_action),
             pendingIntent
         )
     }

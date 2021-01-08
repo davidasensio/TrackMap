@@ -9,6 +9,11 @@
     <string name="you">you</string>
     <string name="by_you">you</string>
 
+    <string name="foreground_notification_summary">Tracking is active</string>
+    <string name="foreground_notification_content_text">Live Tracking location is active</string>
+    <string name="foreground_notification_big_text">While tracking is active user location is being monitored. Stop tracking action is available below</string>
+    <string name="foreground_notification_stop_tracking_action">Stop tracking</string>
+
     <string name="title_home">Home</string>
     <string name="title_join">Join</string>
     <string name="title_create">Create</string>

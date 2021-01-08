@@ -285,8 +285,6 @@ class EntriesFragment : Fragment() {
         const val KEY_INTENT_TRACKMAP_CODE = "KEY_INTENT_TRACKMAP_CODE"
         private const val START_TRACKMAP_ACTIVITY_REQUEST_CODE = 200
 
-        private var isFirstLoading: Boolean = true
-
         fun newInstance() = EntriesFragment()
     }
 }
