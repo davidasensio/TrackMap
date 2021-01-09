@@ -16,7 +16,7 @@ import com.handysparksoft.usecases.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class MainViewModel(
+class EntriesViewModel(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,
@@ -168,7 +168,7 @@ class MainViewModel(
     }
 }
 
-class MainViewModelFactory(
+class EntriesViewModelFactory(
     private val getTrackMapsUseCase: GetTrackMapsUseCase,
     private val saveUserUseCase: SaveUserUseCase,
     private val leaveTrackMapUseCase: LeaveTrackMapUseCase,

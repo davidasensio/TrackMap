@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/trackMapItemContent"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/ThemeItemBackgroundColor"
+    android:elevation="4dp"
+    android:foreground="?attr/selectableItemBackgroundBorderless"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:paddingStart="16dp"
+    android:paddingTop="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="8dp"
+    tools:ignore="UnusedAttribute"
+    tools:targetApi="m">
+
+    <com.handysparksoft.trackmap.core.custom.CircleImageView
+        android:id="@+id/userProfileImage"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:background="@drawable/ic_person_pin_placeholder"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/userNickname"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textColor="@color/ThemeTextColor"
+        android:textSize="17sp"
+        app:layout_constraintStart_toEndOf="@id/userProfileImage"
+        app:layout_constraintTop_toTopOf="@id/userProfileImage"
+        tools:text="David" />
+
+    <TextView
+        android:id="@+id/userFullname"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:ellipsize="end"
+        android:lines="1"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="@id/userProfileImage"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@id/userProfileImage"
+        app:layout_constraintTop_toBottomOf="@+id/userNickname"
+        app:layout_constraintVertical_bias="1.0"
+        tools:text="David Asensio" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/userOwnerTagView"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
+        android:minHeight="0dp"
+        android:padding="4dp"
+        android:text="@string/participants_owner_tag"
+        android:textAllCaps="false"
+        android:textColor="@color/colorPrimary"
+        android:textSize="10sp"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/colorPrimary"
+        app:strokeWidth="0.5dp"
+        tools:ignore="SmallSp"
+        tools:visibility="visible" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

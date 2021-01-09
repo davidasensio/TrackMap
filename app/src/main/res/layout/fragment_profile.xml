@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:title="Profile"
+        app:title="@string/profile_title"
         app:titleTextColor="@android:color/white" />
 
     <com.handysparksoft.trackmap.core.custom.CircleImageView

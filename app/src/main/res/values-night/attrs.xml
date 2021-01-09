@@ -3,4 +3,6 @@
     <item name="ThemeBackgroundApp" type="drawable">@drawable/ic_tile_background_dark</item>
     <item name="ThemeBackgroundColor" type="color">#1D2124</item>
     <item name="ThemeItemBackgroundColor" type="color">#FF0B0D0E</item>
+
+    <item name="ThemeTextColor" type="color">#FFFFFF</item>
 </resources>
