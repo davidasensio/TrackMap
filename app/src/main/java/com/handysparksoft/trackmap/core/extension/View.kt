@@ -54,7 +54,7 @@ fun View.snackbar(
     }
 }
 
-fun View.showTransitionTo(endView: View, easing: Easing) {
+fun View.showTransitionTo(endView: View, easing: Easing, avoidHideViews: Boolean = false) {
     // Construct a container transform transition between two views
     val transition = com.google.android.material.transition.platform.MaterialContainerTransform()
     transition.scrimColor = Color.TRANSPARENT
@@ -70,7 +70,7 @@ fun View.showTransitionTo(endView: View, easing: Easing) {
         this.rootView as ViewGroup?,
         transition as android.transition.Transition
     )
-    this.visibility = View.INVISIBLE
+    this.visibility = if (avoidHideViews) View.VISIBLE else View.INVISIBLE
     endView.visibility = View.VISIBLE
 }
 

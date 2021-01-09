@@ -3,8 +3,9 @@ package com.handysparksoft.trackmap.core.di
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
-import com.handysparksoft.trackmap.features.entries.MainViewModelFactory
+import com.handysparksoft.trackmap.features.entries.EntriesViewModelFactory
 import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
+import com.handysparksoft.trackmap.features.participants.ParticipantsViewModelFactory
 import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
 import com.handysparksoft.usecases.*
@@ -15,7 +16,7 @@ import dagger.Provides
 class ViewModelModule {
 
     @Provides
-    fun mainViewModelFactoryProvider(
+    fun entriesViewModelFactoryProvider(
         getTrackMapsUseCase: GetTrackMapsUseCase,
         saveUserUseCase: SaveUserUseCase,
         leaveTrackMapUseCase: LeaveTrackMapUseCase,
@@ -25,7 +26,7 @@ class ViewModelModule {
         userHandler: UserHandler,
         prefs: Prefs
     ) =
-        MainViewModelFactory(
+        EntriesViewModelFactory(
             getTrackMapsUseCase,
             saveUserUseCase,
             leaveTrackMapUseCase,
@@ -70,4 +71,16 @@ class ViewModelModule {
         prefs: Prefs,
     ) =
         ProfileViewModelFactory(getUuserProfileDataUseCase, updateUserProfileUseCase, userHandler, prefs)
+
+    @Provides
+    fun participantsViewModelFactoryProvider(
+        userProfileDataUseCase: GetUserProfileDataUseCase,
+        userHandler: UserHandler,
+        prefs: Prefs
+    ) =
+        ParticipantsViewModelFactory(
+            userProfileDataUseCase,
+            userHandler,
+            prefs
+        )
 }

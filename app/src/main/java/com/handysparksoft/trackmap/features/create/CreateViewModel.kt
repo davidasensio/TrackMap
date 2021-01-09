@@ -1,5 +1,6 @@
 package com.handysparksoft.trackmap.features.create
 
+import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -36,15 +37,30 @@ class CreateViewModel(
 
     fun getTrackMapCode(): LiveData<String> {
         if (trackMapCode.value == null) {
-            trackMapCode.value = generateRandomCode()
+            generateRandomCode()
         }
         return trackMapCode
     }
 
-    private fun generateRandomCode(): String {
+    private var attempts = 3
+    private fun generateRandomCode() {
         val part1 = Random().nextInt(999)
         val part2 = Random().nextInt(999)
-        return String.format("%03d-%03d", part1, part2)
+        val codeAttempt = String.format("%03d-%03d", part1, part2)
+
+        launch(Dispatchers.Main) {
+            Log.d("***", "Checking whether already exits TrackMap code: $codeAttempt")
+            val trackMapCodeAlreadyExists = saveTrackMapUseCase.checkIfTrackMapCodeAlreadyExists(codeAttempt)
+            if (trackMapCodeAlreadyExists) {
+                Log.d("***", "Oh no! Already exits :( (Trying next attempt)")
+                if (--attempts > 0) {
+                    generateRandomCode()
+                }
+            } else {
+                Log.d("***", "Perfect! TrackMap code available!")
+                trackMapCode.value = codeAttempt
+            }
+        }
     }
 
     fun createTrackMap(trackMapId: String, name: String, description: String) {

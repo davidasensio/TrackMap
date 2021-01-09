@@ -19,7 +19,8 @@ class EntriesAdapter(
     private val onLeaveListener: (trackMap: TrackMap) -> Unit,
     private val onFavoriteListener: (trackMap: TrackMap, favorite: Boolean) -> Unit,
     private val onLiveTrackingListener: (trackMap: TrackMap, startTracking: Boolean) -> Unit,
-    private val onShareListener: (trackMap: TrackMap) -> Unit
+    private val onShareListener: (trackMap: TrackMap) -> Unit,
+    private val onShowParticipantsListener: (trackMap: TrackMap) -> Unit
 ) : RecyclerView.Adapter<EntriesAdapter.ViewHolder>() {
 
     var items: List<TrackMap> = emptyList()
@@ -61,6 +62,9 @@ class EntriesAdapter(
                 // Bind listeners
                 itemBinding.codeBottomTextView.setOnClickListener {
                     onShareListener.invoke(trackMap)
+                }
+                itemBinding.participantsBottomTextView.setOnClickListener {
+                    onShowParticipantsListener.invoke(trackMap)
                 }
                 itemBinding.trackMapLeaveImageButton.setOnClickListener {
                     onLeaveListener.invoke(trackMap)

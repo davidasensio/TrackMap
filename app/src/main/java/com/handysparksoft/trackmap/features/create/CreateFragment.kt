@@ -70,7 +70,9 @@ class CreateFragment : Fragment() {
     }
 
     private fun validateForm(callback: (success: Boolean) -> Unit) {
-        val success = (binding.createNameEditText.text?.isNotEmpty() == true &&
+        val success = (
+                binding.createCodeEditText.text?.isNotEmpty() == true &&
+                binding.createNameEditText.text?.isNotEmpty() == true &&
                 binding.createDescriptionEditText.text?.isNotEmpty() == true)
         callback(success)
     }

@@ -130,7 +130,8 @@ class MainActivity : AppCompatActivity() {
                 else -> supportActionBar?.hide()
             }
             when (destination.label) {
-                "Profile" -> binding.bottomNavigation.visibility = View.GONE
+                "Profile",
+                "Participants" -> binding.bottomNavigation.visibility = View.GONE
                 else -> binding.bottomNavigation.visibility = View.VISIBLE
             }
         }

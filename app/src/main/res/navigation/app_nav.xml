@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_entriesFragment_to_proifleFragment"
             app:destination="@id/proifleFragment" />
+        <action
+            android:id="@+id/action_entriesFragment_to_participantsFragment"
+            app:destination="@id/participantsFragment" />
     </fragment>
     <fragment
         android:id="@+id/joinFragment"
@@ -46,5 +49,17 @@
         <action
             android:id="@+id/action_proifleFragment_to_entriesFragment"
             app:destination="@id/entriesFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/participantsFragment"
+        android:name="com.handysparksoft.trackmap.features.participants.ParticipantsFragment"
+        tools:layout="@layout/fragment_participants"
+        android:label="Participants" >
+        <action
+            android:id="@+id/action_participantsFragment_to_entriesFragment"
+            app:destination="@id/entriesFragment" />
+        <argument
+            android:name="trackMap"
+            app:argType="com.handysparksoft.domain.model.TrackMap" />
     </fragment>
 </navigation>

@@ -2,9 +2,12 @@ package com.handysparksoft.trackmap.core.platform
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.handysparksoft.domain.model.UserProfileData
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 class Prefs @Inject constructor(context: Context) {
@@ -54,6 +57,35 @@ class Prefs @Inject constructor(context: Context) {
         }
 
 
+    // UserDataProfile Cache (Cache for list of participants)
+    var userDataProfileMapCache: HashMap<String, UserProfileData>
+        get() {
+            return if (!isCacheExpired()) {
+                val serializedValue = prefs.getString(KEY_USER_DATA_PROFILE_MAP_CACHE, null)
+                serializedValue?.let {
+                    val type = object : TypeToken<HashMap<String, UserProfileData>>() {}.type
+                    Gson().fromJson(it, type)
+                } ?: HashMap()
+            } else {
+                Log.d("***", "Cache has expired!. Data will be renewed")
+                HashMap()
+            }
+        }
+        set(value) {
+            val serializedValue = Gson().toJson(value)
+            prefs.edit().putString(KEY_USER_DATA_PROFILE_MAP_CACHE, serializedValue).apply()
+        }
+
+    // Cache will expires after a period of time since the last update
+    var userDataProfileMapCacheLastUpdate: Long
+        get() = prefs.getLong(KEY_USER_DATA_PROFILE_MAP_CACHE_LAST_UPDATE, 0)
+        set(value) = prefs.edit().putLong(KEY_USER_DATA_PROFILE_MAP_CACHE_LAST_UPDATE, value)
+            .apply()
+
+    private fun isCacheExpired(): Boolean =
+        (System.currentTimeMillis() - userDataProfileMapCacheLastUpdate) > CACHE_EXPIRATION_TIME
+
+
     companion object {
         private const val KEY_USER_FIREBASE_TOKEN = "key_user_firebase_token"
         private const val KEY_USER_PROFILE_DATA = "key_user_profile_data"
@@ -62,5 +94,10 @@ class Prefs @Inject constructor(context: Context) {
         private const val KEY_ONBOARDING_SPOTLIGHT_VIEWED = "key_onboarding_spotlight_viewed"
         private const val KEY_LAST_LOCATION_LATITUDE = "key_last_location_latitude"
         private const val KEY_LAST_LOCATION_LONGITUDE = "key_last_location_longitude"
+        private const val KEY_USER_DATA_PROFILE_MAP_CACHE = "key_user_data_profile_map_cache"
+        private const val KEY_USER_DATA_PROFILE_MAP_CACHE_LAST_UPDATE =
+            "key_user_data_profile_map_cache_last_update"
+
+        private val CACHE_EXPIRATION_TIME = TimeUnit.HOURS.toMillis(8)
     }
 }

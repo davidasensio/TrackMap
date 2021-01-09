@@ -9,6 +9,11 @@
     <string name="you">tú</string>
     <string name="by_you">tí</string>
 
+    <string name="foreground_notification_summary">Tracking está activo</string>
+    <string name="foreground_notification_content_text">Tracking en tiempo real está activo</string>
+    <string name="foreground_notification_big_text">Mientras el tracking está activo la localización del usuario es monitorizada. La acción de stop tracking está disponible debajo</string>
+    <string name="foreground_notification_stop_tracking_action">Detener tracking</string>
+
     <string name="title_home">Inicio</string>
     <string name="title_join">Unirse</string>
     <string name="title_create">Crear</string>
@@ -131,4 +136,11 @@
     <string name="push_notification_user_joined_title">Nuevo participante en TrackMap</string>
     <string name="push_notification_user_joined_message">%1$s se ha unido a %2$s</string>
     <string name="push_notification_generic_user_joined_message">Un nuevo participante</string>
+
+    <string name="participants_title">Participantes</string>
+    <string name="participants_subtitle">Creado por %1$s, %2$s</string>
+    <string name="participants_count_title">%1$d Participants</string>
+    <string name="participants_content_description">Lista de participantes</string>
+    <string name="participants_image_description">Imagen del participant</string>
+    <string name="participants_owner_tag">Creador del grupo</string>
 </resources>
