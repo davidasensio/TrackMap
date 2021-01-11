@@ -92,7 +92,7 @@ class ParticipantsViewModel(
         trackMapOwnerId: String
     ): List<UserProfileData> {
         return participants
-            .sortedBy { it.nickname.toLowerCase() }
+            .sortedBy { it.nickname?.toLowerCase() ?: it.fullName?.toLowerCase() ?: it.userId }
             .sortedByDescending { it.userId == trackMapOwnerId }
             .sortedByDescending { it.userId == yourUserId }
     }

@@ -178,6 +178,7 @@ class LocationHandler @Inject constructor(private val context: Context) {
         participantSnapshots[trackMapId] = trackMapSnapshots
     }
 
+    @Synchronized
     fun getMaxSpeed(trackMapId: String, userId: String): Long {
         return try {
             participantSnapshots[trackMapId]?.filter { it.userId == userId }?.maxOf { it.speed }
@@ -187,6 +188,7 @@ class LocationHandler @Inject constructor(private val context: Context) {
         }
     }
 
+    @Synchronized
     fun getMaxAltitudeAMSL(trackMapId: String, userId: String): Long {
         return try {
             participantSnapshots[trackMapId]?.filter { it.userId == userId }
