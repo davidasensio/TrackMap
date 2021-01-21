@@ -21,8 +21,9 @@ class TrackMapViewModel(private val userHandler: UserHandler) : ViewModel(),
     }
 }
 
-class TrackMapViewModelFactory(private val userHandler: UserHandler) : ViewModelProvider.Factory {
+class TrackMapViewModelFactory(private val userHandler: UserHandler) : ViewModelProvider.NewInstanceFactory() {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(userHandler::class.java).newInstance(userHandler)
+        return TrackMapViewModel(userHandler) as T
     }
 }

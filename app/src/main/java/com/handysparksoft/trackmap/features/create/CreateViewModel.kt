@@ -50,7 +50,8 @@ class CreateViewModel(
 
         launch(Dispatchers.Main) {
             Log.d("***", "Checking whether already exits TrackMap code: $codeAttempt")
-            val trackMapCodeAlreadyExists = saveTrackMapUseCase.checkIfTrackMapCodeAlreadyExists(codeAttempt)
+            val trackMapCodeAlreadyExists =
+                saveTrackMapUseCase.checkIfTrackMapCodeAlreadyExists(codeAttempt)
             if (trackMapCodeAlreadyExists) {
                 Log.d("***", "Oh no! Already exits :( (Trying next attempt)")
                 if (--attempts > 0) {
@@ -92,12 +93,12 @@ class CreateViewModelFactory(
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
     private val userHandler: UserHandler
 ) :
-    ViewModelProvider.Factory {
+    ViewModelProvider.NewInstanceFactory() {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        modelClass.getConstructor(
-            saveTrackMapUseCase::class.java,
-            saveUserTrackMapUseCase::class.java,
-            userHandler::class.java
-        )
-            .newInstance(saveTrackMapUseCase, saveUserTrackMapUseCase, userHandler)
+        CreateViewModel(
+            saveTrackMapUseCase,
+            saveUserTrackMapUseCase,
+            userHandler
+        ) as T
 }

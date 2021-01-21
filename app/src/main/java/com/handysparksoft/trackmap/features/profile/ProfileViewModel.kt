@@ -110,13 +110,13 @@ class ProfileViewModelFactory(
     private val userHandler: UserHandler,
     private val prefs: Prefs
 ) :
-    ViewModelProvider.Factory {
+    ViewModelProvider.NewInstanceFactory() {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        modelClass.getConstructor(
-            getUserProfileDataUseCase::class.java,
-            updateUserProfileUseCase::class.java,
-            userHandler::class.java,
-            prefs::class.java,
-        )
-            .newInstance(getUserProfileDataUseCase, updateUserProfileUseCase, userHandler, prefs)
+        ProfileViewModel(
+            getUserProfileDataUseCase,
+            updateUserProfileUseCase,
+            userHandler,
+            prefs
+        ) as T
 }

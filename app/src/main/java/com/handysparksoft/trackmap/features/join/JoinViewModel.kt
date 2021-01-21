@@ -111,18 +111,14 @@ class JoinViewModelFactory(
     private val getUserAccessDataUseCase: GetUserAccessDataUseCase,
     private val userHandler: UserHandler
 ) :
-    ViewModelProvider.Factory {
+    ViewModelProvider.NewInstanceFactory() {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(
-            joinTrackMapUseCase::class.java,
-            saveUserTrackMapUseCase::class.java,
-            getUserAccessDataUseCase::class.java,
-            userHandler::class.java
-        ).newInstance(
+        return JoinViewModel(
             joinTrackMapUseCase,
             saveUserTrackMapUseCase,
             getUserAccessDataUseCase,
             userHandler
-        )
+        ) as T
     }
 }

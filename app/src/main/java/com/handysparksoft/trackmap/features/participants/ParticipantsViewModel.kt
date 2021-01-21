@@ -103,17 +103,13 @@ class ParticipantsViewModelFactory(
     private val userHandler: UserHandler,
     private val prefs: Prefs,
 ) :
-    ViewModelProvider.Factory {
+    ViewModelProvider.NewInstanceFactory() {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(
-            getUserProfileDataUseCase::class.java,
-            userHandler::class.java,
-            prefs::class.java
-
-        ).newInstance(
+        return ParticipantsViewModel(
             getUserProfileDataUseCase,
             userHandler,
             prefs
-        )
+        ) as T
     }
 }

@@ -178,18 +178,10 @@ class EntriesViewModelFactory(
     private val userHandler: UserHandler,
     private val prefs: Prefs
 ) :
-    ViewModelProvider.Factory {
+    ViewModelProvider.NewInstanceFactory() {
+    @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return modelClass.getConstructor(
-            getTrackMapsUseCase::class.java,
-            saveUserUseCase::class.java,
-            leaveTrackMapUseCase::class.java,
-            stopLiveTrackingUseCase::class.java,
-            favoriteTrackMapUseCase::class.java,
-            updateUserBatteryLevelUseCase::class.java,
-            userHandler::class.java,
-            prefs::class.java
-        ).newInstance(
+        return EntriesViewModel(
             getTrackMapsUseCase,
             saveUserUseCase,
             leaveTrackMapUseCase,
@@ -198,6 +190,6 @@ class EntriesViewModelFactory(
             updateUserBatteryLevelUseCase,
             userHandler,
             prefs
-        )
+        ) as T
     }
 }
