@@ -67,4 +67,12 @@ class UseCaseModule {
     @Provides
     fun stopLiveTrackingUseCaseProvider(trackMapRepository: TrackMapRepository) =
         StopLiveTrackingUseCase(trackMapRepository)
+
+    @Provides
+    fun sendPushNotificationUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        SendPushNotificationUseCase(trackMapRepository)
+
+    @Provides
+    fun getTrackMapByIdUseCaseProvider(trackMapRepository: TrackMapRepository) =
+        GetTrackMapByIdUseCase(trackMapRepository)
 }

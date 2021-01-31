@@ -86,7 +86,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     override fun onDestroy() {
         stopRequestLocationUpdates()
         stopRequestGPSLocationUpdates()
-        locationForegroundServiceHandler.clearAllLiveTracking()
+        locationForegroundServiceHandler.onDestroy()
         destroyScope()
 
         super.onDestroy()

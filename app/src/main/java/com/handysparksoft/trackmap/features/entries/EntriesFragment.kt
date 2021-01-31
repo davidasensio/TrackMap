@@ -11,7 +11,6 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
@@ -27,7 +26,6 @@ import com.handysparksoft.trackmap.features.entries.EntriesViewModel.UiModel.*
 import com.handysparksoft.trackmap.features.entries.sort.SortEntriesBottomSheetDialogFragment
 import com.handysparksoft.trackmap.features.join.JoinViewModel
 import com.handysparksoft.trackmap.features.main.MainActivity
-import com.handysparksoft.trackmap.features.participants.ParticipantsFragment
 import com.handysparksoft.trackmap.features.participants.ParticipantsFragment.Companion.TRACKMAP_ARGUMENT
 import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import javax.inject.Inject
@@ -98,12 +96,18 @@ class EntriesFragment : Fragment() {
         viewModel.model.observe(viewLifecycleOwner, Observer(::updateUi))
         viewModel.goEvent.observe(viewLifecycleOwner, Observer(::onGoEvent))
         viewModel.leaveEvent.observe(viewLifecycleOwner, Observer(::onLeaveEvent))
+        viewModel.pingEvent.observe(viewLifecycleOwner, Observer(::onPingEvent))
+        viewModel.pingKOEvent.observe(viewLifecycleOwner, Observer(::onPingKOEvent))
         viewModel.shareEvent.observe(viewLifecycleOwner, Observer(::onShareEvent))
         joinViewModel.joinFeedbackEvent.observe(viewLifecycleOwner, Observer(::onJoinFeedbackEvent))
         viewModel.saveUser()
         viewModel.updateUserBatteryLevel()
 
         setupUI()
+
+        locationForegroundServiceHandler.onDestroyListener = {
+            viewModel.refresh()
+        }
 
         (requireActivity() as MainActivity).let { mainActivity ->
             mainActivity.onSortMenuItemClick {
@@ -147,13 +151,20 @@ class EntriesFragment : Fragment() {
                 viewModel.onLeaveTrackMapClicked(it)
                 TrackEvent.LeaveActionClick.track()
             },
+            onPingParticipantsListener = {
+                viewModel.onPingParticipantsClicked(it)
+                TrackEvent.PingActionClick.track()
+            },
             onShareListener = {
                 viewModel.onShareTrackMapClicked(it)
                 TrackEvent.ShareActionClick.track()
             },
             onShowParticipantsListener = {
                 val bundle = bundleOf(TRACKMAP_ARGUMENT to it)
-                findNavController().navigate(R.id.action_entriesFragment_to_participantsFragment, bundle)
+                findNavController().navigate(
+                    R.id.action_entriesFragment_to_participantsFragment,
+                    bundle
+                )
                 TrackEvent.ShowParticipantsActionClick.track()
             },
             onFavoriteListener = { trackMap, favorite ->
@@ -181,7 +192,9 @@ class EntriesFragment : Fragment() {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
 
-                locationForegroundServiceHandler.setUserTrackMapIds(requireActivity(), model.data.map { it.trackMapId })
+                locationForegroundServiceHandler.setUserTrackMapIds(
+                    requireActivity(),
+                    model.data.map { it.trackMapId })
                 if (!locationForegroundServiceHandler.isServiceRunning(requireActivity())) {
                     // Reset possible remaining TrackMap states in Live Tracking when service is not running
                     if (model.data.any { it.liveParticipantIds?.contains(userHandler.getUserId()) == true }) {
@@ -232,6 +245,31 @@ class EntriesFragment : Fragment() {
         }
     }
 
+    private fun onPingEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            val pingDialog = AlertDialog.Builder(requireContext())
+            pingDialog.setMessage(getString(R.string.ping_participants_question, it.name))
+            pingDialog.setPositiveButton(R.string.ping_participants_positive_button) { dialog, _ ->
+                viewModel.pingParticipants(requireContext(), it)
+                dialog.dismiss()
+            }
+            pingDialog.setNegativeButton(R.string.cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            pingDialog.show()
+        }
+    }
+
+    private fun onPingKOEvent(event: Event<TrackMap>) {
+        event.getContentIfNotHandled()?.let {
+            binding.recycler.snackbar(
+                message = getString(R.string.ping_participants_non_live_tracking_active),
+                length = Snackbar.LENGTH_INDEFINITE,
+                actionListener = {}
+            )
+        }
+    }
+
     private fun onShareEvent(event: Event<TrackMap>) {
         event.getContentIfNotHandled()?.let {
             DeeplinkHandler.generateDeeplink(requireActivity(), it.trackMapId, it.name)
@@ -262,7 +300,6 @@ class EntriesFragment : Fragment() {
             requireActivity().intent.getStringExtra(KEY_INTENT_TRACKMAP_CODE)
         if (trackMapCodeExtra != null) {
             val decodedCode = DeeplinkHandler.decodeBase64(trackMapCodeExtra)
-//            viewModel.joinTrackMap(trackMapCode = decodedCode, showFeedback = true)
             joinViewModel.joinTrackMap(
                 context = requireContext(),
                 trackMapCode = decodedCode,

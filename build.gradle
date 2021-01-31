@@ -31,8 +31,8 @@ allprojects {
     }
 
     ext {
-        referenceVersionCode = 17
-        referenceVersionName = "1.1.4"
+        referenceVersionCode = 18
+        referenceVersionName = "1.1.5"
 
         getCustomVersionCode = { referenceVersionCode ->
             def referenceVersionMultiplier = 10000

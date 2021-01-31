@@ -28,6 +28,8 @@ class LocationForegroundServiceHandler @Inject constructor(
 
     val liveTrackingMapIds = mutableSetOf<String>()
 
+    var onDestroyListener: (() -> Unit)? = null
+
     init {
         initScope()
     }
@@ -125,5 +127,10 @@ class LocationForegroundServiceHandler @Inject constructor(
                 activity.startService(serviceIntent)
             }
         }
+    }
+
+    fun onDestroy() {
+        clearAllLiveTracking()
+        onDestroyListener?.invoke()
     }
 }

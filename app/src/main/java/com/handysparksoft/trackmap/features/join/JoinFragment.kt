@@ -18,6 +18,9 @@ import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.hideKeyBoard
 import com.handysparksoft.trackmap.core.extension.snackbar
 import com.handysparksoft.trackmap.core.platform.Event
+import com.handysparksoft.trackmap.core.platform.TrackEvent
+import com.handysparksoft.trackmap.core.platform.TrackEvent.JoinActionClick
+import com.handysparksoft.trackmap.core.platform.track
 import com.handysparksoft.trackmap.databinding.FragmentJoinBinding
 
 
@@ -61,6 +64,7 @@ class JoinFragment : Fragment() {
                 }
             }
             activity?.hideKeyBoard()
+            JoinActionClick.track()
         }
     }
 

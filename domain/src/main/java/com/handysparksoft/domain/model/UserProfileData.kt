@@ -2,7 +2,7 @@ package com.handysparksoft.domain.model
 
 import java.io.Serializable
 
-data class UserProfileData(
+data class  UserProfileData(
     val userId: String,
     val nickname: String?,
     val fullName: String?,
