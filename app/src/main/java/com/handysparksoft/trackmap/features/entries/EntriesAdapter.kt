@@ -17,6 +17,7 @@ class EntriesAdapter(
     private val userSession: String,
     private val onGoListener: (trackMap: TrackMap) -> Unit,
     private val onLeaveListener: (trackMap: TrackMap) -> Unit,
+    private val onPingParticipantsListener: (trackMap: TrackMap) -> Unit,
     private val onFavoriteListener: (trackMap: TrackMap, favorite: Boolean) -> Unit,
     private val onLiveTrackingListener: (trackMap: TrackMap, startTracking: Boolean) -> Unit,
     private val onShareListener: (trackMap: TrackMap) -> Unit,
@@ -40,7 +41,6 @@ class EntriesAdapter(
 
     inner class ViewHolder(private val itemBinding: ItemTrackmapBinding) :
         RecyclerView.ViewHolder(itemBinding.root) {
-        //@Suppress("DEPRECATION")
         fun bind(trackMap: TrackMap) {
             if (trackMap.participantIds != null) {
                 val ownerName = trackMap.ownerName ?: trackMap.ownerId
@@ -56,7 +56,7 @@ class EntriesAdapter(
 
                 setLiveTrackingState(
                     itemBinding.trackMapLiveTrackingButton,
-                    trackMap.liveParticipantIds?.contains(userSession) == true
+                    isLiveTrackingActive(trackMap)
                 )
 
                 // Bind listeners
@@ -68,6 +68,9 @@ class EntriesAdapter(
                 }
                 itemBinding.trackMapLeaveImageButton.setOnClickListener {
                     onLeaveListener.invoke(trackMap)
+                }
+                itemBinding.trackMapPingImageButton.setOnClickListener {
+                    onPingParticipantsListener.invoke(trackMap)
                 }
                 itemBinding.trackMapFavoriteImageButton.setOnClickListener {
                     val selected = it.tag == true
@@ -86,6 +89,9 @@ class EntriesAdapter(
                 }
             }
         }
+
+        private fun isLiveTrackingActive(trackMap: TrackMap) =
+            trackMap.liveParticipantIds?.contains(userSession) == true
 
         private fun getCreationText(
             view: View,

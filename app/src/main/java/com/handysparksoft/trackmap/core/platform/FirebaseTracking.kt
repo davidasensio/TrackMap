@@ -53,6 +53,7 @@ sealed class TrackEvent {
 
     object GoActionClick : TrackEvent()
     object LeaveActionClick : TrackEvent()
+    object PingActionClick : TrackEvent()
     object ShareActionClick : TrackEvent()
     object ShowParticipantsActionClick : TrackEvent()
     object FavoriteActionClick : TrackEvent()

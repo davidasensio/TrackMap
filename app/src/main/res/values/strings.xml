@@ -143,4 +143,11 @@
     <string name="participants_content_description">Participant list</string>
     <string name="participants_image_description">Participant image</string>
     <string name="participants_owner_tag">Group\'s Owner</string>
+
+    <string name="ping_participants_question">You are going to ping all participants of \"%1$s\" to let them know you have activated your live tracking</string>
+    <string name="ping_participants_positive_button">Proceed</string>
+    <string name="ping_participants_non_live_tracking_active">First activate the live tracking to notify other participants</string>
+
+    <string name="push_notification_ping_user_being_tracked_title">%1$s</string>
+    <string name="push_notification_ping_user_being_tracked_participant">%1$s\n📌 Sharing live tracking</string>
 </resources>

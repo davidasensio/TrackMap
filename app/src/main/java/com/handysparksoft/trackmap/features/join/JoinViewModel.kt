@@ -12,9 +12,11 @@ import com.handysparksoft.domain.model.PushNotification
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.platform.*
+import com.handysparksoft.trackmap.features.notification.PushNotificationHandler
 import com.handysparksoft.usecases.GetUserAccessDataUseCase
 import com.handysparksoft.usecases.JoinTrackMapUseCase
 import com.handysparksoft.usecases.SaveUserTrackMapUseCase
+import com.handysparksoft.usecases.SendPushNotificationUseCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -23,8 +25,9 @@ import kotlinx.coroutines.launch
 class JoinViewModel(
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-    private val getUserAccessDataUseCase: GetUserAccessDataUseCase,
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val pushNotificationHandler: PushNotificationHandler
+
 ) : ViewModel(), Scope by Scope.Impl() {
 
     private val _joinFeedbackEvent = MutableLiveData<Event<TrackMap>>()
@@ -37,6 +40,7 @@ class JoinViewModel(
 
     @CallSuper
     override fun onCleared() {
+        pushNotificationHandler.destroy()
         destroyScope()
         super.onCleared()
     }
@@ -56,50 +60,7 @@ class JoinViewModel(
                 TrackEvent.JoinedTrackMap.track()
 
                 // Push notification that new participant joined trackmap
-                notifyNewParticipantHasJoin(context, userId, trackMap)
-            }
-        }
-    }
-
-    private fun notifyNewParticipantHasJoin(
-        context: Context,
-        userId: String,
-        trackMap: TrackMap
-    ) {
-        launch(Dispatchers.IO) {
-            val tokens = mutableListOf<String>()
-            val awaitAll = trackMap.participantIds.filter { it != userId }.map {
-                async { getUserAccessDataUseCase.execute(it) }
-            }.awaitAll()
-
-            awaitAll.forEach { result ->
-                if (result is Result.Success) {
-                    result.data.userToken?.let { tokens.add(it) }
-                }
-            }
-
-            if (tokens.isNotEmpty()) {
-                val participant = userHandler.getUserNickname()
-                    ?: context.getString(R.string.push_notification_generic_user_joined_message)
-
-                val notificationData = NotificationData(
-                    title = context.getString(R.string.push_notification_user_joined_title),
-                    body = context.getString(
-                        R.string.push_notification_user_joined_message,
-                        participant,
-                        trackMap.name
-                    )
-                )
-                val pushNotification = PushNotification(
-                    to = null,
-                    registration_ids = tokens,
-                    notification = notificationData
-                )
-                val authorizationToken = context.getString(R.string.push_notification_server_key)
-                joinTrackMapUseCase.executeSendPushNotification(
-                    authorizationToken,
-                    pushNotification
-                )
+                pushNotificationHandler.notifyNewParticipantHasJoin(context, userId, trackMap)
             }
         }
     }
@@ -108,8 +69,8 @@ class JoinViewModel(
 class JoinViewModelFactory(
     private val joinTrackMapUseCase: JoinTrackMapUseCase,
     private val saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-    private val getUserAccessDataUseCase: GetUserAccessDataUseCase,
-    private val userHandler: UserHandler
+    private val userHandler: UserHandler,
+    private val pushNotificationHandler: PushNotificationHandler
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
@@ -117,8 +78,8 @@ class JoinViewModelFactory(
         return JoinViewModel(
             joinTrackMapUseCase,
             saveUserTrackMapUseCase,
-            getUserAccessDataUseCase,
-            userHandler
+            userHandler,
+            pushNotificationHandler
         ) as T
     }
 }
