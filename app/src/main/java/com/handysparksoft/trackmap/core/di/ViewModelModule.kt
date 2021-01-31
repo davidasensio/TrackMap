@@ -1,10 +1,12 @@
 package com.handysparksoft.trackmap.core.di
 
+import com.handysparksoft.trackmap.core.platform.LocationForegroundServiceHandler
 import com.handysparksoft.trackmap.core.platform.Prefs
 import com.handysparksoft.trackmap.core.platform.UserHandler
 import com.handysparksoft.trackmap.features.create.CreateViewModelFactory
 import com.handysparksoft.trackmap.features.entries.EntriesViewModelFactory
 import com.handysparksoft.trackmap.features.join.JoinViewModelFactory
+import com.handysparksoft.trackmap.features.notification.PushNotificationHandler
 import com.handysparksoft.trackmap.features.participants.ParticipantsViewModelFactory
 import com.handysparksoft.trackmap.features.profile.ProfileViewModelFactory
 import com.handysparksoft.trackmap.features.trackmap.TrackMapViewModelFactory
@@ -24,7 +26,10 @@ class ViewModelModule {
         favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
         updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
         userHandler: UserHandler,
-        prefs: Prefs
+        prefs: Prefs,
+        getTrackMapByIdUseCase: GetTrackMapByIdUseCase,
+        pushNotificationHandler: PushNotificationHandler,
+        locationForegroundServiceHandler: LocationForegroundServiceHandler
     ) =
         EntriesViewModelFactory(
             getTrackMapsUseCase,
@@ -34,7 +39,10 @@ class ViewModelModule {
             favoriteTrackMapUseCase,
             updateUserBatteryLevelUseCase,
             userHandler,
-            prefs
+            prefs,
+            getTrackMapByIdUseCase,
+            pushNotificationHandler,
+            locationForegroundServiceHandler
         )
 
     @Provides
@@ -53,14 +61,14 @@ class ViewModelModule {
     fun joinViewModelFactoryProvider(
         joinTrackMapUseCase: JoinTrackMapUseCase,
         saveUserTrackMapUseCase: SaveUserTrackMapUseCase,
-        getUserAccessDataUseCase: GetUserAccessDataUseCase,
-        userHandler: UserHandler
+        userHandler: UserHandler,
+        pushNotificationHandler: PushNotificationHandler
     ) =
         JoinViewModelFactory(
             joinTrackMapUseCase,
             saveUserTrackMapUseCase,
-            getUserAccessDataUseCase,
-            userHandler
+            userHandler,
+            pushNotificationHandler
         )
 
     @Provides
@@ -70,7 +78,12 @@ class ViewModelModule {
         userHandler: UserHandler,
         prefs: Prefs,
     ) =
-        ProfileViewModelFactory(getUuserProfileDataUseCase, updateUserProfileUseCase, userHandler, prefs)
+        ProfileViewModelFactory(
+            getUuserProfileDataUseCase,
+            updateUserProfileUseCase,
+            userHandler,
+            prefs
+        )
 
     @Provides
     fun participantsViewModelFactoryProvider(

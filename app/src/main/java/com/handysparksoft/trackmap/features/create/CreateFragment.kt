@@ -13,6 +13,9 @@ import com.handysparksoft.trackmap.R
 import com.handysparksoft.trackmap.core.extension.SnackbarType
 import com.handysparksoft.trackmap.core.extension.app
 import com.handysparksoft.trackmap.core.extension.snackbar
+import com.handysparksoft.trackmap.core.platform.TrackEvent
+import com.handysparksoft.trackmap.core.platform.TrackEvent.CreateActionClick
+import com.handysparksoft.trackmap.core.platform.track
 import com.handysparksoft.trackmap.core.platform.viewbinding.FragmentViewBindingHolder
 import com.handysparksoft.trackmap.databinding.FragmentCreateBinding
 
@@ -66,6 +69,7 @@ class CreateFragment : Fragment() {
                     )
                 }
             }
+            CreateActionClick.track()
         }
     }
 

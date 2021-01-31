@@ -33,8 +33,4 @@ class JoinTrackMapUseCase(private val trackMapRepository: TrackMapRepository) {
         }
         return null
     }
-
-    suspend fun executeSendPushNotification(authorization: String, pushNotification: PushNotification) {
-        trackMapRepository.sendPushNotification(authorization,  pushNotification)
-    }
 }

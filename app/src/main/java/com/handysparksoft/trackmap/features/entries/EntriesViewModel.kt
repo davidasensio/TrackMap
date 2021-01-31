@@ -1,5 +1,6 @@
 package com.handysparksoft.trackmap.features.entries
 
+import android.content.Context
 import androidx.annotation.CallSuper
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -8,10 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.handysparksoft.data.Result
 import com.handysparksoft.domain.model.TrackMap
 import com.handysparksoft.domain.model.UserBatteryLevel
-import com.handysparksoft.trackmap.core.platform.Event
-import com.handysparksoft.trackmap.core.platform.Prefs
-import com.handysparksoft.trackmap.core.platform.Scope
-import com.handysparksoft.trackmap.core.platform.UserHandler
+import com.handysparksoft.trackmap.core.platform.*
+import com.handysparksoft.trackmap.features.notification.PushNotificationHandler
 import com.handysparksoft.usecases.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -24,7 +23,10 @@ class EntriesViewModel(
     private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
     private val updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
     private val userHandler: UserHandler,
-    private val prefs: Prefs
+    private val prefs: Prefs,
+    private val getTrackMapByIdUseCase: GetTrackMapByIdUseCase,
+    private val pushNotificationHandler: PushNotificationHandler,
+    private val locationForegroundServiceHandler: LocationForegroundServiceHandler
 ) : ViewModel(), Scope by Scope.Impl() {
 
     sealed class UiModel {
@@ -49,6 +51,14 @@ class EntriesViewModel(
     private val _leaveEvent = MutableLiveData<Event<TrackMap>>()
     val leaveEvent: LiveData<Event<TrackMap>>
         get() = _leaveEvent
+
+    private val _pingEvent = MutableLiveData<Event<TrackMap>>()
+    val pingEvent: LiveData<Event<TrackMap>>
+        get() = _pingEvent
+
+    private val _pingKOEvent = MutableLiveData<Event<TrackMap>>()
+    val pingKOEvent: LiveData<Event<TrackMap>>
+        get() = _pingKOEvent
 
     private val _shareEvent = MutableLiveData<Event<TrackMap>>()
     val shareEvent: LiveData<Event<TrackMap>>
@@ -88,6 +98,21 @@ class EntriesViewModel(
 
     fun onLeaveTrackMapClicked(trackMap: TrackMap) {
         _leaveEvent.value = Event(trackMap)
+    }
+
+    fun onPingParticipantsClicked(trackMap: TrackMap) {
+        val userId = userHandler.getUserId()
+        launch(Dispatchers.Main) {
+            getTrackMapByIdUseCase.execute(trackMap.trackMapId)?.let {
+                val trackMapTrackingActive =
+                    locationForegroundServiceHandler.hasLiveTrackingAlreadyStarted(it.trackMapId)
+                if (trackMapTrackingActive && isUserLiveTrackingActive(userId, it)) {
+                    _pingEvent.value = Event(it)
+                } else {
+                    _pingKOEvent.value = Event(it)
+                }
+            }
+        }
     }
 
     fun onShareTrackMapClicked(trackMap: TrackMap) {
@@ -138,6 +163,15 @@ class EntriesViewModel(
         }
     }
 
+    fun pingParticipants(context: Context, trackMap: TrackMap) {
+        val userId = userHandler.getUserId()
+        pushNotificationHandler.pingParticipants(context, userId, trackMap)
+    }
+
+    private fun isUserLiveTrackingActive(userId: String, trackMap: TrackMap): Boolean {
+        return trackMap.liveParticipantIds?.contains(userId) == true
+    }
+
     fun sortByDate() {
         _model.value = UiModel.Content(currentTrackMaps.sortedByDescending { it.creationDate }.sortedBy { it.favorite != true })
     }
@@ -176,7 +210,10 @@ class EntriesViewModelFactory(
     private val favoriteTrackMapUseCase: FavoriteTrackMapUseCase,
     private val updateUserBatteryLevelUseCase: UpdateUserBatteryLevelUseCase,
     private val userHandler: UserHandler,
-    private val prefs: Prefs
+    private val prefs: Prefs,
+    private val getTrackMapByIdUseCase: GetTrackMapByIdUseCase,
+    private val pushNotificationHandler: PushNotificationHandler,
+    private val locationForegroundServiceHandler: LocationForegroundServiceHandler
 ) :
     ViewModelProvider.NewInstanceFactory() {
     @Suppress("UNCHECKED_CAST")
@@ -189,7 +226,10 @@ class EntriesViewModelFactory(
             favoriteTrackMapUseCase,
             updateUserBatteryLevelUseCase,
             userHandler,
-            prefs
+            prefs,
+            getTrackMapByIdUseCase,
+            pushNotificationHandler,
+            locationForegroundServiceHandler
         ) as T
     }
 }

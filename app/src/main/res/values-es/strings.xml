@@ -143,4 +143,11 @@
     <string name="participants_content_description">Lista de participantes</string>
     <string name="participants_image_description">Imagen del participant</string>
     <string name="participants_owner_tag">Creador del grupo</string>
+
+    <string name="ping_participants_question">Vas a notificar a los participantes de \"%1$s\" de que estás compartiendo tu ubicación en tiempo real</string>
+    <string name="ping_participants_positive_button">Proceder</string>
+    <string name="ping_participants_non_live_tracking_active">Activa primero el tracking en tiempo real para notificar al resto de participantes</string>
+
+    <string name="push_notification_ping_user_being_tracked_title">%1$s</string>
+    <string name="push_notification_ping_user_being_tracked_participant">%1$s\n📌 Compartiendo ubiciación en tiempo real</string>
 </resources>
