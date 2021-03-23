@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.reflect.TypeToken
 import com.handysparksoft.domain.model.UserProfileData
 import java.util.concurrent.TimeUnit
@@ -63,8 +64,13 @@ class Prefs @Inject constructor(context: Context) {
             return if (!isCacheExpired()) {
                 val serializedValue = prefs.getString(KEY_USER_DATA_PROFILE_MAP_CACHE, null)
                 serializedValue?.let {
-                    val type = object : TypeToken<HashMap<String, UserProfileData>>() {}.type
-                    Gson().fromJson(it, type)
+                    try {
+                        val type = object : TypeToken<HashMap<String, UserProfileData>>() {}.type
+                        Gson().fromJson(it, type)
+                    } catch (e: JsonSyntaxException) {
+                        Log.e("***", "Error parsing DataProfileMapCache")
+                        HashMap()
+                    }
                 } ?: HashMap()
             } else {
                 Log.d("***", "Cache has expired!. Data will be renewed")

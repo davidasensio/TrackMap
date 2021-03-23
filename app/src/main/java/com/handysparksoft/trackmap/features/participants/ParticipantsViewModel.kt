@@ -67,7 +67,9 @@ class ParticipantsViewModel(
 
             awaitAll.forEach { result ->
                 if (result is Result.Success) {
-                    loadedUsers.add(result.data)
+                    if (result.data.userId != null) {
+                        loadedUsers.add(result.data)
+                    }
                 }
             }
 
