@@ -97,8 +97,6 @@ class ParticipantsFragment : Fragment() {
     }
 
     private fun setupUI() {
-        binding.trackMapParticipantsTitle.text =
-            getString(R.string.participants_count_title, trackMap.participantIds.size)
         binding.participantsContentLayout.setOnClickListener {
             closeZoomView()
         }
@@ -128,6 +126,7 @@ class ParticipantsFragment : Fragment() {
             is Content -> {
                 adapter.items = model.data
                 adapter.notifyDataSetChanged()
+                binding.trackMapParticipantsTitle.text = getString(R.string.participants_count_title, model.data.size)
             }
             is Error -> {
                 val message =
