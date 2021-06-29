@@ -169,6 +169,7 @@ class LocationForegroundService : Service(), Scope by Scope.Impl() {
     }
 
     private fun stopRequestLocationUpdates() {
+        locationHandler.clearSnapshots()
         locationHandler.unsubscribeLocationUpdates()
     }
 

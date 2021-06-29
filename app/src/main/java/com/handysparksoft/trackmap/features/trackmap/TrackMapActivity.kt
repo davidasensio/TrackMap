@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.drawable.AnimatedVectorDrawable
 import android.location.Location
 import android.net.Uri
@@ -18,16 +19,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toBitmap
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.*
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
@@ -49,6 +49,8 @@ import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity.MyPosition
 import java.util.*
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.collections.HashMap
+
 
 class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
@@ -93,6 +95,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private val userMarkerMap = hashMapOf<String, UserMarkerData>()
 
     private var frameOrFollowParticipantsInMap = true
+    private var showRouteInMap = true
 
     private var pipModeEnabled = false
     private var googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
@@ -110,6 +113,45 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private var participantToFollow: ParticipantLocation? = null
 
     lateinit var countDownTimer: CountDownTimer
+
+    private val startCap by lazy {
+        CustomCap(
+            BitmapDescriptorFactory.fromBitmap(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_flag_green
+                )?.toBitmap()
+            )
+        )
+    }
+    private val endCap by lazy {
+        CustomCap(
+            BitmapDescriptorFactory.fromBitmap(
+                ContextCompat.getDrawable(
+                    this,
+                    R.drawable.ic_flag_red
+                )?.toBitmap()
+            )
+        )
+    }
+    private val polylineColors = listOf(
+        Color.parseColor("#CFB6E5"),
+        Color.parseColor("#C1E3FE"),
+        Color.parseColor("#C1E3FE"),
+        Color.parseColor("#FFD9E0"),
+        Color.parseColor("#F1EECD"),
+        Color.parseColor("#C9DECE"),
+        Color.parseColor("#C2B1A8"),
+        Color.parseColor("#D0C7B5"),
+        Color.parseColor("#B3C28A"),
+        Color.parseColor("#8CB78D"),
+        Color.parseColor("#7D96B0"),
+        Color.parseColor("#94C0C0"),
+        Color.parseColor("#E7CB71"),
+        Color.parseColor("#A9BD95"),
+        Color.parseColor("#FDB692"),
+        Color.parseColor("#C0A4A5")
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         TrackEvent.EnterTrackMapActivity.track()
@@ -181,12 +223,14 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             clearInfoWindows()
             binding.switchMapStyleButton.gone()
             binding.frameOrFollowParticipantsInMapButton.gone()
+            binding.showRouteButton.gone()
             binding.trackMapBottomCardView.visible()
             googleMap.isMyLocationEnabled = false
             googleMapFramePadding = GOOGLE_MAP_FRAME_MIN_PADDING_DP
         } else {
             binding.switchMapStyleButton.visible()
             binding.frameOrFollowParticipantsInMapButton.visible()
+            binding.showRouteButton.visible()
             binding.trackMapBottomCardView.gone()
             googleMap.isMyLocationEnabled = true
             googleMapFramePadding = GOOGLE_MAP_FRAME_MAX_PADDING_DP
@@ -216,8 +260,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
             if (frameOrFollowParticipantsInMap) {
                 binding.frameOrFollowParticipantsInMapButton.setImageResource(frameOffResource)
-                (binding.frameOrFollowParticipantsInMapButton.drawable as AnimatedVectorDrawable)
-                    .start()
+                try {
+                    (binding.frameOrFollowParticipantsInMapButton.drawable as AnimatedVectorDrawable)
+                        .start()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
             } else {
                 binding.frameOrFollowParticipantsInMapButton.setImageResource(frameOnResource)
             }
@@ -225,7 +273,30 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             frameOrFollowParticipantsInMap = !frameOrFollowParticipantsInMap
         }
 
+        binding.showRouteButton.setOnClickListener {
+            val mapPathOnResource = R.drawable.ic_map_path_on
+            val mapPathOffResource = R.drawable.ic_map_path_off_anim
+
+            if (showRouteInMap) {
+                binding.showRouteButton.setImageResource(mapPathOffResource)
+                try {
+                    (binding.showRouteButton.drawable as AnimatedVectorDrawable).start()
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            } else {
+                binding.showRouteButton.setImageResource(mapPathOnResource)
+            }
+            showRouteInMap = !showRouteInMap
+        }
+
         ViewCompat.setOnApplyWindowInsetsListener(binding.frameOrFollowParticipantsInMapButton) { _, insets ->
+            statusBarInsetHeight = insets.systemWindowInsetTop
+            navigationBarInsetHeight = insets.systemWindowInsetBottom
+            insets
+        }
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.showRouteButton) { _, insets ->
             statusBarInsetHeight = insets.systemWindowInsetTop
             navigationBarInsetHeight = insets.systemWindowInsetBottom
             insets
@@ -468,14 +539,15 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun setMapPadding() {
+    private fun setMapPadding(extra: Int = 0) {
         val topPadding = statusBarInsetHeight
-        val bottomPadding = navigationBarInsetHeight
+        val bottomPadding = navigationBarInsetHeight + extra
+        val minBottomFABSpace = this.dip(GOOGLE_MAP_BOTTOM_FAB_SPACE_DP)
 
         googleMap.setPadding(0, topPadding, 0, bottomPadding)
-        val layoutParams = binding.frameOrFollowParticipantsInMapButton.layoutParams
-        (layoutParams as? ConstraintLayout.LayoutParams)?.apply {
-            setMargins(marginStart, topMargin, marginEnd, bottomMargin + navigationBarInsetHeight)
+        val layoutParamsFrame = binding.frameOrFollowParticipantsInMapButton.layoutParams
+        (layoutParamsFrame as? ConstraintLayout.LayoutParams)?.apply {
+            setMargins(marginStart, topMargin, marginEnd, minBottomFABSpace + bottomPadding)
         }
     }
 
@@ -582,10 +654,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun animateFrameButtonToMakeSpace() {
         val value = this.dip(GOOGLE_MAP_MARKER_INTENT_SPACE) * -1f
         binding.frameOrFollowParticipantsInMapButton.animate().translationY(value).start()
+        binding.showRouteButton.animate().translationY(value).start()
     }
 
     private fun resetFrameButtonExtraSpace() {
         binding.frameOrFollowParticipantsInMapButton.animate().translationY(0f).start()
+        binding.showRouteButton.animate().translationY(0f).start()
     }
 
     private fun reAddCustomLocatedMarker() {
@@ -720,16 +794,27 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun subscribeForParticipantLocationUpdates(userId: String) {
         participantsLocationChildEventListener = object : ChildEventListener {
+            var atomicLatitude = 0.0
+            var atomicLongitude = 0.0
+
             private fun onParticipantDataUpdate(snapshot: DataSnapshot) {
                 participants.firstOrNull { it.userId == userId }?.let {
                     when (snapshot.key) {
-                        "latitude" -> it.latitude = snapshot.value as Double
-                        "longitude" -> it.longitude = snapshot.value as Double
+                        "latitude" -> atomicLatitude = snapshot.value as Double
+                        "longitude" -> atomicLongitude = snapshot.value as Double
                         "altitudeAMSL" -> it.altitudeAMSL = snapshot.value as Long
                         "altitudeGeoid" -> it.altitudeGeoid = snapshot.value as Long
                         "speed" -> it.speed = snapshot.value as Long
                         "batteryLevel" -> it.batteryLevel = snapshot.value as Long
                         "lastAccess" -> it.lastAccess = snapshot.value as Long
+                    }
+
+                    // Atomic LatLng update
+                    if (atomicLatitude != 0.0 && atomicLongitude != 0.0) {
+                        it.latitude = atomicLatitude
+                        it.longitude = atomicLongitude
+                        atomicLatitude = 0.0
+                        atomicLongitude = 0.0
                     }
                 }
                 refreshTrackMap()
@@ -800,6 +885,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                     marker.showInfoWindow()
                 }
                 participantMarkers.add(marker)
+
+                if (showRouteInMap) {
+                    printParticipantPolylines(userId, latLng)
+                }
             }
 
             // Refresh selected marker bottom sheet info
@@ -811,6 +900,56 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                 frameOrFollowParticipants()
             }
         }
+    }
+
+
+    private fun printParticipantPolylines(userId: String, latLng: LatLng) {
+        if (participantRoutes[trackMapId] == null) {
+            participantRoutes[trackMapId] = HashMap()
+        }
+
+        val currentLatLngs = participantRoutes[trackMapId]?.get(userId)
+        if (currentLatLngs == null) {
+            participantRoutes[trackMapId]?.put(userId, mutableListOf(latLng))
+        } else {
+            val lastLatLng = currentLatLngs.last()
+            val results = FloatArray(1)
+            Location.distanceBetween(
+                lastLatLng.latitude,
+                lastLatLng.longitude,
+                latLng.latitude,
+                latLng.longitude,
+                results
+            )
+            val distanceInMeters = results[0]
+            if (distanceInMeters > ROUTE_POINT_THRESHOLD_METERS) {
+                currentLatLngs.add(latLng)
+                participantRoutes[trackMapId]?.put(userId, currentLatLngs)
+            }
+        }
+
+        val userLocations = participantRoutes[trackMapId]?.get(userId)
+        val options = PolylineOptions()
+            .addAll(userLocations)
+            /* listOf(
+                 LatLng(36.401843,-5.677472),
+                 LatLng(41.720502,-6.336652),
+                 LatLng(39.720502,-36.036652),
+                 LatLng(36.401843,-5.677472))
+             )*/
+            .width(5f)
+            .color(getPolylineColorByUser(userId))
+            .jointType(JointType.ROUND)
+            .startCap(startCap)
+            .geodesic(true)
+            .endCap(RoundCap())
+
+        googleMap.addPolyline(options)
+    }
+
+    private fun getPolylineColorByUser(userId: String): Int {
+        val index = participants.map { it.userId }.indexOf(userId)
+        return polylineColors[polylineColors.size % (1 + index)]
     }
 
     private fun addUserMarkerData(participantLocation: ParticipantLocation) {
@@ -918,6 +1057,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun showOrHideMarkerBottomSheet(sameMarker: Boolean) {
+        setMapPadding(0)
         val state =
             if (sameMarker &&
                 (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
@@ -925,6 +1065,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
             ) {
                 BottomSheetBehavior.STATE_HIDDEN
             } else if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
+                setMapPadding(this.dip(GOOGLE_MAP_BOTTOM_SHEET_SPACE_DP))
                 BottomSheetBehavior.STATE_HALF_EXPANDED
             } else {
                 bottomSheetBehavior.state
@@ -1063,6 +1204,8 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val GOOGLE_MAP_FRAME_MIN_PADDING_DP = 16
         private const val GOOGLE_MAP_FRAME_MAX_PADDING_DP = 64
         private const val GOOGLE_MAP_MARKER_INTENT_SPACE = 56
+        private const val GOOGLE_MAP_BOTTOM_FAB_SPACE_DP = 24
+        private const val GOOGLE_MAP_BOTTOM_SHEET_SPACE_DP = 220
         private const val ANY_MARKER_INTENT_ACTION_DELAY_SECS = 5L
         private const val CUSTOM_LOCATED_MARKER_TAG = "CustomMarker"
 
@@ -1072,6 +1215,11 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         private const val UNIT_METERS = "m"
 
         private const val LAST_ACTIVITY_IN_MINUTES_LIMIT = 480 // 8 hours
+
+
+        // TrackMapId -> UserId, LatLng
+        val participantRoutes = HashMap<String, HashMap<String, MutableList<LatLng>>>()
+        private const val ROUTE_POINT_THRESHOLD_METERS = 4f
 
         fun start(context: Context, trackMap: TrackMap) {
             context.startActivity<TrackMapActivity> {

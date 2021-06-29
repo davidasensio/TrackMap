@@ -8,6 +8,7 @@ import android.location.LocationManager
 import android.os.Build
 import com.handysparksoft.trackmap.core.extension.logDebug
 import com.handysparksoft.trackmap.core.platform.LocationForegroundService.Companion.ACTION_STOP
+import com.handysparksoft.trackmap.features.trackmap.TrackMapActivity
 import com.handysparksoft.usecases.StartLiveTrackingUseCase
 import com.handysparksoft.usecases.StopLiveTrackingUseCase
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +46,7 @@ class LocationForegroundServiceHandler @Inject constructor(
         if (startTracking) {
             startService(activity)
             liveTrackingMapIds.add(trackMapId)
+            TrackMapActivity.participantRoutes.entries.removeAll{ it.key == trackMapId }
 
             launch(Dispatchers.IO) {
                 startLiveTrackingUseCase.execute(userHandler.getUserId(), trackMapId)
