@@ -1,0 +1,42 @@
+<animated-vector
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt">
+    <aapt:attr name="android:drawable">
+        <vector
+            android:name="vector"
+            android:width="27dp"
+            android:height="27dp"
+            android:viewportWidth="27"
+            android:viewportHeight="27">
+            <path
+                android:name="path"
+                android:pathData="M21.3955,19.5097L25.4903,23.6045C25.0513,23.8562 24.5425,24 24,24C22.8915,24 21.9345,23.3925 21.4155,22.5L8.25,22.5C5.355,22.5 3,20.145 3,17.25C3,14.355 5.355,12 8.25,12L13.8858,12L15.3858,13.5L8.25,13.5C6.183,13.5 4.5,15.183 4.5,17.25C4.5,19.317 6.183,21 8.25,21L21,21C21,20.4575 21.1438,19.9487 21.3955,19.5097ZM22.9159,18.2017C23.2521,18.0714 23.6177,18 24,18C25.6575,18 27,19.3425 27,21C27,21.3823 26.9286,21.7479 26.7983,22.0841L22.9159,18.2017ZM16.7142,12L21.75,12C23.817,12 25.5,10.317 25.5,8.25C25.5,6.183 23.817,4.5 21.75,4.5L9.2142,4.5L4.9159,0.2017C5.2521,0.0714 5.6177,0 6,0C7.6575,0 9,1.3425 9,3L21.75,3C24.645,3 27,5.355 27,8.25C27,11.145 24.645,13.5 21.75,13.5L18.2142,13.5L16.7142,12ZM7.4859,5.6001C7.0491,5.8541 6.5426,6 6,6C4.3425,6 3,4.6575 3,3C3,2.4575 3.1438,1.9487 3.3955,1.5097L7.4859,5.6001Z"
+                android:strokeWidth="1"
+                android:fillColor="#000000"
+                android:fillType="nonZero"
+                android:strokeColor="#00000000"/>
+
+            <path
+                android:name="path_1"
+                android:pathData="M2.2001,2.2381L25,25"
+                android:strokeAlpha="1"
+                android:strokeWidth="2"
+                android:fillColor="#00000000"
+                android:strokeColor="#000000"
+                android:fillType="evenOdd"
+                android:strokeLineCap="square"/>
+
+        </vector>
+    </aapt:attr>
+    <target android:name="path_1">
+        <aapt:attr name="android:animation">
+            <objectAnimator
+                android:propertyName="trimPathEnd"
+                android:duration="500"
+                android:valueFrom="0"
+                android:valueTo="1"
+                android:valueType="floatType"
+                android:interpolator="@android:interpolator/fast_out_slow_in"/>
+        </aapt:attr>
+    </target>
+</animated-vector>
