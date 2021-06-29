@@ -178,6 +178,18 @@ class LocationHandler @Inject constructor(private val context: Context) {
         participantSnapshots[trackMapId] = trackMapSnapshots
     }
 
+    fun getParticipantSnapshots(
+        trackMapId: String,
+        participantId: String
+    ): List<ParticipantLocationSnapshot> {
+        return participantSnapshots[trackMapId]?.filter { it.userId == participantId }
+            ?: emptyList()
+    }
+
+    fun clearSnapshots() {
+        participantSnapshots.clear()
+    }
+
     @Synchronized
     fun getMaxSpeed(trackMapId: String, userId: String): Long {
         return try {
@@ -216,6 +228,6 @@ class LocationHandler @Inject constructor(private val context: Context) {
         private const val MS_TO_KMH_FACTOR = 3.6
 
         // Snapshots Update Rate
-        private const val SNAPSHOT_UPDATE_RATE_MILLIS = 5000L
+        private val SNAPSHOT_UPDATE_RATE_MILLIS = if (BuildConfig.DEBUG) 10 else 1000L
     }
 }
