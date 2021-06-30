@@ -815,9 +815,10 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
                         it.longitude = atomicLongitude
                         atomicLatitude = 0.0
                         atomicLongitude = 0.0
+
+                        refreshTrackMap()
                     }
                 }
-                refreshTrackMap()
             }
 
             override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
@@ -931,12 +932,6 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
         val userLocations = participantRoutes[trackMapId]?.get(userId)
         val options = PolylineOptions()
             .addAll(userLocations)
-            /* listOf(
-                 LatLng(36.401843,-5.677472),
-                 LatLng(41.720502,-6.336652),
-                 LatLng(39.720502,-36.036652),
-                 LatLng(36.401843,-5.677472))
-             )*/
             .width(5f)
             .color(getPolylineColorByUser(userId))
             .jointType(JointType.ROUND)
@@ -1057,12 +1052,12 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun showOrHideMarkerBottomSheet(sameMarker: Boolean) {
-        setMapPadding(0)
         val state =
             if (sameMarker &&
                 (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED ||
                         bottomSheetBehavior.state == BottomSheetBehavior.STATE_HALF_EXPANDED)
             ) {
+                setMapPadding(0)
                 BottomSheetBehavior.STATE_HIDDEN
             } else if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_HIDDEN) {
                 setMapPadding(this.dip(GOOGLE_MAP_BOTTOM_SHEET_SPACE_DP))
@@ -1078,6 +1073,7 @@ class TrackMapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun hideMarkerBottomSheet() {
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+        setMapPadding(0)
     }
 
     private fun refreshBottomSheetMarkerData(markerTag: String) {

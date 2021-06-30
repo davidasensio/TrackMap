@@ -109,6 +109,10 @@ class MainActivity : AppCompatActivity() {
                 onSortMenuItemClickListener?.invoke()
                 TrackEvent.MenuSortActionClick.track()
             }
+            R.id.menuContact -> {
+                ShareIntentHandler.showContactShareIntent(this)
+                TrackEvent.MenuContactActionClick.track()
+            }
         }
         return super.onOptionsItemSelected(item)
     }

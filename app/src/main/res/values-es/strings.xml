@@ -67,10 +67,15 @@
     <string name="menu_main_order">Órden</string>
     <string name="menu_main_share_app">Compartir app</string>
     <string name="menu_main_rate_this_app">Votar esta app</string>
+    <string name="menu_main_contact">Contacto</string>
 
     <string name="share_app_title">Prueba esta App!</string>
     <string name="share_app_content">Descarga TrackMap y comparte tu localización con quien tú quieras.</string>
     <string name="share_app_google_play_url" translatable="false">https://play.google.com/store/apps/details?id=com.handysparksoft.trackmap</string>
+
+
+    <string name="intent_contact_subject">[TrackMap] Contact info</string>
+    <string name="intent_contact_text">Hola equipo de TrackMap,\n\n -> Tu info aquí…\n\n Saludos.</string>
 
     <string name="sort_trackmaps_title">Ordenar TrackMaps por</string>
     <string name="sort_trackmaps_by_date">Fecha (recientes primero)</string>

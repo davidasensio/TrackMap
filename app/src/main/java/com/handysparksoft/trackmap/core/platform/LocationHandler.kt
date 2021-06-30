@@ -14,6 +14,7 @@ import com.handysparksoft.domain.model.NMEAMessage
 import com.handysparksoft.domain.model.ParticipantLocationSnapshot
 import com.handysparksoft.trackmap.BuildConfig
 import com.handysparksoft.trackmap.core.extension.toLatLng
+import java.lang.Exception
 import java.lang.reflect.Method
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -195,7 +196,7 @@ class LocationHandler @Inject constructor(private val context: Context) {
         return try {
             participantSnapshots[trackMapId]?.filter { it.userId == userId }?.maxOf { it.speed }
                 ?: 0
-        } catch (e: NoSuchElementException) {
+        } catch (e: Exception) {
             0
         }
     }
@@ -205,7 +206,7 @@ class LocationHandler @Inject constructor(private val context: Context) {
         return try {
             participantSnapshots[trackMapId]?.filter { it.userId == userId }
                 ?.maxOf { it.altitudeAMSL } ?: 0
-        } catch (e: NoSuchElementException) {
+        } catch (e: Exception) {
             0
         }
     }

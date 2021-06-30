@@ -46,6 +46,7 @@ sealed class TrackEvent {
     object MenuShareActionClick : TrackEvent()
     object MenuRateActionClick : TrackEvent()
     object MenuSortActionClick : TrackEvent()
+    object MenuContactActionClick : TrackEvent()
 
     object ProfileBackActionClick : TrackEvent()
     object ProfilePickImageActionClick : TrackEvent()
