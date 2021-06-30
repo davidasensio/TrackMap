@@ -17,4 +17,9 @@
         android:icon="@drawable/ic_star_white"
         android:title="@string/menu_main_rate_this_app"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/menuContact"
+        android:icon="@drawable/ic_email"
+        android:title="@string/menu_main_contact"
+        app:showAsAction="never" />
 </menu>

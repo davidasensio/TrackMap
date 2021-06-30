@@ -44,6 +44,17 @@ object ShareIntentHandler {
         startChooserIntent(sendIntent, activity)
     }
 
+    fun showContactShareIntent(activity: Activity) {
+        val emailIntent =
+            Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")).apply {
+                putExtra(Intent.EXTRA_EMAIL, arrayOf(activity.getString(R.string.intent_contact_email)))
+                putExtra(Intent.EXTRA_SUBJECT, activity.getString(R.string.intent_contact_subject))
+                putExtra(Intent.EXTRA_TEXT, activity.getString(R.string.intent_contact_text))
+            }
+
+        startChooserIntent(emailIntent, activity)
+    }
+
     private fun startChooserIntent(sendIntent: Intent, activity: Activity) {
         val shareIntent = Intent.createChooser(sendIntent, null)
         if (shareIntent.resolveActivity(activity.packageManager) != null) {
